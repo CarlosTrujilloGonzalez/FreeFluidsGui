@@ -29,7 +29,7 @@
 
 #include "FFeosPure.h"
 #include "FFphysprop.h"
-#include "FFbaseClasses.h"
+//#include "FFbaseClasses.h"
 
 //EOS conversion from QString to enumeration
 void ConvertEosToEnumeration(const QString *eosModel,enum FF_EOS *eos);
@@ -40,35 +40,32 @@ void ConvertEosToEnumeration2(const std::string *eosModel,enum FF_EOS *eos);
 //EOS conversion from enumeration to std::string
 void ConvertEnumerationToEos(const enum FF_EOS *eos, QString *eosModel);
 
-//Get general data for a substance object from the database
-void GetGeneralData(FF::Substance *subs,QSqlDatabase *db);
-
 //Get basic data for a SubstanceData structure from the database
 void GetBasicData(int id,FF_SubstanceData *subsData,QSqlDatabase *db);
 
-
-//Get general data for a BaseProp structure from the database
-void GetBasePropData(int id,FF_BaseProp *baseProp,QSqlDatabase *db);
 
 //This will recover the necessary information from the database, given product, eos and Cp0 correlation to be used
 void GetEosData(const int *IdProduct,enum FF_EOS *eos,const int *IdEos,const int *IdCorrParam,QSqlDatabase *db,void *dataV,FF_Correlation *cp0);
 
 //Get EOS data for a SubstanceData structure
-void GetEOSData(enum FF_EosType *eosType,FF_SubstanceData *subsData,QSqlDatabase *db);
-
-void GetEosData2(enum FF_EosType *eosType,FF::Substance *subs,QSqlDatabase *db);
+void GetEOSData(int *eosType,FF_SubstanceData *subsData,QSqlDatabase *db);
 
 void GetCorrDataByType(const int *IdProduct,const QString *type,QSqlDatabase *db,int *corrNum,double coef[]);
 
-void GetCorrDataById(const int *IdCorrParam,QSqlDatabase *db,double *MW,int *corrNum,double coef[]);
 
-void GetCorrDataById2(FF_Correlation *corr,QSqlDatabase *db);
+void GetCorrDataById(FF_Correlation *corr,QSqlDatabase *db);
+
+//Get default data for a SubstanceData structure from the database. This means baseProp, Unifac composition, eos and physical properties
+void GetSubsDefaultData(int id,FF_SubstanceData *subsData,QSqlDatabase *db);
 
 //Adds a new eos to the database
 void AddEosToDataBase(int idSubs,enum FF_EosType eosType,void *eosData,double *Tmin,double *Tmax, QString *description,QSqlDatabase *db);
 
 //Adds a new correlation to the database
 void AddCorrToDataBase(int idSubs,FF_Correlation *corr,double *Tmin,double *Tmax, QString *description,QSqlDatabase *db);
+
+//Writes the Unifac information from the database to a file from where it can be extracted using C
+void WriteUnifacToFile(QSqlDatabase *db);
 
 #endif // DATABASETOOLS
 

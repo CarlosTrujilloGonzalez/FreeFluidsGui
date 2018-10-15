@@ -36,7 +36,8 @@
 #include "FFeosMix.h"
 #include "FFphysprop.h"
 #include "FFtools.h"
-#include "FFbaseClasses.h"
+#include "FFequilibrium.h"
+//#include "FFbaseClasses.h"
 #include "databasetools.h"
 
 
@@ -67,27 +68,35 @@ private slots:
     void cbSubsToolsSelOptCorr(int position);//Slot for fixing the the bounds of the needed parameters
     void btnSubsToolsClearCoef();//Slot for clearing content of the forced coeffients table, and optimization errors
     void btnSubsToolsFindCorr();//Slot for correlation coefficients calculation
-    void btnSubsToolsFindEOS();//Slot for EOS coefficients calculation
-    void btnSubsToolsTestEOS();//Slot for EOS coefficients test
+    void btnSubsToolsFindEos();//Slot for EOS coefficients calculation
     void twSubsToolsClear();//Slot for clearing content in the table
     void twSubsToolsInterchange();//Slot for interchanging table columns
     void twSubsToolsDoOperation();//Slot for do operation on a data column
     void btnSubsToolAddEos();//Slot for adding EOS to database
     void btnSubsToolAddCorr();//Slot for adding correlation to database
+
     void twMixCompositionClear();//Slot for clearing content in the table
     void twMixCompositionAdd();//Slot for adding a substance to the table
     void twMixCompositionCalcFract();//Slot for calculation of mass and molar fractions
+    void cbMixCalcLiqModelLoad(int position);
     void cbMixCalcEosTypeLoad(int);//Slot for loading the existing EOS and Cp0 correlations for the selected substances
     void cbMixCalcMixRuleLoad(int);//Slot for storing the selected mixing rule
+    void cbMixCalcActModelLoad(int row);//Slot for storing the selected activity model
     void twMixIntParamEosDisplay(int row, int column);//Slot for displaying the intParam array for eos, for the selecte pair
     void twMixIntParamEosFill(int row);//Slot for filling the intParam array for eos, from the database
     void twMixIntParamEosUpdate(int row, int column);//Slot for updating the intParam array for eos, from the display
-    void twMixCalcUpdate();//Slot for mixture calculation, and display in table
+    void twMixIntParamClear();//Slot for clearing all interaction parameters
+    void btnMixCalcCreateSys();//Slot for substances and mixture creation
+    void btnMixCalcExportMix(); //Slot for mixture exportation
+
     void twMixCalcBubbleT();//Slot for mixture bubble T calculation, and display in table
     void twMixCalcDewT();//Slot for mixture dew T calculation, and display in table
+    void twMixCalcTenvelope();//Slot for the temperature envelope calculation for binary mixtures
     void twMixCalcBubbleP();//Slot for mixture bubble P calculation, and display in table
     void twMixCalcDewP();//Slot for mixture dew P calculation, and display in table
     void twMixCalcPenvelope();//Slot for the pressure envelope calculation for binary mixtures
+    void twMixCalcVLflashPT();//Slot for mixture VL flash P,T calculation, and display in table
+
     void on_actionDisplay_license_triggered();
 
 private:
@@ -101,8 +110,7 @@ private:
     QDoubleValidator *tempCValidator;
 
     //Substance calculation usage
-    FF::Substance *subs;//To hold substance information, for substance calculation or addition to mixture
-    FF_SubstanceData *subsData;
+    FF_SubstanceData *subsData;//To hold substance information, for substance calculation or addition to mixture
     QSqlQueryModel *subsCalcEOSModel;
     QTableView *tvSubsCalcSelEOS;
     QSqlQueryModel *subsCalcCp0Model;
@@ -112,26 +120,29 @@ private:
     //Subst tools usage
     QSqlQueryModel *subsToolsCorrModel;
     QTableView *tvSubsToolsSelCorr;
+    FF_SAFTFitData *data;
     //QSqlTableModel *tableModel;
     //QDataWidgetMapper *mapper;
 
     //Mixture calculation usage
-    FF::ThermoSystem *thSys;
+    FF_SubstanceData **subsPoint;
+    FF_SubstanceData *substance;
+    FF_MixData *mix;
     QSqlQueryModel *mixCalcEOSModel[6];
     QTableView *tvMixCalcSelEOS[6];
     QSqlQueryModel *mixCalcCp0Model[6];
     QTableView *tvMixCalcSelCp0[6];
-    int numSubs;//number of substances really used in the calculation of mixtures
     double *c;//the concentration of substances in the mixture
     //QString eosType;
-    enum FF_MixingRule rule;//the mixing rule to use
-    float pintParamEos[12][12][6];//Will hold the eos interaction parameters to be used for each pair of substances
-    float pintParamAct[12][12][6];//Will hold the activity interaction parameters to be used for each pair of substances
+    //enum FF_MixingRule rule;//the mixing rule to use
+    //float pintParamEos[15][15][6];//Will hold the eos interaction parameters to be used for each pair of substances
+    float pintParamAct[15][15][6];//Will hold the activity interaction parameters to be used for each pair of substances
     QSqlQueryModel *mixIntParamSelModel;//model for display the interaction parameters available for the pair, in the combobox
     QTableView *tvMixIntParamSel;//table for display the interaction parameters available for the pair
 
     int eosSel[12],cp0Sel[12];//the number of row selected(in the combobox) for eos and cp0 correlation, for each possible substance
     void getMixEosCpSel();//Pass the number of the rows selected for eos, and cp0 correlation, for each possible substance, to an array format
+    void writeMixResultsTable(FF_ThermoProperties *th0l,FF_PhaseThermoProp *thl,FF_ThermoProperties *th0g,FF_PhaseThermoProp *thg);//Write in the results table the thermodynamic records
 };
 
 #endif // FREEFLUIDSMAINWINDOW_H

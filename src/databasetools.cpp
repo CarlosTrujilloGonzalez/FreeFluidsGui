@@ -34,9 +34,12 @@
 void ConvertEosToEnumeration(const QString *eosModel,enum FF_EOS *eos)
 {
     if (*eosModel=="PCSAFT") *eos=FF_PCSAFT;
-    else if (*eosModel=="DPCSAFT_GV") *eos=FF_DPCSAFT_GV;
-    else if (*eosModel=="DPCSAFT_JC") *eos=FF_DPCSAFT_JC;
+    else if (*eosModel=="PPCSAFT_GV") *eos=FF_PPCSAFT_GV;
+    else if (*eosModel=="PPCSAFT_JC") *eos=FF_PPCSAFT_JC;
     else if (*eosModel=="PCSAFTPOL1") *eos=FF_PCSAFTPOL1;
+    else if (*eosModel=="SAFTVRMie") *eos=FF_SAFTVRMie;
+    else if (*eosModel=="PSAFTVRMie_GV") *eos=FF_PSAFTVRMie_GV;
+    else if (*eosModel=="PSAFTVRMie_JC") *eos=FF_PSAFTVRMie_JC;
     else if (*eosModel=="SW") *eos=FF_SW;
     else if (*eosModel=="IAPWS95") *eos=FF_IAPWS95;
     else if (*eosModel=="PR76") *eos=FF_PR76;
@@ -66,9 +69,12 @@ void ConvertEosToEnumeration(const QString *eosModel,enum FF_EOS *eos)
 void ConvertEosToEnumeration2(const std::string *eosModel,enum FF_EOS *eos)
 {
     if (*eosModel=="PCSAFT") *eos=FF_PCSAFT;
-    else if (*eosModel=="DPCSAFT_GV") *eos=FF_DPCSAFT_GV;
-    else if (*eosModel=="DPCSAFT_JC") *eos=FF_DPCSAFT_JC;
+    else if (*eosModel=="PPCSAFT_GV") *eos=FF_PPCSAFT_GV;
+    else if (*eosModel=="PPCSAFT_JC") *eos=FF_PPCSAFT_JC;
     else if (*eosModel=="PCSAFTPOL1") *eos=FF_PCSAFTPOL1;
+    else if (*eosModel=="SAFTVRMie") *eos=FF_SAFTVRMie;
+    else if (*eosModel=="PSAFTVRMie_GV") *eos=FF_PSAFTVRMie_GV;
+    else if (*eosModel=="PSAFTVRMie_JC") *eos=FF_PSAFTVRMie_JC;
     else if (*eosModel=="SW") *eos=FF_SW;
     else if (*eosModel=="IAPWS95") *eos=FF_IAPWS95;
     else if (*eosModel=="PR76") *eos=FF_PR76;
@@ -97,12 +103,25 @@ void ConvertEosToEnumeration2(const std::string *eosModel,enum FF_EOS *eos)
 void ConvertEnumerationToEos(const enum FF_EOS *eos, QString *eosModel)
 {
     if (*eos==FF_PCSAFT) *eosModel="PCSAFT";
-    else if (*eos==FF_PCSAFT1) *eosModel="PCSAFT";
+    else if (*eos==FF_PCSAFT1A) *eosModel="PCSAFT";
+    else if (*eos==FF_PCSAFT2A) *eosModel="PCSAFT";
     else if (*eos==FF_PCSAFT2B) *eosModel="PCSAFT";
+    else if (*eos==FF_PCSAFT3B) *eosModel="PCSAFT";
     else if (*eos==FF_PCSAFT4C) *eosModel="PCSAFT";
-    else if (*eos==FF_DPCSAFT_GV) *eosModel="DPCSAFT_GV";
-    else if (*eos==FF_DPCSAFT_JC) *eosModel="DPCSAFT_JC";
+    else if (*eos==FF_PPCSAFT_GV) *eosModel="PPCSAFT_GV";
+    else if (*eos==FF_PPCSAFT_JC) *eosModel="PPCSAFT_JC";
+    else if (*eos==FF_PPCSAFT1A_GV) *eosModel="PPCSAFT_GV";
+    else if (*eos==FF_PPCSAFT2B_GV) *eosModel="PPCSAFT_GV";
+    else if (*eos==FF_PPCSAFT2B_JC) *eosModel="PPCSAFT_JC";
+    else if (*eos==FF_PPCSAFT3B_GV) *eosModel="PPCSAFT_GV";
+    else if (*eos==FF_PPCSAFT4C_GV) *eosModel="PPCSAFT_GV";
     else if (*eos==FF_PCSAFTPOL1) *eosModel="PCSAFTPOL1";
+    else if (*eos==FF_SAFTVRMie) *eosModel="SAFTVRMie";
+    else if (*eos==FF_SAFTVRMie1A) *eosModel="SAFTVRMie";
+    else if (*eos==FF_SAFTVRMie2B) *eosModel="SAFTVRMie";
+    else if (*eos==FF_SAFTVRMie4C) *eosModel="SAFTVRMie";
+    else if (*eos==FF_PSAFTVRMie_GV) *eosModel="PSAFTVRMie_GV";
+    else if (*eos==FF_PSAFTVRMie_JC) *eosModel="PSAFTVRMie_JC";
     else if (*eos==FF_SW) *eosModel="SW";
     else if (*eos==FF_IAPWS95) *eosModel="IAPWS95";
     else if (*eos==FF_PR76) *eosModel="PR76";
@@ -127,41 +146,25 @@ void ConvertEnumerationToEos(const enum FF_EOS *eos, QString *eosModel)
     else if (*eos==FF_SRKPOL2) *eosModel="SRKPOL2";
 }
 
-
-void GetGeneralData(FF::Substance *subs,QSqlDatabase *db)
-{
-    QSqlQuery query1(*db);
-    //We query the Products table for general data
-    query1.prepare("SELECT MW,Tc,Pc,Vc,w,Zc,Zra,mu,Tb,VdWV FROM Products WHERE (Id=?)");//this will ask for product common parameters
-    query1.addBindValue(subs->id);
-    query1.exec();
-    query1.first();
-    subs->baseProp.MW=query1.value(query1.record().indexOf("MW")).toDouble();
-    subs->baseProp.Tc=query1.value(query1.record().indexOf("Tc")).toDouble();
-    subs->baseProp.Pc=query1.value(query1.record().indexOf("Pc")).toDouble();
-    subs->baseProp.Vc=query1.value(query1.record().indexOf("Vc")).toDouble();
-    subs->baseProp.Zc=query1.value(query1.record().indexOf("Zc")).toDouble();
-    subs->baseProp.w=query1.value(query1.record().indexOf("w")).toDouble();
-    subs->baseProp.Zra=query1.value(query1.record().indexOf("Zra")).toDouble();
-    subs->baseProp.r=query1.value(query1.record().indexOf("UniquacR")).toDouble();
-    subs->baseProp.q=query1.value(query1.record().indexOf("UniquacQ")).toDouble();
-    subs->baseProp.qRes=query1.value(query1.record().indexOf("UniquacQres")).toDouble();
-    subs->baseProp.mu=query1.value(query1.record().indexOf("mu")).toDouble();
-    subs->baseProp.Tb=query1.value(query1.record().indexOf("Tb")).toDouble();
-    subs->VdWV=query1.value(query1.record().indexOf("VdWV")).toDouble();
-    //printf("MW:%f\n",query1.value(query1.record().indexOf("MW")).toDouble());
-}
-
-//Get basic data for a SubstanceData structure from the database
+//Get basic data for a SubstanceData structure from the database. This means baseProp, Unifac composition and puntual physical properties
 void GetBasicData(int id,FF_SubstanceData *subsData,QSqlDatabase *db){
     QSqlQuery query1(*db);
+    int i;
     //We query the Products table for general data
-    query1.prepare("SELECT MW,Tc,Pc,Vc,w,Zc,Zra,mu,Tb,VdWV,Cp0,Cp0Temp,LiqDens,LiqDensTemp,Vp,VpTemp,Hv,HvTemp,Cpl,CplTemp,LiqVisc,LiqViscTemp,LiqThCond,LiqThCondTemp FROM Products WHERE (Id=?)");
+    query1.prepare("SELECT * FROM Products WHERE (Id=?)");
     //this will ask for product common parameters
     query1.addBindValue(id);
     query1.exec();
     query1.first();
+    strncpy(subsData->CAS,query1.value(query1.record().indexOf("CAS")).toString().toStdString().c_str(),22);
+    if(query1.value(query1.record().indexOf("Family")).toString()=="Water") subsData->baseProp.type=10;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Alcohol") subsData->baseProp.type=11;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Polyol") subsData->baseProp.type=12;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Acid") subsData->baseProp.type=20;
+    else subsData->baseProp.type=0;
     subsData->baseProp.MW=query1.value(query1.record().indexOf("MW")).toDouble();
+    subsData->baseProp.MWmono=query1.value(query1.record().indexOf("MonomerMW")).toDouble();
+    subsData->baseProp.numMono=1;
     subsData->baseProp.Tc=query1.value(query1.record().indexOf("Tc")).toDouble();
     subsData->baseProp.Pc=query1.value(query1.record().indexOf("Pc")).toDouble();
     subsData->baseProp.Vc=query1.value(query1.record().indexOf("Vc")).toDouble();
@@ -171,8 +174,17 @@ void GetBasicData(int id,FF_SubstanceData *subsData,QSqlDatabase *db){
     subsData->baseProp.r=query1.value(query1.record().indexOf("UniquacR")).toDouble();
     subsData->baseProp.q=query1.value(query1.record().indexOf("UniquacQ")).toDouble();
     subsData->baseProp.qRes=query1.value(query1.record().indexOf("UniquacQres")).toDouble();
+    subsData->baseProp.VdWV=query1.value(query1.record().indexOf("VdWV")).toDouble();
+    subsData->baseProp.Vliq=query1.value(query1.record().indexOf("Vliq")).toDouble();
+    if ((subsData->baseProp.Vliq>0)&&(subsData->baseProp.VdWV>0)) subsData->baseProp.FV=subsData->baseProp.Vliq-1.2*subsData->baseProp.VdWV;
+    else subsData->baseProp.FV=0;
     subsData->baseProp.mu=query1.value(query1.record().indexOf("mu")).toDouble();
+    subsData->baseProp.Q=query1.value(query1.record().indexOf("Q")).toDouble();
     subsData->baseProp.Tb=query1.value(query1.record().indexOf("Tb")).toDouble();
+    subsData->baseProp.Hildebrand=query1.value(query1.record().indexOf("Hildebrand")).toDouble();
+    subsData->baseProp.HansenD=query1.value(query1.record().indexOf("HansenD")).toDouble();
+    subsData->baseProp.HansenP=query1.value(query1.record().indexOf("HansenP")).toDouble();
+    subsData->baseProp.HansenH=query1.value(query1.record().indexOf("HansenH")).toDouble();
     subsData->cp0.x=query1.value(query1.record().indexOf("Cp0Temp")).toDouble();
     subsData->cp0.y=query1.value(query1.record().indexOf("Cp0")).toDouble();
     subsData->vp.x=query1.value(query1.record().indexOf("VpTemp")).toDouble();
@@ -189,31 +201,50 @@ void GetBasicData(int id,FF_SubstanceData *subsData,QSqlDatabase *db){
     subsData->lThC.y=query1.value(query1.record().indexOf("LiqThCond")).toDouble();
     //printf("MW:%f\n",query1.value(query1.record().indexOf("MW")).toDouble());
 
-}
-
-void GetBasePropData(int id,FF_BaseProp *baseProp,QSqlDatabase *db)
-{
-    QSqlQuery query1(*db);
-    //We query the Products table for general data
-    query1.prepare("SELECT MW,Tc,Pc,Vc,w,Zc,Zra,mu,Tb,VdWV FROM Products WHERE (Id=?)");//this will ask for product common parameters
+    for(i=0;i<10;i++){
+        subsData->UnifStdSubg[i][0]=subsData->UnifStdSubg[i][1]=0;
+        subsData->UnifPSRKSubg[i][0]=subsData->UnifPSRKSubg[i][1]=0;
+        subsData->UnifDortSubg[i][0]=subsData->UnifDortSubg[i][1]=0;
+        subsData->UnifNistSubg[i][0]=subsData->UnifNistSubg[i][1]=0;
+    }
+    query1.prepare("SELECT * FROM Products_UnifacSt WHERE (IdProduct=?)");
     query1.addBindValue(id);
     query1.exec();
-    query1.first();
-    baseProp->MW=query1.value(query1.record().indexOf("MW")).toDouble();
-    baseProp->Tc=query1.value(query1.record().indexOf("Tc")).toDouble();
-    baseProp->Pc=query1.value(query1.record().indexOf("Pc")).toDouble();
-    baseProp->Vc=query1.value(query1.record().indexOf("Vc")).toDouble();
-    baseProp->Zc=query1.value(query1.record().indexOf("Zc")).toDouble();
-    baseProp->w=query1.value(query1.record().indexOf("w")).toDouble();
-    baseProp->Zra=query1.value(query1.record().indexOf("Zra")).toDouble();
-    baseProp->r=query1.value(query1.record().indexOf("UniquacR")).toDouble();
-    baseProp->q=query1.value(query1.record().indexOf("UniquacQ")).toDouble();
-    baseProp->qRes=query1.value(query1.record().indexOf("UniquacQres")).toDouble();
-    baseProp->mu=query1.value(query1.record().indexOf("mu")).toDouble();
-    baseProp->Tb=query1.value(query1.record().indexOf("Tb")).toDouble();
-    //printf("MW:%f\n",query1.value(query1.record().indexOf("MW")).toDouble());
-
+    i=0;
+    while (query1.next()) {
+        subsData->UnifStdSubg[i][0]=query1.value(query1.record().indexOf("UnifacSubgroup")).toInt();
+        subsData->UnifStdSubg[i][1]=query1.value(query1.record().indexOf("Number")).toInt();
+        i++;
+    }
+    query1.prepare("SELECT * FROM Products_UnifacPSRK WHERE (IdProduct=?)");
+    query1.addBindValue(id);
+    query1.exec();
+    i=0;
+    while (query1.next()) {
+        subsData->UnifPSRKSubg[i][0]=query1.value(query1.record().indexOf("UnifacSubgroup")).toInt();
+        subsData->UnifPSRKSubg[i][1]=query1.value(query1.record().indexOf("Number")).toInt();
+        i++;
+    }
+    query1.prepare("SELECT * FROM Products_UnifacDort WHERE (IdProduct=?)");
+    query1.addBindValue(id);
+    query1.exec();
+    i=0;
+    while (query1.next()) {
+        subsData->UnifDortSubg[i][0]=query1.value(query1.record().indexOf("UnifacSubgroup")).toInt();
+        subsData->UnifDortSubg[i][1]=query1.value(query1.record().indexOf("Number")).toInt();
+        i++;
+    }
+    query1.prepare("SELECT * FROM Products_UnifacNist WHERE (IdProduct=?)");
+    query1.addBindValue(id);
+    query1.exec();
+    i=0;
+    while (query1.next()) {
+        subsData->UnifNistSubg[i][0]=query1.value(query1.record().indexOf("UnifacSubgroup")).toInt();
+        subsData->UnifNistSubg[i][1]=query1.value(query1.record().indexOf("Number")).toInt();
+        i++;
+    }
 }
+
 
 void GetEosData(const int *IdProduct,enum FF_EOS *eos,const int *IdEos,const int *IdCorrParam,QSqlDatabase *db,void *dataV, FF_Correlation *cp0)
 {
@@ -227,8 +258,8 @@ void GetEosData(const int *IdProduct,enum FF_EOS *eos,const int *IdEos,const int
     switch (*eos)//Depending on the eos we will query different tables
     {
         case FF_PCSAFT:
-        case FF_DPCSAFT_GV:
-        case FF_DPCSAFT_JC:
+        case FF_PPCSAFT_GV:
+        case FF_PPCSAFT_JC:
         case FF_PCSAFTPOL1:
         {
             //printf("Hola soy FF_PCSAFT en BD\n");
@@ -350,7 +381,7 @@ void GetEosData(const int *IdProduct,enum FF_EOS *eos,const int *IdEos,const int
             else data->Tc=query1.value(query1.record().indexOf("Tc")).toDouble();
             if (query2.value(query2.record().indexOf("Pc")).toDouble() > 0) data->Pc=query2.value(query2.record().indexOf("Pc")).toDouble();
             else data->Pc=query1.value(query1.record().indexOf("Pc")).toDouble();
-            if (query2.value(query2.record().indexOf("Zc")).toDouble() > 0.0) data->w=query2.value(query2.record().indexOf("w")).toDouble();
+            if (query2.value(query2.record().indexOf("Zc")).toDouble() > 0.0) data->Zc=query2.value(query2.record().indexOf("Zc")).toDouble();
             else data->Zc=query1.value(query1.record().indexOf("Zc")).toDouble();
             if (query2.value(query2.record().indexOf("w")).toDouble() > 0.0) data->w=query2.value(query2.record().indexOf("w")).toDouble();
             else data->w=query1.value(query1.record().indexOf("w")).toDouble();
@@ -388,7 +419,7 @@ void GetEosData(const int *IdProduct,enum FF_EOS *eos,const int *IdEos,const int
     //printf("form:%i A:%f B:%f C:%f D:%f E:%f\n",cp0->form,cp0->A,cp0->B,cp0->C,cp0->D,cp0->E);
 }
 
-void GetEOSData(enum FF_EosType *eosType,FF_SubstanceData *subsData,QSqlDatabase *db)
+void GetEOSData(int *eosType,FF_SubstanceData *subsData,QSqlDatabase *db)
 {
     QSqlQuery query1(*db),query2(*db);
     std::string eosString;//To store the eos model in string format
@@ -401,7 +432,7 @@ void GetEOSData(enum FF_EosType *eosType,FF_SubstanceData *subsData,QSqlDatabase
     if (*eosType==FF_SAFTtype)//Depending on the eos we query different fields from the EoPparam table, and store the result in different places of the Substance object
     {
             //printf("Hola soy FF_PCSAFT en BD\n");
-            query2.prepare("SELECT Eos,MW,Tc,Pc,Zc,sigma,m,epsilon,kAB,epsilonAB,mu,xp,nPos,nNeg,nAcid FROM EosParam WHERE (Id=?)");//and this for eos parameters
+            query2.prepare("SELECT Eos,MW,Tc,Pc,Zc,sigma,m,epsilon,lambdaA,lambdaR,chi,kAB,epsilonAB,mu,xp,nPos,nNeg,nAcid FROM EosParam WHERE (Id=?)");//and this for eos parameters
             query2.addBindValue(subsData->saftData.id);
             query2.exec();
             query2.first();
@@ -422,6 +453,9 @@ void GetEOSData(enum FF_EosType *eosType,FF_SubstanceData *subsData,QSqlDatabase
                 subsData->saftData.m=subsData->saftData.MW*subsData->saftData.m;//for polymers
             }
             subsData->saftData.epsilon=query2.value(query2.record().indexOf("epsilon")).toDouble();
+            subsData->saftData.la=query2.value(query2.record().indexOf("lambdaA")).toDouble();
+            subsData->saftData.lr=query2.value(query2.record().indexOf("lambdaR")).toDouble();
+            subsData->saftData.chi=query2.value(query2.record().indexOf("chi")).toDouble();
             subsData->saftData.kAB=query2.value(query2.record().indexOf("kAB")).toDouble();
             subsData->saftData.epsilonAB=query2.value(query2.record().indexOf("epsilonAB")).toDouble();
             subsData->saftData.mu=query2.value(query2.record().indexOf("mu")).toDouble();
@@ -500,7 +534,7 @@ void GetEOSData(enum FF_EosType *eosType,FF_SubstanceData *subsData,QSqlDatabase
 
         } while (query3.next());
     }
-    else if ((*eosType==FF_CubicType)||(*eosType==FF_CubicPR)||(*eosType==FF_CubicSRK))//
+    else if ((*eosType==FF_CubicType)||(*eosType==FF_CubicPRtype)||(*eosType==FF_CubicSRKtype))//
         {
             query2.prepare("SELECT Eos,MW,Tc,Pc,Zc,w,c,k1,k2,k3,k4 FROM EosParam WHERE (Id=?)");//and this for eos parameters
             query2.addBindValue(subsData->cubicData.id);
@@ -517,9 +551,9 @@ void GetEOSData(enum FF_EosType *eosType,FF_SubstanceData *subsData,QSqlDatabase
             else subsData->cubicData.Tc=query1.value(query1.record().indexOf("Tc")).toDouble();
             if (query2.value(query2.record().indexOf("Pc")).toDouble() > 0) subsData->cubicData.Pc=query2.value(query2.record().indexOf("Pc")).toDouble();
             else subsData->cubicData.Pc=query1.value(query1.record().indexOf("Pc")).toDouble();
-            if (query2.value(query2.record().indexOf("Zc")).toDouble() > 0.0) subsData->cubicData.w=query2.value(query2.record().indexOf("w")).toDouble();
+            if (query2.value(query2.record().indexOf("Zc")).toDouble() > 0) subsData->cubicData.Zc=query2.value(query2.record().indexOf("Zc")).toDouble();
             else subsData->cubicData.Zc=query1.value(query1.record().indexOf("Zc")).toDouble();
-            if (query2.value(query2.record().indexOf("w")).toDouble() > 0.0) subsData->cubicData.w=query2.value(query2.record().indexOf("w")).toDouble();
+            if (query2.value(query2.record().indexOf("w")).toDouble() > 0) subsData->cubicData.w=query2.value(query2.record().indexOf("w")).toDouble();
             else subsData->cubicData.w=query1.value(query1.record().indexOf("w")).toDouble();
             subsData->cubicData.VdWV=query1.value(query1.record().indexOf("VdWV")).toDouble();
             subsData->cubicData.c=query2.value(query2.record().indexOf("c")).toDouble();
@@ -533,159 +567,17 @@ void GetEOSData(enum FF_EosType *eosType,FF_SubstanceData *subsData,QSqlDatabase
 }
 
 
-void GetEosData2(enum FF_EosType *eosType,FF::Substance *subs,QSqlDatabase *db)
-{
-    QSqlQuery query1(*db),query2(*db);
-    std::string eosString;//To store the eos model in string format
-    //We query the Products table for general data
-    query1.prepare("SELECT MW,Tc,Pc,w,Zc,VdWV FROM Products WHERE (Id=?)");//this will ask for product common parameters
-    query1.addBindValue(subs->id);
-    query1.exec();
-    query1.first();
-    //printf("MW:%f\n",query1.value(query1.record().indexOf("MW")).toDouble());
-    if (*eosType==FF_SAFTtype)//Depending on the eos we query different fields from the EoPparam table, and store the result in different places of the Substance object
-    {
-            //printf("Hola soy FF_PCSAFT en BD\n");
-            query2.prepare("SELECT Eos,MW,Tc,Pc,Zc,sigma,m,epsilon,kAB,epsilonAB,mu,xp,nPos,nNeg,nAcid FROM EosParam WHERE (Id=?)");//and this for eos parameters
-            query2.addBindValue(subs->saftData.id);
-            query2.exec();
-            query2.first();
-            eosString=query2.value(query2.record().indexOf("Eos")).toString().toStdString();
-            ConvertEosToEnumeration2(&eosString,&subs->saftData.eos);
-            if (query2.value(query2.record().indexOf("MW")).toDouble() > 0) subs->saftData.MW=query2.value(query2.record().indexOf("MW")).toDouble();
-            else subs->saftData.MW=query1.value(query1.record().indexOf("MW")).toDouble();
-            if (query2.value(query2.record().indexOf("Tc")).toDouble() > 0) subs->saftData.Tc=query2.value(query2.record().indexOf("Tc")).toDouble();
-            else subs->saftData.Tc=query1.value(query1.record().indexOf("Tc")).toDouble();
-            if (query2.value(query2.record().indexOf("Pc")).toDouble() > 0) subs->saftData.Pc=query2.value(query2.record().indexOf("Pc")).toDouble();
-            else subs->saftData.Pc=query1.value(query1.record().indexOf("Pc")).toDouble();
-            if (query2.value(query2.record().indexOf("Zc")).toDouble() > 0) subs->saftData.Zc=query2.value(query2.record().indexOf("Zc")).toDouble();
-            else subs->saftData.Zc=query1.value(query1.record().indexOf("Zc")).toDouble();
-            subs->saftData.w=query1.value(query1.record().indexOf("w")).toDouble();
-            subs->saftData.sigma=query2.value(query2.record().indexOf("sigma")).toDouble();
-            subs->saftData.m=query2.value(query2.record().indexOf("m")).toDouble();
-            if (query2.value(query2.record().indexOf("Eos")).toString()=="PCSAFTPOL1"){
-                subs->saftData.m=subs->saftData.MW*subs->saftData.m;//for polymers
-            }
-            subs->saftData.epsilon=query2.value(query2.record().indexOf("epsilon")).toDouble();
-            subs->saftData.kAB=query2.value(query2.record().indexOf("kAB")).toDouble();
-            subs->saftData.epsilonAB=query2.value(query2.record().indexOf("epsilonAB")).toDouble();
-            subs->saftData.mu=query2.value(query2.record().indexOf("mu")).toDouble();
-            subs->saftData.xp=query2.value(query2.record().indexOf("xp")).toDouble();
-            subs->saftData.nPos=query2.value(query2.record().indexOf("nPos")).toInt();
-            subs->saftData.nNeg=query2.value(query2.record().indexOf("nNeg")).toInt();
-            subs->saftData.nAcid=query2.value(query2.record().indexOf("nAcid")).toInt();
-            //printf("MW:%f Tc:%f Pc:%f Zc:%f sigma:%f m:%f epsilon:%f kAB:%f epsilonAB:%f nPos:%i nNeg:%i nAcid:%i\n",
-            //       subs->saftData.MW,subs->saftData.Tc,subs->saftData.Pc,subs->saftData.Zc,subs->saftData.sigma,subs->saftData.m,
-            //subs->saftData.epsilon,subs->saftData.kAB,subs->saftData.epsilonAB,subs->saftData.nPos,subs->saftData.nNeg,subs->saftData.nAcid);
-    }
-    else if (*eosType==FF_SWtype)//Span and Wagner type eos
-    {
-        query2.prepare("SELECT Eos,MW,Tc,Pc,Zc,tRef,rhoRef,nPol,nExp,nSpec,nFinal,Tmin,Tmax,Pmax FROM EosParam WHERE (Id=?)");//and this for eos parameters
-        query2.addBindValue(subs->swData.id);
-        query2.exec();
-        query2.first();
-        eosString=query2.value(query2.record().indexOf("Eos")).toString().toStdString();
-        ConvertEosToEnumeration2(&eosString,&subs->swData.eos);
-        if (query2.value(query2.record().indexOf("MW")).toDouble() > 0) subs->swData.MW=query2.value(query2.record().indexOf("MW")).toDouble();
-        else subs->swData.MW=query1.value(query1.record().indexOf("MW")).toDouble();
-        if (query2.value(query2.record().indexOf("Tc")).toDouble() > 0) subs->swData.Tc=query2.value(query2.record().indexOf("Tc")).toDouble();
-        else subs->swData.Tc=query1.value(query1.record().indexOf("Tc")).toDouble();
-        if (query2.value(query2.record().indexOf("Pc")).toDouble() > 0) subs->swData.Pc=query2.value(query2.record().indexOf("Pc")).toDouble();
-        else subs->swData.Pc=query1.value(query1.record().indexOf("Pc")).toDouble();
-        if (query2.value(query2.record().indexOf("Zc")).toDouble() > 0) subs->swData.Zc=query2.value(query2.record().indexOf("Zc")).toDouble();
-        else subs->swData.Zc=query1.value(query1.record().indexOf("Zc")).toDouble();
-        subs->swData.w=query1.value(query1.record().indexOf("w")).toDouble();
-        subs->swData.tRef=query2.value(query2.record().indexOf("tRef")).toDouble();
-        subs->swData.rhoRef=query2.value(query2.record().indexOf("rhoRef")).toDouble();
-        subs->swData.nPol=query2.value(query2.record().indexOf("nPol")).toInt();
-        subs->swData.nExp=query2.value(query2.record().indexOf("nExp")).toInt();
-        subs->swData.nSpec=query2.value(query2.record().indexOf("nSpec")).toInt();
-        subs->swData.nFinal=query2.value(query2.record().indexOf("nFinal")).toInt();
-
-        //printf("MW:%f Tc:%f Pc:%f Zc:%f tRef:%f rhoRef:%f nPol:%i nExp:%i nSpec:%i\n",subs->swData.MW,subs->swData.Tc,subs->swData.Pc,subs->swData.Zc,
-        //subs->swData.tRef,subs->swData.rhoRef,subs->swData.nPol,subs->swData.nExp,subs->swData.nSpec);
-        //printf("N.eos:%i\n",*IdEos);
-        QSqlQuery query3(*db);
-        query3.prepare("SELECT * FROM SWparam WHERE (IdEos=?) ORDER BY Position");
-        query3.addBindValue(subs->swData.id);
-        query3.exec();
-        query3.first();
-        int i,j;
-        do
-        {
-            i=query3.value(query3.record().indexOf("Position")).toInt();
-            //printf("position:%i\n",i);
-            subs->swData.n[i-1]=query3.value(query3.record().indexOf("n")).toDouble();
-            subs->swData.d[i-1]=query3.value(query3.record().indexOf("d")).toInt();
-            subs->swData.t[i-1]=query3.value(query3.record().indexOf("t")).toDouble();
-            if ((i > subs->swData.nPol) && (i<=(subs->swData.nPol+subs->swData.nExp))) subs->swData.c[i-1]=query3.value(query3.record().indexOf("c")).toInt();
-            //printf("n:%f d:%i t:%f c:%i\n",subs->swData.n[i-1],subs->swData.d[i-1],subs->swData.t[i-1],subs->swData.c[i-1]);
-            if ((i > (subs->swData.nPol+subs->swData.nExp)) && (i<=(subs->swData.nPol+subs->swData.nExp+subs->swData.nSpec)))
-            {
-               //printf("%i\n",i);
-               j=i-subs->swData.nPol-subs->swData.nExp-1;
-               subs->swData.a[j]=query3.value(query3.record().indexOf("alpha")).toDouble();
-               subs->swData.e[j]=query3.value(query3.record().indexOf("epsilon")).toDouble();
-               subs->swData.b[j]=query3.value(query3.record().indexOf("beta")).toDouble();
-               subs->swData.g[j]=query3.value(query3.record().indexOf("gamma")).toDouble();
-            }
-            if ((i > (subs->swData.nPol+subs->swData.nExp+subs->swData.nSpec)) && (i<=(subs->swData.nPol+subs->swData.nExp+subs->swData.nSpec+subs->swData.nFinal)))
-            {
-               //printf("%i\n",i);
-               j=i-subs->swData.nPol-subs->swData.nExp-subs->swData.nSpec-1;
-               subs->swData.af[j]=query3.value(query3.record().indexOf("a")).toDouble();
-               subs->swData.bf[j]=query3.value(query3.record().indexOf("b")).toDouble();
-               subs->swData.Af[j]=query3.value(query3.record().indexOf("Af")).toDouble();
-               subs->swData.Bf[j]=query3.value(query3.record().indexOf("Bf")).toDouble();
-               subs->swData.Cf[j]=query3.value(query3.record().indexOf("Cf")).toDouble();
-               subs->swData.Df[j]=query3.value(query3.record().indexOf("Df")).toDouble();
-               subs->swData.betaf[j]=query3.value(query3.record().indexOf("betaf")).toDouble();
-            }
-
-
-        } while (query3.next());
-    }
-    else if ((*eosType==FF_CubicType)||(*eosType==FF_CubicPR)||(*eosType==FF_CubicSRK))//
-        {
-            query2.prepare("SELECT Eos,MW,Tc,Pc,Zc,w,c,k1,k2,k3,k4 FROM EosParam WHERE (Id=?)");//and this for eos parameters
-            query2.addBindValue(subs->cubicData.id);
-            query2.exec();
-            query2.first();
-            eosString=query2.value(query2.record().indexOf("Eos")).toString().toStdString();
-            ConvertEosToEnumeration2(&eosString,&subs->cubicData.eos);
-            //k1Num=query2.record().indexOf("k1");
-            //k2Num=query2.record().indexOf("k2");
-            //k3Num=query2.record().indexOf("k3");
-            if (query2.value(query2.record().indexOf("MW")).toDouble() > 0) subs->cubicData.MW=query2.value(query2.record().indexOf("MW")).toDouble();
-            else subs->cubicData.MW=query1.value(query1.record().indexOf("MW")).toDouble();
-            if (query2.value(query2.record().indexOf("Tc")).toDouble() > 0) subs->cubicData.Tc=query2.value(query2.record().indexOf("Tc")).toDouble();
-            else subs->cubicData.Tc=query1.value(query1.record().indexOf("Tc")).toDouble();
-            if (query2.value(query2.record().indexOf("Pc")).toDouble() > 0) subs->cubicData.Pc=query2.value(query2.record().indexOf("Pc")).toDouble();
-            else subs->cubicData.Pc=query1.value(query1.record().indexOf("Pc")).toDouble();
-            if (query2.value(query2.record().indexOf("Zc")).toDouble() > 0.0) subs->cubicData.w=query2.value(query2.record().indexOf("w")).toDouble();
-            else subs->cubicData.Zc=query1.value(query1.record().indexOf("Zc")).toDouble();
-            if (query2.value(query2.record().indexOf("w")).toDouble() > 0.0) subs->cubicData.w=query2.value(query2.record().indexOf("w")).toDouble();
-            else subs->cubicData.w=query1.value(query1.record().indexOf("w")).toDouble();
-            subs->cubicData.VdWV=query1.value(query1.record().indexOf("VdWV")).toDouble();
-            subs->cubicData.c=query2.value(query2.record().indexOf("c")).toDouble();
-            subs->cubicData.k1=query2.value(query2.record().indexOf("k1")).toDouble();
-            subs->cubicData.k2=query2.value(query2.record().indexOf("k2")).toDouble();
-            subs->cubicData.k3=query2.value(query2.record().indexOf("k3")).toDouble();
-            subs->cubicData.k4=query2.value(query2.record().indexOf("k4")).toDouble();
-            //printf("MW:%f Tc:%f Pc:%f w:%f VdWV:%f k1:%f k2:%f k3:%f k4:%f\n",subs->cubicData.MW,subs->cubicData.Tc,subs->cubicData.Pc,
-            //subs->cubicData.w,subs->cubicData.VdWV,subs->cubicData.k1,subs->cubicData.k2,subs->cubicData.k3,subs->cubicData.k4);
-        }
-}
 
 void GetCorrDataByType(const int *IdProduct,const QString *type,QSqlDatabase *db,int *corrNum,double coef[])//
 {
     QSqlQuery query1(*db);
-    query1.prepare("SELECT CorrelationParam.* FROM PhysProp INNER JOIN (CorrelationEquations INNER JOIN "
-                   "(Correlations INNER JOIN CorrelationParam ON Correlations.Number = CorrelationParam.NumCorrelation) "
-                   "ON CorrelationEquations.Id = Correlations.IdEquation) ON PhysProp.Id = Correlations.IdPhysProp WHERE "
+
+    query1.prepare("SELECT * FROM CorrelationParam INNER JOIN (Correlations INNER JOIN "
+                   "PhysProp ON Correlations.IdPhysProp = PhysProp.Id) "
+                   "ON CorrelationParam.NumCorrelation = Correlations.Number WHERE "
                    "(((CorrelationParam.IdProduct)=?) AND ((PhysProp.Property)=?));");
-    //query1.prepare("SELECT * FROM Correlations INNER JOIN CorrelationParam ON Correlations.Number = CorrelationParam.NumCorrelation WHERE"
-    //               " ((CorrelationParam.IdProduct=?) AND (PhysProp.Property=?))");
+
+
     query1.addBindValue(*IdProduct);
     query1.addBindValue(*type);
     query1.exec();
@@ -701,35 +593,8 @@ void GetCorrDataByType(const int *IdProduct,const QString *type,QSqlDatabase *db
     //std::cout<<query1.value(query1.record().indexOf("Type")).toString().toStdString()<<std::endl;
 }
 
-void GetCorrDataById(const int *IdCorrParam,QSqlDatabase *db,double *MW,int *corrNum,double coef[])//
-{
-    QSqlQuery query1(*db);
-    query1.prepare("SELECT * FROM Products INNER JOIN CorrelationParam "
-                   "ON Products.Id = CorrelationParam.IdProduct WHERE (((CorrelationParam.Id)=?))");
-    //query1.prepare("SELECT * FROM Products INNER JOIN CorrelationParam ON Products.Id = CorrelationParam.IdProduct WHERE"
-    //               " (CorrelationParam.Id=?)");
-    query1.addBindValue(*IdCorrParam);
-    query1.exec();
-    query1.first();
-    *MW=query1.value(query1.record().indexOf("MW")).toDouble();
-    *corrNum=query1.value(query1.record().indexOf("NumCorrelation")).toInt();
-    coef[0]=query1.value(query1.record().indexOf("A")).toDouble();
-    coef[1]=query1.value(query1.record().indexOf("B")).toDouble();
-    coef[2]=query1.value(query1.record().indexOf("C")).toDouble();
-    coef[3]=query1.value(query1.record().indexOf("D")).toDouble();
-    coef[4]=query1.value(query1.record().indexOf("E")).toDouble();
-    coef[5]=query1.value(query1.record().indexOf("F")).toDouble();
-    coef[6]=query1.value(query1.record().indexOf("G")).toDouble();
-    coef[7]=query1.value(query1.record().indexOf("H")).toDouble();
-    coef[8]=query1.value(query1.record().indexOf("I")).toDouble();
-    coef[9]=query1.value(query1.record().indexOf("J")).toDouble();
-    coef[10]=query1.value(query1.record().indexOf("K")).toDouble();
-    coef[11]=query1.value(query1.record().indexOf("L")).toDouble();
-    coef[12]=query1.value(query1.record().indexOf("M")).toDouble();
-    //printf("%f %f %f %f %f %f %f %f %f %f %f\n",*MW,coef[0],coef[1],coef[2],coef[3],coef[4],coef[5],coef[6],coef[7],coef[8],coef[9]);
-}
 
-void GetCorrDataById2( FF_Correlation *corr,QSqlDatabase *db)//
+void GetCorrDataById( FF_Correlation *corr,QSqlDatabase *db)//
 {
     QSqlQuery query1(*db);
     query1.prepare("SELECT * FROM Products INNER JOIN CorrelationParam "
@@ -754,6 +619,7 @@ void GetCorrDataById2( FF_Correlation *corr,QSqlDatabase *db)//
     corr->coef[10]=query1.value(query1.record().indexOf("K")).toDouble();
     corr->coef[11]=query1.value(query1.record().indexOf("L")).toDouble();
     corr->coef[12]=query1.value(query1.record().indexOf("M")).toDouble();
+    corr->coef[13]=query1.value(query1.record().indexOf("N")).toDouble();
     corr->limI=query1.value(query1.record().indexOf("Tmin")).toDouble();
     corr->limS=query1.value(query1.record().indexOf("Tmax")).toDouble();
     //printf("corr.form:%i\n",corr->form);
@@ -790,8 +656,10 @@ void AddEosToDataBase(int idSubs,enum FF_EosType eosType,void *eosData,double *T
     else if(eosType==FF_SAFTtype){
         FF_SaftEOSdata *saftData=(FF_SaftEOSdata*)eosData;
         ConvertEnumerationToEos(&saftData->eos,&eos);
-        //printf("%i %i %f %f %f %f %f\n",idSubs,saftData->eos,saftData->MW,saftData->Tc,saftData->Pc,saftData->Zc,saftData->w);
-        query.prepare("INSERT INTO EosParam(IdProduct,Eos,MW,Tc,Pc,Zc,w,sigma,m,epsilon,kAB,epsilonAB,mu,xp,nPos,nNeg,nAcid,Tmin,Tmax,Description) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+        //printf("%i %i %f %f %f %f %f %f %f %f\n",idSubs,saftData->eos,saftData->MW,saftData->Tc,saftData->Pc,saftData->Zc,saftData->w,saftData->sigma,saftData->m,saftData->epsilon);
+        //printf("%f %f %f %f %f %f %i %i %i\n",saftData->la,saftData->lr,saftData->kAB,saftData->epsilonAB,saftData->mu,saftData->xp,saftData->nPos,saftData->nNeg,saftData->nAcid);
+        //printf("%f %f %s\n",*Tmin,*Tmax,*description);
+        query.prepare("INSERT INTO EosParam(IdProduct,Eos,MW,Tc,Pc,Zc,w,sigma,m,epsilon,lambdaA,lambdaR,kAB,epsilonAB,mu,xp,nPos,nNeg,nAcid,Tmin,Tmax,Description) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
         query.addBindValue(idSubs);
         query.addBindValue(eos);
         query.addBindValue(saftData->MW);
@@ -802,6 +670,8 @@ void AddEosToDataBase(int idSubs,enum FF_EosType eosType,void *eosData,double *T
         query.addBindValue(saftData->sigma);
         query.addBindValue(saftData->m);
         query.addBindValue(saftData->epsilon);
+        query.addBindValue(saftData->la);
+        query.addBindValue(saftData->lr);
         query.addBindValue(saftData->kAB);
         query.addBindValue(saftData->epsilonAB);
         query.addBindValue(saftData->mu);
@@ -813,7 +683,14 @@ void AddEosToDataBase(int idSubs,enum FF_EosType eosType,void *eosData,double *T
         query.addBindValue(*Tmax);
         query.addBindValue(*description);
         query.exec();
+        //printf("Inserted\n");
     }
+
+}
+
+//Get default data for a SubstanceData structure from the database. This means baseProp, Unifac composition, eos and physical properties
+void GetSubsDefaultData(int id,FF_SubstanceData *subsData,QSqlDatabase *db){
+    GetBasicData(id,subsData,db);
 
 }
 
@@ -833,6 +710,108 @@ void AddCorrToDataBase(int idSubs,FF_Correlation *corr,double *Tmin,double *Tmax
         query.addBindValue(*Tmax);
         query.addBindValue(*description);
         query.exec();
+}
 
-
+//Writes the Unifac information from the database to a file from where it can be extracted using C
+void WriteUnifacToFile(QSqlDatabase *db){
+    int sg,g,g1,g2;
+    double r,q,A12,B12,C12,A21,B21,C21;
+    QSqlQuery query(*db);
+    query.prepare("SELECT * FROM UnifacSubgroups");
+    query.exec();
+    FILE *fStd, *fPSRK, *fDort, *fNist;
+    fStd=fopen("UnifacSubgStd.txt","w+");
+    fPSRK=fopen("UnifacSubgPSRK.txt","w+");
+    fDort=fopen("UnifacSubgDort.txt","w+");
+    fNist=fopen("UnifacSubgNist.txt","w+");
+    while (query.next()){
+        if (query.value(query.record().indexOf("SubgroupVL")).toInt()>0){
+            sg=query.value(query.record().indexOf("SubgroupVL")).toInt();
+            g=query.value(query.record().indexOf("GroupVL")).toInt();
+            r=query.value(query.record().indexOf("Rk")).toDouble();
+            q=query.value(query.record().indexOf("Qk")).toDouble();
+            fprintf(fStd,"%03i%03i%6.4f%6.4f\n",sg,g,r,q);
+        }
+        if (query.value(query.record().indexOf("SubgroupPSRK")).toInt()>0){
+            sg=query.value(query.record().indexOf("SubgroupPSRK")).toInt();
+            g=query.value(query.record().indexOf("GroupPSRK")).toInt();
+            r=query.value(query.record().indexOf("RkPSRK")).toDouble();
+            q=query.value(query.record().indexOf("QkPSRK")).toDouble();
+            fprintf(fPSRK,"%03i%03i%6.4f%6.4f\n",sg,g,r,q);
+        }
+        if (query.value(query.record().indexOf("SubgroupDortmund")).toInt()>0){
+            sg=query.value(query.record().indexOf("SubgroupDortmund")).toInt();
+            g=query.value(query.record().indexOf("GroupDortmund")).toInt();
+            r=query.value(query.record().indexOf("RkDortmund")).toDouble();
+            q=query.value(query.record().indexOf("QkDortmund")).toDouble();
+            fprintf(fDort,"%03i%03i%6.4f%6.4f\n",sg,g,r,q);
+        }
+        if (query.value(query.record().indexOf("SubgroupNist")).toInt()>0){
+            sg=query.value(query.record().indexOf("SubgroupNist")).toInt();
+            g=query.value(query.record().indexOf("GroupNist")).toInt();
+            r=query.value(query.record().indexOf("RkNist")).toDouble();
+            q=query.value(query.record().indexOf("QkNist")).toDouble();
+            fprintf(fNist,"%03i%03i%6.4f%6.4f\n",sg,g,r,q);
+        }
+    }
+    fclose(fStd);
+    fclose(fPSRK);
+    fclose(fDort);
+    fclose(fNist);
+    query.prepare("SELECT * FROM UnifacStInteraction");
+    query.exec();
+    fStd=fopen("UnifacInterStd.txt","w+");
+    while (query.next()){
+            g1=query.value(query.record().indexOf("i")).toInt();
+            g2=query.value(query.record().indexOf("j")).toInt();
+            A12=query.value(query.record().indexOf("Aij")).toDouble();
+            A21=query.value(query.record().indexOf("Aji")).toDouble();
+            fprintf(fStd,"%03i%03i%010.4f%010.4f\n",g1,g2,A12,A21);
+    }
+    fclose(fStd);
+    query.prepare("SELECT * FROM UnifacPSRKInteraction");
+    query.exec();
+    fPSRK=fopen("UnifacInterPSRK.txt","w+");
+    while (query.next()){
+            g1=query.value(query.record().indexOf("i")).toInt();
+            g2=query.value(query.record().indexOf("j")).toInt();
+            A12=query.value(query.record().indexOf("Aij")).toDouble();
+            B12=query.value(query.record().indexOf("Bij")).toDouble();
+            C12=query.value(query.record().indexOf("Cij")).toDouble();
+            A21=query.value(query.record().indexOf("Aji")).toDouble();
+            B21=query.value(query.record().indexOf("Bji")).toDouble();
+            C21=query.value(query.record().indexOf("Cji")).toDouble();
+            fprintf(fPSRK,"%03i%03i%010.3f%010.5f%010.7f%010.3f%010.5f%010.7f\n",g1,g2,A12,B12,C12,A21,B21,C21);
+    }
+    fclose(fPSRK);
+    query.prepare("SELECT * FROM UnifacDortInteraction");
+    query.exec();
+    fDort=fopen("UnifacInterDort.txt","w+");
+    while (query.next()){
+            g1=query.value(query.record().indexOf("i")).toInt();
+            g2=query.value(query.record().indexOf("j")).toInt();
+            A12=query.value(query.record().indexOf("Aij")).toDouble();
+            B12=query.value(query.record().indexOf("Bij")).toDouble();
+            C12=query.value(query.record().indexOf("Cij")).toDouble();
+            A21=query.value(query.record().indexOf("Aji")).toDouble();
+            B21=query.value(query.record().indexOf("Bji")).toDouble();
+            C21=query.value(query.record().indexOf("Cji")).toDouble();
+            fprintf(fDort,"%03i%03i%010.3f%010.5f%010.7f%010.3f%010.5f%010.7f\n",g1,g2,A12,B12,C12,A21,B21,C21);
+    }
+    fclose(fDort);
+    query.prepare("SELECT * FROM UnifacNistInteraction");
+    query.exec();
+    fNist=fopen("UnifacInterNist.txt","w+");
+    while (query.next()){
+            g1=query.value(query.record().indexOf("i")).toInt();
+            g2=query.value(query.record().indexOf("j")).toInt();
+            A12=query.value(query.record().indexOf("Aij")).toDouble();
+            B12=query.value(query.record().indexOf("Bij")).toDouble();
+            C12=query.value(query.record().indexOf("Cij")).toDouble();
+            A21=query.value(query.record().indexOf("Aji")).toDouble();
+            B21=query.value(query.record().indexOf("Bji")).toDouble();
+            C21=query.value(query.record().indexOf("Cji")).toDouble();
+            fprintf(fNist,"%03i%03i%010.3f%010.5f%010.7f%010.3f%010.5f%010.7f\n",g1,g2,A12,B12,C12,A21,B21,C21);
+    }
+    fclose(fNist);
 }
