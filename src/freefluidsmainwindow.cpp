@@ -54,7 +54,7 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     }
     //QueryModel(no editable) for holding the substances list
     subsListModel=new QSqlQueryModel(this);
-    subsListModel->setQuery("SELECT Id,Name,MW from Products WHERE (Id<2001) ORDER BY Name");
+    subsListModel->setQuery("SELECT Id,Name,MW from Products WHERE (InGitHub=-1) ORDER BY Name");
     //Data entry validators
     presBarValidator=new QDoubleValidator(0.0,10000.0,5,this);
     //presBarValidator->setNotation(QDoubleValidator::StandardNotation);
@@ -247,7 +247,7 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     connect(ui->cbMixCalcActModelSelec,SIGNAL(currentIndexChanged(int)),this,SLOT(cbMixCalcActModelLoad(int)));//Mixing rule selection is stored
 
     //combobox for EOS selection, model and view assignation for substances
-    for (int i=0;i<6;i++){
+    for (int i=0;i<15;i++){
     mixCalcEOSModel[i] = new QSqlQueryModel(this);
     tvMixCalcSelEOS[i] = new QTableView(this);
     tvMixCalcSelEOS[i]->verticalHeader()->hide();
@@ -258,6 +258,16 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     ui->cbMixCalcEosSelec4->setModel(mixCalcEOSModel[3]);
     ui->cbMixCalcEosSelec5->setModel(mixCalcEOSModel[4]);
     ui->cbMixCalcEosSelec6->setModel(mixCalcEOSModel[5]);
+    ui->cbMixCalcEosSelec7->setModel(mixCalcEOSModel[6]);
+    ui->cbMixCalcEosSelec8->setModel(mixCalcEOSModel[7]);
+    ui->cbMixCalcEosSelec9->setModel(mixCalcEOSModel[8]);
+    ui->cbMixCalcEosSelec10->setModel(mixCalcEOSModel[9]);
+    ui->cbMixCalcEosSelec11->setModel(mixCalcEOSModel[10]);
+    ui->cbMixCalcEosSelec12->setModel(mixCalcEOSModel[11]);
+    ui->cbMixCalcEosSelec13->setModel(mixCalcEOSModel[12]);
+    ui->cbMixCalcEosSelec14->setModel(mixCalcEOSModel[13]);
+    ui->cbMixCalcEosSelec15->setModel(mixCalcEOSModel[14]);
+
     //tvMixCalcSelEOS[0] = new QTableView(ui->cbMixCalcEosSelec1 );
     ui->cbMixCalcEosSelec1->setView(tvMixCalcSelEOS[0]);
     ui->cbMixCalcEosSelec2->setView(tvMixCalcSelEOS[1]);
@@ -265,9 +275,18 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     ui->cbMixCalcEosSelec4->setView(tvMixCalcSelEOS[3]);
     ui->cbMixCalcEosSelec5->setView(tvMixCalcSelEOS[4]);
     ui->cbMixCalcEosSelec6->setView(tvMixCalcSelEOS[5]);
+    ui->cbMixCalcEosSelec7->setView(tvMixCalcSelEOS[6]);
+    ui->cbMixCalcEosSelec8->setView(tvMixCalcSelEOS[7]);
+    ui->cbMixCalcEosSelec9->setView(tvMixCalcSelEOS[8]);
+    ui->cbMixCalcEosSelec10->setView(tvMixCalcSelEOS[9]);
+    ui->cbMixCalcEosSelec11->setView(tvMixCalcSelEOS[10]);
+    ui->cbMixCalcEosSelec12->setView(tvMixCalcSelEOS[11]);
+    ui->cbMixCalcEosSelec13->setView(tvMixCalcSelEOS[12]);
+    ui->cbMixCalcEosSelec14->setView(tvMixCalcSelEOS[13]);
+    ui->cbMixCalcEosSelec15->setView(tvMixCalcSelEOS[14]);
 
     //combobox for Cp0 selection, model and view assignation for substances
-    for (int i=0;i<6;i++){
+    for (int i=0;i<15;i++){
     mixCalcCp0Model[i] = new QSqlQueryModel(this);
     tvMixCalcSelCp0[i] = new QTableView(this);
     tvMixCalcSelCp0[i]->verticalHeader()->hide();
@@ -278,12 +297,31 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     ui->cbMixCalcCp0Selec4->setModel(mixCalcCp0Model[3]);
     ui->cbMixCalcCp0Selec5->setModel(mixCalcCp0Model[4]);
     ui->cbMixCalcCp0Selec6->setModel(mixCalcCp0Model[5]);
+    ui->cbMixCalcCp0Selec7->setModel(mixCalcCp0Model[6]);
+    ui->cbMixCalcCp0Selec8->setModel(mixCalcCp0Model[7]);
+    ui->cbMixCalcCp0Selec9->setModel(mixCalcCp0Model[8]);
+    ui->cbMixCalcCp0Selec10->setModel(mixCalcCp0Model[9]);
+    ui->cbMixCalcCp0Selec11->setModel(mixCalcCp0Model[10]);
+    ui->cbMixCalcCp0Selec12->setModel(mixCalcCp0Model[11]);
+    ui->cbMixCalcCp0Selec13->setModel(mixCalcCp0Model[12]);
+    ui->cbMixCalcCp0Selec14->setModel(mixCalcCp0Model[13]);
+    ui->cbMixCalcCp0Selec15->setModel(mixCalcCp0Model[14]);
+
     ui->cbMixCalcCp0Selec1->setView(tvMixCalcSelCp0[0]);
     ui->cbMixCalcCp0Selec2->setView(tvMixCalcSelCp0[1]);
     ui->cbMixCalcCp0Selec3->setView(tvMixCalcSelCp0[2]);
     ui->cbMixCalcCp0Selec4->setView(tvMixCalcSelCp0[3]);
     ui->cbMixCalcCp0Selec5->setView(tvMixCalcSelCp0[4]);
     ui->cbMixCalcCp0Selec6->setView(tvMixCalcSelCp0[5]);
+    ui->cbMixCalcCp0Selec7->setView(tvMixCalcSelCp0[6]);
+    ui->cbMixCalcCp0Selec8->setView(tvMixCalcSelCp0[7]);
+    ui->cbMixCalcCp0Selec9->setView(tvMixCalcSelCp0[8]);
+    ui->cbMixCalcCp0Selec10->setView(tvMixCalcSelCp0[9]);
+    ui->cbMixCalcCp0Selec11->setView(tvMixCalcSelCp0[10]);
+    ui->cbMixCalcCp0Selec12->setView(tvMixCalcSelCp0[11]);
+    ui->cbMixCalcCp0Selec13->setView(tvMixCalcSelCp0[12]);
+    ui->cbMixCalcCp0Selec14->setView(tvMixCalcSelCp0[13]);
+    ui->cbMixCalcCp0Selec15->setView(tvMixCalcSelCp0[14]);
 
     //tablewidget for pair i,j selection and indication
     connect(ui->twMixPairSel,SIGNAL(cellClicked(int,int)),this,SLOT(twMixIntParamEosDisplay(int,int)));
@@ -317,10 +355,11 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     //button for mixture exportation
     connect(ui->btnMixCalcExportMix,SIGNAL(clicked()),this,SLOT(btnMixCalcExportMix()));
 
-    //Button for mixture calculation from T and P
-     ui->btnMixCalcCalc->setToolTip("Calculation is done at the given global composition at specified T and P, and written to the table");
-     ui->btnMixCalcCalc->setToolTipDuration(4000);
-     //connect(ui->btnMixCalcCalc,SIGNAL(clicked()),this,SLOT(twMixCalcUpdate()));
+    //button for mixture import
+    connect(ui->btnMixCalcImportMix,SIGNAL(clicked()),this,SLOT(btnMixCalcImportMix()));
+
+    //Button for stability check of a given composition
+     connect(ui->btnMixCalcStabCheck,SIGNAL(clicked()),this,SLOT(mixCalcStabCheck()));
 
     //Button for mixture bubble T calculation at given P
           connect(ui->btnMixCalcBubbleT,SIGNAL(clicked()),this,SLOT(twMixCalcBubbleT()));
@@ -341,7 +380,7 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
           connect(ui->btnMixCalcPenvelope,SIGNAL(clicked()),this,SLOT(twMixCalcPenvelope()));
 
     //Button for mixture VL flash PT
-          connect(ui->btnMixCalcVLflashPT,SIGNAL(clicked()),this,SLOT(twMixCalcVLflashPT()));
+          connect(ui->btnMixCalc2PhPTflash,SIGNAL(clicked()),this,SLOT(twMixCalcVLflashPT()));
 
 
     //Mixture results tab setup
@@ -350,12 +389,14 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     //Table widget for calculated mixture data display
     QStringList mixCalcHorLabels;
     QStringList mixCalcVerLabels;
-    mixCalcHorLabels <<"Total"<<"Gas"<<"Liquid 1"<<"Liquid 2";
-    mixCalcVerLabels <<"MW"<<"P (bara)"<<"T(C)"<<"Phase fraction"<<"phi liq."<<"phi gas"<<"Z"<<"V(cm3/mol)"<<"rho(kgr/m3)"<<"H0(KJ/kgr)" <<"S0(KJ/kgr·K)"
+    mixCalcVerLabels <<"MW"<<"P (bara)"<<"T(K)"<<"Phase fraction"<<"phi liq."<<"phi gas"<<"Z"<<"V(cm3/mol)"<<"rho(kgr/m3)"<<"H0(KJ/kgr)" <<"S0(KJ/kgr·K)"
                      <<"Cp0(KJ/kgr·K)"<<"Cv0(KJ/kgr·K)"<<"H(KJ/kgr)"<<"U(KJ/kgr)"<<"S(KJ/kgr·K)"<<"Cp(KJ/kgr·K)"<<"Cv(KJ/kgr·K)"<<"Sound S.(m/s)"<<"J.T.coeff(K/bar)"
                      <<"I.T.coeff(KJ/bar)"<<"(dP/dT)V(bar/K)"<<"(dP/dV)T(bar/m3)"<< "Arr"<<"(dArr/dV)T"<<"(d2Arr/dV2)T"<<"(dArr/dT)V"<<"(d2Arr/dT2)V"
-                     <<"d2Arr/dTdV"<<"Mol fract.1"<<"Mol fract.2"<<"Mol fract.3"<<"Mol fract.4"<<"Mol fract.5"<<"Mol fract.6"<<"Mass fract.1"<<"Mass fract.2"
-                     <<"Mass fract.3"<<"Mass fract.4"<<"Mass fract.5"<<"Mass fract.6"<<"Phi 1"<<"Phi 2"<<"Phi 3"<<"Phi 4"<<"Phi 5"<<"Phi 6";
+                     <<"d2Arr/dTdV"<<"Mol fract.1"<<"Mol fract.2"<<"Mol fract.3"<<"Mol fract.4"<<"Mol fract.5"<<"Mol fract.6"<<"Mol fract.7"<<"Mol fract.8"
+                    <<"Mol fract.9"<<"Mol fract.10"<<"Mol fract.11"<<"Mol fract.12"<<"Mol fract.13"<<"Mol fract.14"<<"Mol fract.15"<<"Mass fract.1"<<"Mass fract.2"
+                     <<"Mass fract.3"<<"Mass fract.4"<<"Mass fract.5"<<"Mass fract.6"<<"Mass fract.7"<<"Mass fract.8"<<"Mass fract.9"<<"Mass fract.10"
+                    <<"Mass fract.11"<<"Mass fract.12"<<"Mass fract.13"<<"Mass fract.14"<<"Mass fract.15"<<"Phi 1"<<"Phi 2"<<"Phi 3"<<"Phi 4"<<"Phi 5"<<"Phi 6"
+                      <<"Phi 7"<<"Phi 8"<<"Phi 9"<<"Phi 10"<<"Phi 11"<<"Phi 12"<<"Phi 13"<<"Phi 14"<<"Phi 15";
     ui->twMixCalc->setHorizontalHeaderLabels(mixCalcHorLabels);
     ui->twMixCalc->setVerticalHeaderLabels(mixCalcVerLabels);
     for (int i=0;i<ui->twMixCalc->columnCount();i++)for (int j=0;j<ui->twMixCalc->rowCount();j++) ui->twMixCalc->setItem(j,i,new QTableWidgetItem());
@@ -1809,16 +1850,30 @@ void FreeFluidsMainWindow::getMixEosCpSel(){
     eosSel[3]=ui->cbMixCalcEosSelec4->currentIndex();
     eosSel[4]=ui->cbMixCalcEosSelec5->currentIndex();
     eosSel[5]=ui->cbMixCalcEosSelec6->currentIndex();
+    eosSel[6]=ui->cbMixCalcEosSelec7->currentIndex();
+    eosSel[7]=ui->cbMixCalcEosSelec8->currentIndex();
+    eosSel[8]=ui->cbMixCalcEosSelec9->currentIndex();
+    eosSel[9]=ui->cbMixCalcEosSelec10->currentIndex();
+    eosSel[10]=ui->cbMixCalcEosSelec11->currentIndex();
+    eosSel[11]=ui->cbMixCalcEosSelec12->currentIndex();
+
     cp0Sel[0]=ui->cbMixCalcCp0Selec1->currentIndex();
     cp0Sel[1]=ui->cbMixCalcCp0Selec2->currentIndex();
     cp0Sel[2]=ui->cbMixCalcCp0Selec3->currentIndex();
     cp0Sel[3]=ui->cbMixCalcCp0Selec4->currentIndex();
     cp0Sel[4]=ui->cbMixCalcCp0Selec5->currentIndex();
     cp0Sel[5]=ui->cbMixCalcCp0Selec6->currentIndex();
+    cp0Sel[6]=ui->cbMixCalcCp0Selec7->currentIndex();
+    cp0Sel[7]=ui->cbMixCalcCp0Selec8->currentIndex();
+    cp0Sel[8]=ui->cbMixCalcCp0Selec9->currentIndex();
+    cp0Sel[9]=ui->cbMixCalcCp0Selec10->currentIndex();
+    cp0Sel[10]=ui->cbMixCalcCp0Selec11->currentIndex();
+    cp0Sel[11]=ui->cbMixCalcCp0Selec12->currentIndex();
 }
 
 //Write in the results table the thermodynamic records
-void FreeFluidsMainWindow::writeMixResultsTable(FF_ThermoProperties *th0l,FF_PhaseThermoProp *thl,FF_ThermoProperties *th0g,FF_PhaseThermoProp *thg){
+void FreeFluidsMainWindow::writeMixResultsTable(int *numSubs,FF_ThermoProperties *th0l,FF_PhaseThermoProp *thl,FF_ThermoProperties *th0g,FF_PhaseThermoProp *thg){
+    int i;
     ui->twMixCalc->item(0,1)->setText(QString::number(thg->MW));
     ui->twMixCalc->item(1,1)->setText(QString::number(thg->P*0.00001));
     ui->twMixCalc->item(2,1)->setText(QString::number(thg->T));
@@ -1851,12 +1906,30 @@ void FreeFluidsMainWindow::writeMixResultsTable(FF_ThermoProperties *th0l,FF_Pha
     ui->twMixCalc->item(32,1)->setText(QString::number(thg->c[3]));
     ui->twMixCalc->item(33,1)->setText(QString::number(thg->c[4]));
     ui->twMixCalc->item(34,1)->setText(QString::number(thg->c[5]));
-    ui->twMixCalc->item(41,1)->setText(QString::number(thg->subsPhi[0]));
-    ui->twMixCalc->item(42,1)->setText(QString::number(thg->subsPhi[1]));
-    ui->twMixCalc->item(43,1)->setText(QString::number(thg->subsPhi[2]));
-    ui->twMixCalc->item(44,1)->setText(QString::number(thg->subsPhi[3]));
-    ui->twMixCalc->item(45,1)->setText(QString::number(thg->subsPhi[4]));
-    ui->twMixCalc->item(46,1)->setText(QString::number(thg->subsPhi[5]));
+    ui->twMixCalc->item(35,1)->setText(QString::number(thg->c[6]));
+    ui->twMixCalc->item(36,1)->setText(QString::number(thg->c[7]));
+    ui->twMixCalc->item(37,1)->setText(QString::number(thg->c[8]));
+    ui->twMixCalc->item(38,1)->setText(QString::number(thg->c[9]));
+    ui->twMixCalc->item(39,1)->setText(QString::number(thg->c[10]));
+    ui->twMixCalc->item(40,1)->setText(QString::number(thg->c[11]));
+    ui->twMixCalc->item(41,1)->setText(QString::number(thg->c[12]));
+    ui->twMixCalc->item(42,1)->setText(QString::number(thg->c[13]));
+    ui->twMixCalc->item(43,1)->setText(QString::number(thg->c[14]));
+    ui->twMixCalc->item(59,1)->setText(QString::number(thg->subsPhi[0]));
+    ui->twMixCalc->item(60,1)->setText(QString::number(thg->subsPhi[1]));
+    ui->twMixCalc->item(61,1)->setText(QString::number(thg->subsPhi[2]));
+    ui->twMixCalc->item(62,1)->setText(QString::number(thg->subsPhi[3]));
+    ui->twMixCalc->item(63,1)->setText(QString::number(thg->subsPhi[4]));
+    ui->twMixCalc->item(64,1)->setText(QString::number(thg->subsPhi[5]));
+    ui->twMixCalc->item(65,1)->setText(QString::number(thg->subsPhi[6]));
+    ui->twMixCalc->item(66,1)->setText(QString::number(thg->subsPhi[7]));
+    ui->twMixCalc->item(67,1)->setText(QString::number(thg->subsPhi[8]));
+    ui->twMixCalc->item(68,1)->setText(QString::number(thg->subsPhi[9]));
+    ui->twMixCalc->item(69,1)->setText(QString::number(thg->subsPhi[10]));
+    ui->twMixCalc->item(70,1)->setText(QString::number(thg->subsPhi[11]));
+    ui->twMixCalc->item(71,1)->setText(QString::number(thg->subsPhi[12]));
+    ui->twMixCalc->item(71,1)->setText(QString::number(thg->subsPhi[13]));
+    ui->twMixCalc->item(73,1)->setText(QString::number(thg->subsPhi[14]));
     ui->twMixCalc->item(0,2)->setText(QString::number(thl->MW));
     ui->twMixCalc->item(1,2)->setText(QString::number(thl->P*0.00001));
     ui->twMixCalc->item(2,2)->setText(QString::number(thl->T));
@@ -1889,12 +1962,37 @@ void FreeFluidsMainWindow::writeMixResultsTable(FF_ThermoProperties *th0l,FF_Pha
     ui->twMixCalc->item(32,2)->setText(QString::number(thl->c[3]));
     ui->twMixCalc->item(33,2)->setText(QString::number(thl->c[4]));
     ui->twMixCalc->item(34,2)->setText(QString::number(thl->c[5]));
-    ui->twMixCalc->item(41,2)->setText(QString::number(thl->subsPhi[0]));
-    ui->twMixCalc->item(42,2)->setText(QString::number(thl->subsPhi[1]));
-    ui->twMixCalc->item(43,2)->setText(QString::number(thl->subsPhi[2]));
-    ui->twMixCalc->item(44,2)->setText(QString::number(thl->subsPhi[3]));
-    ui->twMixCalc->item(45,2)->setText(QString::number(thl->subsPhi[4]));
-    ui->twMixCalc->item(46,2)->setText(QString::number(thl->subsPhi[5]));
+    ui->twMixCalc->item(35,2)->setText(QString::number(thl->c[6]));
+    ui->twMixCalc->item(36,2)->setText(QString::number(thl->c[7]));
+    ui->twMixCalc->item(37,2)->setText(QString::number(thl->c[8]));
+    ui->twMixCalc->item(38,2)->setText(QString::number(thl->c[9]));
+    ui->twMixCalc->item(39,2)->setText(QString::number(thl->c[10]));
+    ui->twMixCalc->item(40,2)->setText(QString::number(thl->c[11]));
+    ui->twMixCalc->item(41,2)->setText(QString::number(thl->c[12]));
+    ui->twMixCalc->item(42,2)->setText(QString::number(thl->c[13]));
+    ui->twMixCalc->item(43,2)->setText(QString::number(thl->c[14]));
+    ui->twMixCalc->item(59,2)->setText(QString::number(thl->subsPhi[0]));
+    ui->twMixCalc->item(60,2)->setText(QString::number(thl->subsPhi[1]));
+    ui->twMixCalc->item(61,2)->setText(QString::number(thl->subsPhi[2]));
+    ui->twMixCalc->item(62,2)->setText(QString::number(thl->subsPhi[3]));
+    ui->twMixCalc->item(63,2)->setText(QString::number(thl->subsPhi[4]));
+    ui->twMixCalc->item(64,2)->setText(QString::number(thl->subsPhi[5]));
+    ui->twMixCalc->item(65,2)->setText(QString::number(thl->subsPhi[6]));
+    ui->twMixCalc->item(66,2)->setText(QString::number(thl->subsPhi[7]));
+    ui->twMixCalc->item(67,2)->setText(QString::number(thl->subsPhi[8]));
+    ui->twMixCalc->item(68,2)->setText(QString::number(thl->subsPhi[9]));
+    ui->twMixCalc->item(69,2)->setText(QString::number(thl->subsPhi[10]));
+    ui->twMixCalc->item(70,2)->setText(QString::number(thl->subsPhi[11]));
+    ui->twMixCalc->item(71,2)->setText(QString::number(thl->subsPhi[12]));
+    ui->twMixCalc->item(72,2)->setText(QString::number(thl->subsPhi[13]));
+    ui->twMixCalc->item(73,2)->setText(QString::number(thl->subsPhi[14]));
+
+    for(i=*numSubs;i<15;i++){
+        ui->twMixCalc->item(29+i,1)->setText("");
+        ui->twMixCalc->item(29+i,2)->setText("");
+        ui->twMixCalc->item(59+i,1)->setText("");
+        ui->twMixCalc->item(59+i,2)->setText("");
+    }
 }
 
 //Slot for adding a new substances to the composition table
@@ -2264,6 +2362,7 @@ void FreeFluidsMainWindow::btnMixCalcCreateSys(){
     //Read the selection made for the substances and get their data
     for (i=0;i< mix->numSubs;i++){
         substance[i].id=ui->twMixComposition->item(i,0)->text().toInt();
+        strcpy(substance[i].name,ui->twMixComposition->item(i,1)->text().toStdString().c_str());
         //printf("subst[%i]\n",substance[i].id);
         GetBasicData(substance[i].id,&substance[i],&db);
         //printf("MW:%f\n",substance[i].baseProp.MW);
@@ -2280,8 +2379,6 @@ void FreeFluidsMainWindow::btnMixCalcCreateSys(){
         //printf("A:%f\n",substance[i].cp0Corr.coef[0]);
 
 
-
-
         type="Vp";
         GetCorrDataByType(&substance[i].id,&type,&db,&substance[i].vpCorr.form,substance[i].vpCorr.coef);//Hangs the program
         //printf("A:%f\n",substance[i].vpCorr.coef[0]);
@@ -2293,10 +2390,10 @@ void FreeFluidsMainWindow::btnMixCalcCreateSys(){
     }
 
 
-    subsPoint= new FF_SubstanceData*[12];
+    subsPoint= new FF_SubstanceData*[15];
     //FF_SubstanceData* subsPoint[12];
 
-    for(i=0;i<12;i++)subsPoint[i]=&substance[i];
+    for(i=0;i<15;i++)subsPoint[i]=&substance[i];
 
     FF_MixFillDataWithSubsData(&mix->numSubs,subsPoint,mix);
 
@@ -2311,6 +2408,14 @@ void FreeFluidsMainWindow::btnMixCalcCreateSys(){
 
 //Slot for mixture exportation
 void FreeFluidsMainWindow::btnMixCalcExportMix(){
+    int i;
+    double c[15];
+    for(i=0;i<15;i++){
+        c[i]=0;
+    }
+    for (i=0;i< mix->numSubs;i++){
+        c[i]=ui->twMixComposition->item(i,5)->text().toDouble();//substance molar fraction
+    }
     QFileDialog *dia = new QFileDialog(this,"Choose directory and file name");
     dia->showNormal();
     QString fileName;
@@ -2327,10 +2432,144 @@ void FreeFluidsMainWindow::btnMixCalcExportMix(){
         exit (1);
     }
     fwrite (mix, sizeof(FF_MixData), 1, outfile);
+    fwrite (c, sizeof(double), 15, outfile);
     fclose(outfile);
     delete dia;
 }
 
+//Slot for mixture importation
+void FreeFluidsMainWindow::btnMixCalcImportMix(){
+    int i,j;
+    double c[15];
+    QFileDialog *dia = new QFileDialog(this,"Choose directory and file name");
+    dia->showNormal();
+    QString fileName;
+    if (dia->exec())
+        fileName = dia->selectedFiles().first();
+
+    FILE *infile;
+    // open file for reading
+    infile = fopen (fileName.toStdString().c_str(),"rb");
+    if (infile == NULL)
+    {
+        fprintf(stderr, "\nError opend file\n");
+        delete dia;
+        exit (1);
+    }
+    fread(mix, sizeof(FF_MixData), 1, infile);
+    fread(c, sizeof(double), 15, infile);
+    fclose(infile);
+    delete dia;
+
+    //Now it is necessary to show the content of mix in the interface
+    //clears the content of the composition table
+    for (i=0;i<ui->twMixComposition->rowCount();i++) for (j=0;j<ui->twMixComposition->columnCount();j++) ui->twMixComposition->item(i,j)->setText("");
+    if(mix->thModelActEos==0)ui->cbMixCalcLiqModelSelec->setCurrentIndex(0);
+    else ui->cbMixCalcLiqModelSelec->setCurrentIndex(1);
+    switch(mix->eosType){
+    case FF_NoType:
+        ui->cbMixCalcEosTypeSelec->setCurrentIndex(0);
+        break;
+    case FF_CubicPRtype:
+        ui->cbMixCalcEosTypeSelec->setCurrentIndex(1);
+        break;
+    case FF_CubicSRKtype:
+        ui->cbMixCalcEosTypeSelec->setCurrentIndex(2);
+        break;
+    case FF_SAFTtype:
+        ui->cbMixCalcEosTypeSelec->setCurrentIndex(3);
+        break;
+    }
+    switch(mix->mixRule){
+    case FF_NoMixRul:
+        ui->cbMixCalcMixRuleSelec->setCurrentIndex(0);
+        break;
+    case FF_VdWnoInt:
+        ui->cbMixCalcMixRuleSelec->setCurrentIndex(1);
+        break;
+    case FF_VdW:
+        ui->cbMixCalcMixRuleSelec->setCurrentIndex(2);
+        break;
+    case FF_PR:
+        ui->cbMixCalcMixRuleSelec->setCurrentIndex(3);
+        break;
+    case FF_MKP:
+        ui->cbMixCalcMixRuleSelec->setCurrentIndex(4);
+        break;
+    case FF_HV:
+        ui->cbMixCalcMixRuleSelec->setCurrentIndex(5);
+        break;
+    case FF_MHV1:
+        ui->cbMixCalcMixRuleSelec->setCurrentIndex(6);
+        break;
+    case FF_PSRK:
+        ui->cbMixCalcMixRuleSelec->setCurrentIndex(7);
+        break;
+    case FF_LCVM:
+        ui->cbMixCalcMixRuleSelec->setCurrentIndex(8);
+        break;
+    case FF_MHV2:
+        ui->cbMixCalcMixRuleSelec->setCurrentIndex(9);
+        break;
+    case FF_UMR:
+        ui->cbMixCalcMixRuleSelec->setCurrentIndex(10);
+        break;
+    case FF_BL:
+        ui->cbMixCalcMixRuleSelec->setCurrentIndex(11);
+        break;
+    }
+    switch(mix->actModel){
+    case FF_NoModel:
+        ui->cbMixCalcActModelSelec->setCurrentIndex(0);
+        break;
+    case FF_Wilson:
+        ui->cbMixCalcActModelSelec->setCurrentIndex(1);
+        break;
+    case FF_NRTL:
+        ui->cbMixCalcActModelSelec->setCurrentIndex(2);
+        break;
+    case FF_UNIQUAC:
+        ui->cbMixCalcActModelSelec->setCurrentIndex(3);
+        break;
+    case FF_UNIQUACFV:
+        ui->cbMixCalcActModelSelec->setCurrentIndex(4);
+        break;
+    case FF_UNIFACStd:
+        ui->cbMixCalcActModelSelec->setCurrentIndex(5);
+        break;
+    case FF_UNIFACPSRK:
+        ui->cbMixCalcActModelSelec->setCurrentIndex(6);
+        break;
+    case FF_UNIFACDort:
+        ui->cbMixCalcActModelSelec->setCurrentIndex(7);
+        break;
+    case FF_UNIFACNist:
+        ui->cbMixCalcActModelSelec->setCurrentIndex(8);
+        break;
+    case FF_EntropicFV:
+        ui->cbMixCalcActModelSelec->setCurrentIndex(9);
+        break;
+    case FF_Hildebrand:
+        ui->cbMixCalcActModelSelec->setCurrentIndex(10);
+        break;
+    case FF_Hansen:
+        ui->cbMixCalcActModelSelec->setCurrentIndex(11);
+        break;
+    case FF_Chi:
+        ui->cbMixCalcActModelSelec->setCurrentIndex(12);
+        break;
+    }
+    for(i=0;i<mix->numSubs;i++){
+        ui->twMixComposition->item(i,0)->setText(QString::number(mix->id[i]));//add Id
+        ui->twMixComposition->item(i,1)->setText(QString(mix->subsName[i]));//add name
+        ui->twMixComposition->item(i,2)->setText(QString::number(mix->baseProp[i].MW));//add MW
+        ui->twMixComposition->item(i,3)->setText(QString::number(c[i]));
+        ui->twMixComposition->item(i,5)->setText(QString::number(c[i]));
+    }
+    if(mix->refVpEos==0)ui->cbMixCalcRefPhiSelec->setCurrentIndex(0);
+    else ui->cbMixCalcRefPhiSelec->setCurrentIndex(1);
+    cbMixCalcEosTypeLoad( ui->cbMixCalcEosTypeSelec->currentIndex());//shows the available eos for each substance
+}
 
 //Slot for mixture bubble P calculation, and display in table
 void FreeFluidsMainWindow::twMixCalcBubbleP(){
@@ -2399,7 +2638,7 @@ void FreeFluidsMainWindow::twMixCalcBubbleP(){
     //printf("T:%f P:%f rhoL:%f Vg:%f state:%c phiL:%f phiG:%f\n",thl.T,thl.P,MW/answerL[0]*0.001,answerG[0],state,phiL,phiG);
     /*
     */
-    writeMixResultsTable(&th0l,&thl,&th0g,&thg);
+    writeMixResultsTable(&mix->numSubs,&th0l,&thl,&th0g,&thg);
     ui->twMixCalc->item(5,1)->setText(QString::number(phiG));
     ui->twMixCalc->item(6,1)->setText(QString::number(Zg));
 
@@ -2463,7 +2702,7 @@ void FreeFluidsMainWindow::twMixCalcDewP(){
     phiG=exp(answerG[1]+answerG[2]-1)/answerG[2];
     //printf("T:%f P:%f rhoL:%f Vg:%f state:%c phiL:%f phiG:%f\n",thl.T,thl.P,MW/answerL[0]*0.001,answerG[0],state,phiL,phiG);
 
-    writeMixResultsTable(&th0l,&thl,&th0g,&thg);
+    writeMixResultsTable(&mix->numSubs,&th0l,&thl,&th0g,&thg);
     ui->twMixCalc->item(5,1)->setText(QString::number(phiG));
     ui->twMixCalc->item(6,1)->setText(QString::number(Zg));
 
@@ -2513,13 +2752,13 @@ void FreeFluidsMainWindow::twMixCalcBubbleT(){
     double bubbleT;
     double bubbleTguess=ui->leMixCalcTempGuess->text().toDouble();
 
-    //we clear the content of the results table
+    //clear the content of the results table
     for (i=0;i<ui->twMixCalc->rowCount();i++){
         ui->twMixCalc->item(i,1)->setText("");
         ui->twMixCalc->item(i,2)->setText("");
     }
 
-    //Now we need to read the selections made for the molar fractions
+    //read the selections made for the molar fractions
     for (i=0;i< mix->numSubs;i++){
         thl.c[i]=ui->twMixComposition->item(i,5)->text().toDouble();//substance molar fraction
     }
@@ -2560,7 +2799,7 @@ void FreeFluidsMainWindow::twMixCalcBubbleT(){
     //printf("T:%f P:%f rhoL:%f Vg:%f state:%c phiL:%f phiG:%f\n",thl.T,thl.P,MW/answerL[0]*0.001,answerG[0],state,phiL,phiG);
     /*
     */
-    writeMixResultsTable(&th0l,&thl,&th0g,&thg);
+    writeMixResultsTable(&mix->numSubs,&th0l,&thl,&th0g,&thg);
     ui->twMixCalc->item(5,1)->setText(QString::number(phiG));
     ui->twMixCalc->item(6,1)->setText(QString::number(Zg));
 
@@ -2632,7 +2871,7 @@ void FreeFluidsMainWindow::twMixCalcDewT(){
     //printf("T:%f P:%f rhoL:%f Vg:%f state:%c phiL:%f phiG:%f\n",thl.T,thl.P,MW/answerL[0]*0.001,answerG[0],state,phiL,phiG);
     /*
     */
-    writeMixResultsTable(&th0l,&thl,&th0g,&thg);
+    writeMixResultsTable(&mix->numSubs,&th0l,&thl,&th0g,&thg);
     ui->twMixCalc->item(5,1)->setText(QString::number(phiG));
     ui->twMixCalc->item(6,1)->setText(QString::number(Zg));
 
@@ -2667,7 +2906,9 @@ void FreeFluidsMainWindow::twMixCalcTenvelope(){
 
 //Slot for mixture VL flash P,T calculation, and display in table
 void FreeFluidsMainWindow::twMixCalcVLflashPT(){
-    printf("Act/Eos: %i Mixrule: %i ActModel: %i form: %i 0: %f 1: %f\n",mix->thModelActEos,mix->mixRule,mix->actModel,mix->intForm,mix->intParam[0][1][0],mix->intParam[0][1][1]);
+    //FF_VLflashPTGO();
+    FF_PTXfeed data;
+    //printf("Act/Eos: %i Mixrule: %i ActModel: %i form: %i 0: %f 1: %f\n",mix->thModelActEos,mix->mixRule,mix->actModel,mix->intForm,mix->intParam[0][1][0],mix->intParam[0][1][1]);
     int i;//the loop variable
     FF_ThermoProperties th0l,th0g;//for ideal gas properties
     FF_PhaseThermoProp thl,thg;//here will be stored the result of the calculations for the liquid and gas phases
@@ -2691,14 +2932,20 @@ void FreeFluidsMainWindow::twMixCalcVLflashPT(){
     //Now we need to read the selections made for the molar fractions
     for (i=0;i< mix->numSubs;i++){
         c[i]=ui->twMixComposition->item(i,5)->text().toDouble();//substance molar fraction
+        data.z[i]=ui->twMixComposition->item(i,5)->text().toDouble();//substance molar fraction
     }
 
     //And begin the calculations
     th0l.MW=thl.MW=MW;
     th0l.T=thl.T=th0g.T=thg.T=273.15+ui->leMixCalcTemp->text().toDouble();//we read the selected temperature
     th0l.P=thl.P=th0g.P=thg.P=1e5*ui->leMixCalcPres->text().toDouble();//we read the selected pressure
-    printf("Going to flash\n");
-    FF_VLflashPT(mix,&thl.T,&thl.P,c,thl.c,thg.c,thl.subsPhi,thg.subsPhi,&thg.fraction);
+    data.mix=mix;
+    data.P=thl.P;
+    data.T=thl.T;
+
+    if(ui->rbMixCalcStd->isChecked()) FF_VLflashPT(mix,&thl.T,&thl.P,c,thl.c,thg.c,thl.subsPhi,thg.subsPhi,&thg.fraction);
+    else if(ui->rbMixCalcGlobalOpt->isChecked()) FF_TwoPhasesFlashPTGO(&data,thl.c,thg.c,thl.subsPhi,thg.subsPhi,&thg.fraction);
+
     thl.fraction=1-thg.fraction;
 
 
@@ -2728,7 +2975,27 @@ void FreeFluidsMainWindow::twMixCalcVLflashPT(){
     FF_MixThermoEOS(mix,&refT,&refP,&thg);
     phiG=exp(answerG[1]+answerG[2]-1)/answerG[2];
     //printf("T:%f P:%f rhoL:%f Vg:%f state:%c phiL:%f phiG:%f\n",thl.T,thl.P,MW/answerL[0]*0.001,answerG[0],state,phiL,phiG);
-    writeMixResultsTable(&th0l,&thl,&th0g,&thg);
+    writeMixResultsTable(&mix->numSubs,&th0l,&thl,&th0g,&thg);
+
+}
+
+//Slot for checking stability of a composition
+void FreeFluidsMainWindow::mixCalcStabCheck(){
+    FF_PTXfeed data;
+    int i,useOptimizer;
+    double tpd,tpdX[15];
+    data.mix=mix;
+    data.P=1e5*ui->leMixCalcPres->text().toDouble();
+    data.T=273.15+ui->leMixCalcTemp->text().toDouble();
+    //Now we need to read the selections made for the molar fractions
+    for (i=0;i< mix->numSubs;i++){
+        data.z[i]=ui->twMixComposition->item(i,5)->text().toDouble();//substance molar fraction
+    }
+    if(ui->rbMixCalcGlobalOpt->isChecked()) useOptimizer=1;
+    else useOptimizer=0;
+    FF_StabilityCheck(&data,&useOptimizer,&tpd,tpdX);
+    ui->leMixCalcStabResult->setText(QString::number(tpd));
+
 }
 
 void FreeFluidsMainWindow::on_actionDisplay_license_triggered()

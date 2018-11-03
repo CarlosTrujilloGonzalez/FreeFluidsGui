@@ -87,7 +87,8 @@ private slots:
     void twMixIntParamEosUpdate(int row, int column);//Slot for updating the intParam array for eos, from the display
     void twMixIntParamClear();//Slot for clearing all interaction parameters
     void btnMixCalcCreateSys();//Slot for substances and mixture creation
-    void btnMixCalcExportMix(); //Slot for mixture exportation
+    void btnMixCalcExportMix(); //Slot for mixture exportation    
+    void btnMixCalcImportMix();//Slot for mixture importation
 
     void twMixCalcBubbleT();//Slot for mixture bubble T calculation, and display in table
     void twMixCalcDewT();//Slot for mixture dew T calculation, and display in table
@@ -96,6 +97,7 @@ private slots:
     void twMixCalcDewP();//Slot for mixture dew P calculation, and display in table
     void twMixCalcPenvelope();//Slot for the pressure envelope calculation for binary mixtures
     void twMixCalcVLflashPT();//Slot for mixture VL flash P,T calculation, and display in table
+    void mixCalcStabCheck();//Slot for checking stability of a composition
 
     void on_actionDisplay_license_triggered();
 
@@ -128,10 +130,10 @@ private:
     FF_SubstanceData **subsPoint;
     FF_SubstanceData *substance;
     FF_MixData *mix;
-    QSqlQueryModel *mixCalcEOSModel[6];
-    QTableView *tvMixCalcSelEOS[6];
-    QSqlQueryModel *mixCalcCp0Model[6];
-    QTableView *tvMixCalcSelCp0[6];
+    QSqlQueryModel *mixCalcEOSModel[15];
+    QTableView *tvMixCalcSelEOS[15];
+    QSqlQueryModel *mixCalcCp0Model[15];
+    QTableView *tvMixCalcSelCp0[15];
     double *c;//the concentration of substances in the mixture
     //QString eosType;
     //enum FF_MixingRule rule;//the mixing rule to use
@@ -142,7 +144,7 @@ private:
 
     int eosSel[12],cp0Sel[12];//the number of row selected(in the combobox) for eos and cp0 correlation, for each possible substance
     void getMixEosCpSel();//Pass the number of the rows selected for eos, and cp0 correlation, for each possible substance, to an array format
-    void writeMixResultsTable(FF_ThermoProperties *th0l,FF_PhaseThermoProp *thl,FF_ThermoProperties *th0g,FF_PhaseThermoProp *thg);//Write in the results table the thermodynamic records
+    void writeMixResultsTable(int *numSubs,FF_ThermoProperties *th0l,FF_PhaseThermoProp *thl,FF_ThermoProperties *th0g,FF_PhaseThermoProp *thg);//Write in the results table the thermodynamic records
 };
 
 #endif // FREEFLUIDSMAINWINDOW_H
