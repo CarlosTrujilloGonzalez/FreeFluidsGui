@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1282</width>
-    <height>883</height>
+    <width>1281</width>
+    <height>866</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>10</x>
       <y>40</y>
       <width>1271</width>
-      <height>781</height>
+      <height>771</height>
      </rect>
     </property>
     <property name="font">
@@ -3657,7 +3657,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="rowCount">
-       <number>12</number>
+       <number>15</number>
       </property>
       <property name="columnCount">
        <number>6</number>
@@ -3669,11 +3669,14 @@ p, li { white-space: pre-wrap; }
        <number>0</number>
       </attribute>
       <attribute name="verticalHeaderDefaultSectionSize">
-       <number>24</number>
-      </attribute>
-      <attribute name="verticalHeaderMinimumSectionSize">
        <number>20</number>
       </attribute>
+      <attribute name="verticalHeaderMinimumSectionSize">
+       <number>22</number>
+      </attribute>
+      <row/>
+      <row/>
+      <row/>
       <row/>
       <row/>
       <row/>
@@ -3697,7 +3700,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>250</x>
-        <y>390</y>
+        <y>380</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -3710,7 +3713,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>130</x>
-        <y>390</y>
+        <y>380</y>
         <width>91</width>
         <height>23</height>
        </rect>
@@ -3722,8 +3725,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="cbMixCompositionMass">
       <property name="geometry">
        <rect>
-        <x>50</x>
-        <y>400</y>
+        <x>100</x>
+        <y>380</y>
         <width>33</width>
         <height>17</height>
        </rect>
@@ -3740,7 +3743,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>10</x>
         <y>380</y>
-        <width>111</width>
+        <width>91</width>
         <height>20</height>
        </rect>
       </property>
@@ -3777,11 +3780,6 @@ p, li { white-space: pre-wrap; }
         <string>SAFT</string>
        </property>
       </item>
-      <item>
-       <property name="text">
-        <string>Sapan-Wagner</string>
-       </property>
-      </item>
      </widget>
      <widget class="QLabel" name="label_56">
       <property name="geometry">
@@ -3799,8 +3797,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcEosSelec1">
       <property name="geometry">
        <rect>
-        <x>462</x>
-        <y>54</y>
+        <x>460</x>
+        <y>60</y>
         <width>471</width>
         <height>20</height>
        </rect>
@@ -3809,8 +3807,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcEosSelec2">
       <property name="geometry">
        <rect>
-        <x>462</x>
-        <y>78</y>
+        <x>460</x>
+        <y>80</y>
         <width>471</width>
         <height>20</height>
        </rect>
@@ -3819,8 +3817,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcEosSelec3">
       <property name="geometry">
        <rect>
-        <x>462</x>
-        <y>102</y>
+        <x>460</x>
+        <y>100</y>
         <width>471</width>
         <height>20</height>
        </rect>
@@ -3829,8 +3827,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcEosSelec4">
       <property name="geometry">
        <rect>
-        <x>462</x>
-        <y>126</y>
+        <x>460</x>
+        <y>120</y>
         <width>471</width>
         <height>20</height>
        </rect>
@@ -3839,8 +3837,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcEosSelec5">
       <property name="geometry">
        <rect>
-        <x>462</x>
-        <y>150</y>
+        <x>460</x>
+        <y>140</y>
         <width>471</width>
         <height>20</height>
        </rect>
@@ -3849,8 +3847,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcEosSelec6">
       <property name="geometry">
        <rect>
-        <x>462</x>
-        <y>174</y>
+        <x>460</x>
+        <y>160</y>
         <width>471</width>
         <height>20</height>
        </rect>
@@ -3859,9 +3857,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcCp0Selec1">
       <property name="geometry">
        <rect>
-        <x>950</x>
-        <y>50</y>
-        <width>305</width>
+        <x>940</x>
+        <y>60</y>
+        <width>311</width>
         <height>20</height>
        </rect>
       </property>
@@ -3869,9 +3867,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcCp0Selec2">
       <property name="geometry">
        <rect>
-        <x>950</x>
-        <y>74</y>
-        <width>305</width>
+        <x>940</x>
+        <y>80</y>
+        <width>311</width>
         <height>20</height>
        </rect>
       </property>
@@ -3879,9 +3877,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcCp0Selec3">
       <property name="geometry">
        <rect>
-        <x>950</x>
-        <y>98</y>
-        <width>305</width>
+        <x>940</x>
+        <y>100</y>
+        <width>311</width>
         <height>20</height>
        </rect>
       </property>
@@ -3889,9 +3887,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcCp0Selec4">
       <property name="geometry">
        <rect>
-        <x>950</x>
-        <y>122</y>
-        <width>305</width>
+        <x>940</x>
+        <y>120</y>
+        <width>311</width>
         <height>20</height>
        </rect>
       </property>
@@ -3899,9 +3897,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcCp0Selec5">
       <property name="geometry">
        <rect>
-        <x>950</x>
-        <y>146</y>
-        <width>305</width>
+        <x>940</x>
+        <y>140</y>
+        <width>311</width>
         <height>20</height>
        </rect>
       </property>
@@ -3909,9 +3907,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcCp0Selec6">
       <property name="geometry">
        <rect>
-        <x>950</x>
-        <y>170</y>
-        <width>305</width>
+        <x>940</x>
+        <y>160</y>
+        <width>311</width>
         <height>20</height>
        </rect>
       </property>
@@ -3920,7 +3918,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>570</x>
-        <y>30</y>
+        <y>40</y>
         <width>221</width>
         <height>21</height>
        </rect>
@@ -3932,8 +3930,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_58">
       <property name="geometry">
        <rect>
-        <x>972</x>
-        <y>26</y>
+        <x>970</x>
+        <y>40</y>
         <width>271</width>
         <height>21</height>
        </rect>
@@ -3945,8 +3943,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcMixRuleSelec">
       <property name="geometry">
        <rect>
-        <x>590</x>
-        <y>360</y>
+        <x>560</x>
+        <y>380</y>
         <width>171</width>
         <height>20</height>
        </rect>
@@ -4015,8 +4013,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_59">
       <property name="geometry">
        <rect>
-        <x>480</x>
-        <y>360</y>
+        <x>470</x>
+        <y>380</y>
         <width>111</width>
         <height>20</height>
        </rect>
@@ -4028,9 +4026,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_60">
       <property name="geometry">
        <rect>
-        <x>970</x>
-        <y>470</y>
-        <width>101</width>
+        <x>340</x>
+        <y>630</y>
+        <width>81</width>
         <height>16</height>
        </rect>
       </property>
@@ -4041,8 +4039,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leMixCalcTemp">
       <property name="geometry">
        <rect>
-        <x>1080</x>
-        <y>500</y>
+        <x>420</x>
+        <y>660</y>
         <width>71</width>
         <height>20</height>
        </rect>
@@ -4054,9 +4052,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_61">
       <property name="geometry">
        <rect>
-        <x>970</x>
-        <y>500</y>
-        <width>101</width>
+        <x>340</x>
+        <y>660</y>
+        <width>81</width>
         <height>16</height>
        </rect>
       </property>
@@ -4067,8 +4065,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leMixCalcPres">
       <property name="geometry">
        <rect>
-        <x>1080</x>
-        <y>470</y>
+        <x>420</x>
+        <y>630</y>
         <width>71</width>
         <height>20</height>
        </rect>
@@ -4077,17 +4075,23 @@ p, li { white-space: pre-wrap; }
        <string>1.01325</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="btnMixCalcCalc">
+     <widget class="QPushButton" name="btnMixCalcStabCheck">
       <property name="geometry">
        <rect>
-        <x>1042</x>
-        <y>536</y>
-        <width>75</width>
+        <x>620</x>
+        <y>620</y>
+        <width>91</width>
         <height>23</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Will perform the stability check using tangent plane distance.&lt;/p&gt;&lt;p&gt;If standard calculation is selected, initialization of the check will be done by Wilson equation.&lt;/p&gt;&lt;p&gt;If global optimizer is selected, a multi-start Nealder-Mead algorithm will be used to obtain the minimumof the tangent plane distance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="toolTipDuration">
+       <number>6000</number>
+      </property>
       <property name="text">
-       <string>Calculate</string>
+       <string>Check stability</string>
       </property>
      </widget>
      <widget class="QLineEdit" name="leMixCalcMWmix">
@@ -4116,8 +4120,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btnMixCalcBubbleT">
       <property name="geometry">
        <rect>
-        <x>992</x>
-        <y>566</y>
+        <x>620</x>
+        <y>680</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -4129,8 +4133,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btnMixCalcDewT">
       <property name="geometry">
        <rect>
-        <x>992</x>
-        <y>596</y>
+        <x>620</x>
+        <y>710</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -4142,8 +4146,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btnMixCalcBubbleP">
       <property name="geometry">
        <rect>
-        <x>1082</x>
-        <y>566</y>
+        <x>720</x>
+        <y>680</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -4155,8 +4159,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btnMixCalcDewP">
       <property name="geometry">
        <rect>
-        <x>1082</x>
-        <y>596</y>
+        <x>720</x>
+        <y>710</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -4168,17 +4172,17 @@ p, li { white-space: pre-wrap; }
      <widget class="QTableWidget" name="twMixPairSel">
       <property name="geometry">
        <rect>
-        <x>8</x>
-        <y>456</y>
+        <x>0</x>
+        <y>440</y>
         <width>311</width>
         <height>301</height>
        </rect>
       </property>
       <property name="rowCount">
-       <number>12</number>
+       <number>15</number>
       </property>
       <property name="columnCount">
-       <number>12</number>
+       <number>15</number>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
        <number>23</number>
@@ -4204,6 +4208,12 @@ p, li { white-space: pre-wrap; }
       <row/>
       <row/>
       <row/>
+      <row/>
+      <row/>
+      <row/>
+      <column/>
+      <column/>
+      <column/>
       <column/>
       <column/>
       <column/>
@@ -4233,7 +4243,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcLiqModelSelec">
       <property name="geometry">
        <rect>
-        <x>610</x>
+        <x>600</x>
         <y>10</y>
         <width>111</width>
         <height>20</height>
@@ -4265,8 +4275,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_64">
       <property name="geometry">
        <rect>
-        <x>790</x>
-        <y>360</y>
+        <x>770</x>
+        <y>380</y>
         <width>91</width>
         <height>16</height>
        </rect>
@@ -4278,8 +4288,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcActModelSelec">
       <property name="geometry">
        <rect>
-        <x>890</x>
-        <y>360</y>
+        <x>840</x>
+        <y>380</y>
         <width>129</width>
         <height>20</height>
        </rect>
@@ -4354,7 +4364,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>1040</x>
-        <y>360</y>
+        <y>380</y>
         <width>111</width>
         <height>20</height>
        </rect>
@@ -4366,8 +4376,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcRefPhiSelec">
       <property name="geometry">
        <rect>
-        <x>1160</x>
-        <y>360</y>
+        <x>1130</x>
+        <y>380</y>
         <width>49</width>
         <height>20</height>
        </rect>
@@ -4395,8 +4405,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QTableWidget" name="twMixIntParamEos">
       <property name="geometry">
        <rect>
-        <x>330</x>
-        <y>530</y>
+        <x>320</x>
+        <y>490</y>
         <width>641</width>
         <height>121</height>
        </rect>
@@ -4436,8 +4446,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_66">
       <property name="geometry">
        <rect>
-        <x>36</x>
-        <y>432</y>
+        <x>40</x>
+        <y>420</y>
         <width>221</width>
         <height>20</height>
        </rect>
@@ -4454,8 +4464,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_67">
       <property name="geometry">
        <rect>
-        <x>488</x>
-        <y>504</y>
+        <x>470</x>
+        <y>470</y>
         <width>221</width>
         <height>17</height>
        </rect>
@@ -4472,8 +4482,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixIntParamSel">
       <property name="geometry">
        <rect>
-        <x>334</x>
-        <y>474</y>
+        <x>330</x>
+        <y>430</y>
         <width>621</width>
         <height>22</height>
        </rect>
@@ -4482,8 +4492,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_68">
       <property name="geometry">
        <rect>
-        <x>480</x>
-        <y>450</y>
+        <x>440</x>
+        <y>410</y>
         <width>301</width>
         <height>17</height>
        </rect>
@@ -4500,41 +4510,43 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btnMixCalcTenvelope">
       <property name="geometry">
        <rect>
-        <x>992</x>
-        <y>628</y>
+        <x>830</x>
+        <y>680</y>
         <width>75</width>
         <height>23</height>
        </rect>
       </property>
       <property name="text">
-       <string>T envelope</string>
+       <string>X,T envelope</string>
       </property>
      </widget>
      <widget class="QPushButton" name="btnMixCalcPenvelope">
       <property name="geometry">
        <rect>
-        <x>1080</x>
-        <y>628</y>
+        <x>830</x>
+        <y>710</y>
         <width>75</width>
         <height>23</height>
        </rect>
       </property>
       <property name="text">
-       <string>P envelope</string>
+       <string>X,P envelope</string>
       </property>
      </widget>
      <widget class="QPushButton" name="btnMixCalcCreateSystem">
       <property name="geometry">
        <rect>
-        <x>530</x>
-        <y>400</y>
-        <width>121</width>
+        <x>1040</x>
+        <y>420</y>
+        <width>131</width>
         <height>33</height>
        </rect>
       </property>
       <property name="font">
        <font>
         <pointsize>10</pointsize>
+        <weight>75</weight>
+        <bold>true</bold>
        </font>
       </property>
       <property name="toolTip">
@@ -4544,24 +4556,30 @@ p, li { white-space: pre-wrap; }
        <string>Create system</string>
       </property>
      </widget>
-     <widget class="QPushButton" name="btnMixCalcVLflashPT">
+     <widget class="QPushButton" name="btnMixCalc2PhPTflash">
       <property name="geometry">
        <rect>
-        <x>1040</x>
-        <y>660</y>
-        <width>75</width>
+        <x>620</x>
+        <y>650</y>
+        <width>111</width>
         <height>23</height>
        </rect>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If standard calculation is selected, a VL flash by sucessive substitutions will be performed.&lt;/p&gt;&lt;p&gt;If Global optimizer is selected a two phases Gibbs energy minimization will be performed.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="toolTipDuration">
+       <number>6000</number>
+      </property>
       <property name="text">
-       <string>VL flash PT</string>
+       <string>2 phases P,T flash</string>
       </property>
      </widget>
      <widget class="QPushButton" name="btnMixCalcClearIntParam">
       <property name="geometry">
        <rect>
-        <x>560</x>
-        <y>680</y>
+        <x>790</x>
+        <y>460</y>
         <width>131</width>
         <height>23</height>
        </rect>
@@ -4573,8 +4591,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btnMixCalcExportMix">
       <property name="geometry">
        <rect>
-        <x>770</x>
-        <y>400</y>
+        <x>1040</x>
+        <y>520</y>
         <width>111</width>
         <height>33</height>
        </rect>
@@ -4585,7 +4603,7 @@ p, li { white-space: pre-wrap; }
        </font>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;First create the system.&lt;/p&gt;&lt;p&gt;Exports the FF_MixData structure created.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt; Exports the FF_MixData structure created and the composition to a file (first you must create the system).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>Export mixture</string>
@@ -4594,8 +4612,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_89">
       <property name="geometry">
        <rect>
-        <x>820</x>
-        <y>720</y>
+        <x>340</x>
+        <y>690</y>
         <width>111</width>
         <height>20</height>
        </rect>
@@ -4607,8 +4625,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leMixCalcPresGuess">
       <property name="geometry">
        <rect>
-        <x>940</x>
-        <y>720</y>
+        <x>460</x>
+        <y>690</y>
         <width>71</width>
         <height>20</height>
        </rect>
@@ -4626,8 +4644,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_90">
       <property name="geometry">
        <rect>
-        <x>1050</x>
-        <y>720</y>
+        <x>340</x>
+        <y>710</y>
         <width>111</width>
         <height>20</height>
        </rect>
@@ -4639,8 +4657,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leMixCalcTempGuess">
       <property name="geometry">
        <rect>
-        <x>1170</x>
-        <y>720</y>
+        <x>460</x>
+        <y>710</y>
         <width>71</width>
         <height>20</height>
        </rect>
@@ -4653,6 +4671,281 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="text">
        <string>0</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcEosSelec7">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>180</y>
+        <width>471</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcEosSelec8">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>200</y>
+        <width>471</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcEosSelec9">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>220</y>
+        <width>471</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcCp0Selec7">
+      <property name="geometry">
+       <rect>
+        <x>940</x>
+        <y>180</y>
+        <width>311</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcCp0Selec8">
+      <property name="geometry">
+       <rect>
+        <x>940</x>
+        <y>200</y>
+        <width>311</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcCp0Selec9">
+      <property name="geometry">
+       <rect>
+        <x>940</x>
+        <y>220</y>
+        <width>311</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcEosSelec10">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>240</y>
+        <width>471</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcEosSelec11">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>260</y>
+        <width>471</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcEosSelec12">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>280</y>
+        <width>471</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcCp0Selec10">
+      <property name="geometry">
+       <rect>
+        <x>940</x>
+        <y>240</y>
+        <width>311</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcCp0Selec11">
+      <property name="geometry">
+       <rect>
+        <x>940</x>
+        <y>260</y>
+        <width>311</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcCp0Selec12">
+      <property name="geometry">
+       <rect>
+        <x>940</x>
+        <y>280</y>
+        <width>311</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QGroupBox" name="groupBox_3">
+      <property name="geometry">
+       <rect>
+        <x>500</x>
+        <y>620</y>
+        <width>111</width>
+        <height>61</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Standard calculation will use isofugacity calculation for equilibrium and Wilson equation for initialization of compositions in tangent plane distance minimization.&lt;/p&gt;&lt;p&gt;Global optimizer will use a multi start Nealder-Mead algorithm for Gibbs energy or tangent plane distance minimization. It can take till 10 seconds for TPD and till 30 seconds for P,T,flash.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="toolTipDuration">
+       <number>10000</number>
+      </property>
+      <property name="title">
+       <string/>
+      </property>
+      <widget class="QRadioButton" name="rbMixCalcStd">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>10</y>
+         <width>91</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Standard calc.</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="rbMixCalcGlobalOpt">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>30</y>
+         <width>101</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Global optimizer</string>
+       </property>
+      </widget>
+     </widget>
+     <widget class="QLineEdit" name="leMixCalcStabResult">
+      <property name="geometry">
+       <rect>
+        <x>760</x>
+        <y>620</y>
+        <width>81</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_91">
+      <property name="geometry">
+       <rect>
+        <x>740</x>
+        <y>620</y>
+        <width>31</width>
+        <height>16</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>tpd:</string>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcEosSelec13">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>300</y>
+        <width>471</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcEosSelec14">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>320</y>
+        <width>471</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcEosSelec15">
+      <property name="geometry">
+       <rect>
+        <x>460</x>
+        <y>340</y>
+        <width>471</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcCp0Selec13">
+      <property name="geometry">
+       <rect>
+        <x>940</x>
+        <y>300</y>
+        <width>311</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcCp0Selec14">
+      <property name="geometry">
+       <rect>
+        <x>940</x>
+        <y>320</y>
+        <width>311</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QComboBox" name="cbMixCalcCp0Selec15">
+      <property name="geometry">
+       <rect>
+        <x>940</x>
+        <y>340</y>
+        <width>311</width>
+        <height>20</height>
+       </rect>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btnMixCalcImportMix">
+      <property name="geometry">
+       <rect>
+        <x>1040</x>
+        <y>570</y>
+        <width>111</width>
+        <height>33</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <pointsize>10</pointsize>
+       </font>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Imports from a file a FF_MixData structure, and a composition,  previously exported.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Import mixture</string>
       </property>
      </widget>
     </widget>
@@ -4670,10 +4963,10 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="rowCount">
-       <number>47</number>
+       <number>74</number>
       </property>
       <property name="columnCount">
-       <number>4</number>
+       <number>8</number>
       </property>
       <attribute name="horizontalHeaderDefaultSectionSize">
        <number>80</number>
@@ -4734,6 +5027,53 @@ p, li { white-space: pre-wrap; }
       <row/>
       <row/>
       <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
+      <column>
+       <property name="text">
+        <string>Total</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Gas</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Liquid 1</string>
+       </property>
+      </column>
+      <column>
+       <property name="text">
+        <string>Liquid 2</string>
+       </property>
+      </column>
       <column/>
       <column/>
       <column/>
@@ -4858,7 +5198,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>864</x>
       <y>8</y>
-      <width>81</width>
+      <width>121</width>
       <height>23</height>
      </rect>
     </property>
@@ -4866,10 +5206,10 @@ p, li { white-space: pre-wrap; }
      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add the selected substance to the mixture&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="toolTipDuration">
-     <number>5</number>
+     <number>6000</number>
     </property>
     <property name="text">
-     <string>Add subs.</string>
+     <string>Add subs. to mixture</string>
     </property>
    </widget>
   </widget>
@@ -4878,9 +5218,27 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1282</width>
+     <width>1281</width>
      <height>21</height>
     </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="minimumSize">
+    <size>
+     <width>20</width>
+     <height>10</height>
+    </size>
+   </property>
+   <property name="focusPolicy">
+    <enum>Qt::ClickFocus</enum>
+   </property>
+   <property name="defaultUp">
+    <bool>true</bool>
    </property>
    <widget class="QMenu" name="menu_License">
     <property name="title">
