@@ -379,7 +379,7 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
           connect(ui->btnMixCalcPenvelope,SIGNAL(clicked()),this,SLOT(twMixCalcPenvelope()));
 
     //Button for mixture VL flash PT
-          //connect(ui->btnMixCalcVLflashPT,SIGNAL(clicked()),this,SLOT(twMixCalcVLflashPT()));
+          connect(ui->btnMixCalc2PhPTflash,SIGNAL(clicked()),this,SLOT(twMixCalcVLflashPT()));
 
 
     //Mixture results tab setup
