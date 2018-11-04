@@ -1,9 +1,17 @@
+Version 1.1.2
+- Bug correction related with forgoten link between flash calculation button and its actuation slot.
 Version 1.1.1
-- Bugs corrections related with SQlite connection and more than 12 substances in a mix. 
+
+- Bugs corrections related with SQlite connection and more than 12 substances in a mix.
+
 Version 1.1
+
 - Interfaced enlarged to manage 15 substances in a mixture.
+
 - Stability check by Michelsen, and global optimizer, methodologies added.
+
 - Two phases flash by global optimizer added.
 - Mixture export to a file contains now also the composition.
+
 - Added import of a mixture from file
 - Code cleaning and bugs correction.
