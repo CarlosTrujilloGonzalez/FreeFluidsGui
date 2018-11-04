@@ -1,3 +1,5 @@
+Version 1.1.1
+- Bugs corrections related with SQlite connection and more than 12 substances in a mix. 
 Version 1.1
 - Interfaced enlarged to manage 15 substances in a mixture.
 - Stability check by Michelsen, and global optimizer, methodologies added.

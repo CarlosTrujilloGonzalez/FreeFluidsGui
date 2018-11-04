@@ -54,7 +54,7 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     }
     //QueryModel(no editable) for holding the substances list
     subsListModel=new QSqlQueryModel(this);
-    subsListModel->setQuery("SELECT Id,Name,MW from Products WHERE (InGitHub=-1) ORDER BY Name");
+    subsListModel->setQuery("SELECT Id,Name,MW from Products WHERE (Id<2001) ORDER BY Name");
     //Data entry validators
     presBarValidator=new QDoubleValidator(0.0,10000.0,5,this);
     //presBarValidator->setNotation(QDoubleValidator::StandardNotation);
@@ -67,14 +67,13 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     subsCompleter->setCompletionMode(QCompleter::CompletionMode(1));
     //std::cout<<subsCompleter->completionModel()->
 
-
     //Common setup
     //************
 
     subsData = new FF_SubstanceData;
     mix = new FF_MixData;
     //fill with 0 the eos binary interaction parameters array
-    for(int i=0;i<12;i++) for(int j=0;j<12;j++) for(int k=0;k<6;k++) mix->intParam[i][j][k]=0;
+    for(int i=0;i<15;i++) for(int j=0;j<15;j++) for(int k=0;k<6;k++) mix->intParam[i][j][k]=0;
 
     //Combobox for substance selection model assignation
     ui->cbSubsCalcSelSubs->setCompleter(subsCompleter);
@@ -380,7 +379,7 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
           connect(ui->btnMixCalcPenvelope,SIGNAL(clicked()),this,SLOT(twMixCalcPenvelope()));
 
     //Button for mixture VL flash PT
-          connect(ui->btnMixCalc2PhPTflash,SIGNAL(clicked()),this,SLOT(twMixCalcVLflashPT()));
+          //connect(ui->btnMixCalcVLflashPT,SIGNAL(clicked()),this,SLOT(twMixCalcVLflashPT()));
 
 
     //Mixture results tab setup
@@ -389,6 +388,14 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     //Table widget for calculated mixture data display
     QStringList mixCalcHorLabels;
     QStringList mixCalcVerLabels;
+    mixCalcHorLabels <<"Total"<<"Gas"<<"Liquid 1"<<"Liquid 2";
+    /*
+    mixCalcVerLabels <<"MW"<<"P (bara)"<<"T(C)"<<"Phase fraction"<<"phi liq."<<"phi gas"<<"Z"<<"V(cm3/mol)"<<"rho(kgr/m3)"<<"H0(KJ/kgr)" <<"S0(KJ/kgr·K)"
+                     <<"Cp0(KJ/kgr·K)"<<"Cv0(KJ/kgr·K)"<<"H(KJ/kgr)"<<"U(KJ/kgr)"<<"S(KJ/kgr·K)"<<"Cp(KJ/kgr·K)"<<"Cv(KJ/kgr·K)"<<"Sound S.(m/s)"<<"J.T.coeff(K/bar)"
+                     <<"I.T.coeff(KJ/bar)"<<"(dP/dT)V(bar/K)"<<"(dP/dV)T(bar/m3)"<< "Arr"<<"(dArr/dV)T"<<"(d2Arr/dV2)T"<<"(dArr/dT)V"<<"(d2Arr/dT2)V"
+                     <<"d2Arr/dTdV"<<"Mol fract.1"<<"Mol fract.2"<<"Mol fract.3"<<"Mol fract.4"<<"Mol fract.5"<<"Mol fract.6"<<"Mass fract.1"<<"Mass fract.2"
+                     <<"Mass fract.3"<<"Mass fract.4"<<"Mass fract.5"<<"Mass fract.6"<<"Phi 1"<<"Phi 2"<<"Phi 3"<<"Phi 4"<<"Phi 5"<<"Phi 6";
+    */
     mixCalcVerLabels <<"MW"<<"P (bara)"<<"T(K)"<<"Phase fraction"<<"phi liq."<<"phi gas"<<"Z"<<"V(cm3/mol)"<<"rho(kgr/m3)"<<"H0(KJ/kgr)" <<"S0(KJ/kgr·K)"
                      <<"Cp0(KJ/kgr·K)"<<"Cv0(KJ/kgr·K)"<<"H(KJ/kgr)"<<"U(KJ/kgr)"<<"S(KJ/kgr·K)"<<"Cp(KJ/kgr·K)"<<"Cv(KJ/kgr·K)"<<"Sound S.(m/s)"<<"J.T.coeff(K/bar)"
                      <<"I.T.coeff(KJ/bar)"<<"(dP/dT)V(bar/K)"<<"(dP/dV)T(bar/m3)"<< "Arr"<<"(dArr/dV)T"<<"(d2Arr/dV2)T"<<"(dArr/dT)V"<<"(d2Arr/dT2)V"
@@ -1856,6 +1863,9 @@ void FreeFluidsMainWindow::getMixEosCpSel(){
     eosSel[9]=ui->cbMixCalcEosSelec10->currentIndex();
     eosSel[10]=ui->cbMixCalcEosSelec11->currentIndex();
     eosSel[11]=ui->cbMixCalcEosSelec12->currentIndex();
+    eosSel[12]=ui->cbMixCalcEosSelec13->currentIndex();
+    eosSel[13]=ui->cbMixCalcEosSelec14->currentIndex();
+    eosSel[14]=ui->cbMixCalcEosSelec15->currentIndex();
 
     cp0Sel[0]=ui->cbMixCalcCp0Selec1->currentIndex();
     cp0Sel[1]=ui->cbMixCalcCp0Selec2->currentIndex();
@@ -1869,6 +1879,9 @@ void FreeFluidsMainWindow::getMixEosCpSel(){
     cp0Sel[9]=ui->cbMixCalcCp0Selec10->currentIndex();
     cp0Sel[10]=ui->cbMixCalcCp0Selec11->currentIndex();
     cp0Sel[11]=ui->cbMixCalcCp0Selec12->currentIndex();
+    cp0Sel[12]=ui->cbMixCalcCp0Selec13->currentIndex();
+    cp0Sel[13]=ui->cbMixCalcCp0Selec14->currentIndex();
+    cp0Sel[14]=ui->cbMixCalcCp0Selec15->currentIndex();
 }
 
 //Write in the results table the thermodynamic records
@@ -1995,6 +2008,7 @@ void FreeFluidsMainWindow::writeMixResultsTable(int *numSubs,FF_ThermoProperties
     }
 }
 
+
 //Slot for adding a new substances to the composition table
 void FreeFluidsMainWindow::twMixCompositionAdd(){
     int subsId;
@@ -2052,6 +2066,7 @@ void  FreeFluidsMainWindow::cbMixCalcLiqModelLoad(int position){
     else mix->thModelActEos=1;
 }
 
+
 //Slot for loading the existing EOS and Cp0 correlations for the selected substances
 void  FreeFluidsMainWindow::cbMixCalcEosTypeLoad(int position){
     QSqlQuery queryEos,queryCp0;
@@ -2078,6 +2093,7 @@ void  FreeFluidsMainWindow::cbMixCalcEosTypeLoad(int position){
 
 
     while ((ui->twMixComposition->item(i,0)->text().toInt()>0)&&(i<(ui->twMixComposition->rowCount()))) i++;//we count the filled rows. We could use also numSubs.
+
     //We load the comboboxes for eos and cp0 selection with the available options for the selected substances and eos type
     for (j=0;j<i;j++){
         //printf("Hola aqui %s\n",eos.toUtf8().constData());
@@ -2110,8 +2126,11 @@ void  FreeFluidsMainWindow::cbMixCalcEosTypeLoad(int position){
         tvMixCalcSelCp0[j]->setColumnWidth(1,227);
         //tvMixCalcSelCp0[j]->resizeColumnsToContents();
         //ui->lineEdit->setText(subsListModel->record(position).value("Name").toString());
+
     }
+
 }
+
 
 //Slot for storing the selected mixing rule
 void FreeFluidsMainWindow::cbMixCalcMixRuleLoad(int row){
@@ -2352,7 +2371,7 @@ void FreeFluidsMainWindow::twMixIntParamClear(){
 
 //Slot for substances and mixture creation
 void FreeFluidsMainWindow::btnMixCalcCreateSys(){
-    substance= new FF_SubstanceData[12];
+    substance= new FF_SubstanceData[15];
 
     QString type;
     int i;//the loop variable
@@ -2379,6 +2398,8 @@ void FreeFluidsMainWindow::btnMixCalcCreateSys(){
         //printf("A:%f\n",substance[i].cp0Corr.coef[0]);
 
 
+
+
         type="Vp";
         GetCorrDataByType(&substance[i].id,&type,&db,&substance[i].vpCorr.form,substance[i].vpCorr.coef);//Hangs the program
         //printf("A:%f\n",substance[i].vpCorr.coef[0]);
@@ -2388,11 +2409,7 @@ void FreeFluidsMainWindow::btnMixCalcCreateSys(){
         //printf("A:%f\n",substance[i].lDensCorr.coef[0]);
 
     }
-
-
     subsPoint= new FF_SubstanceData*[15];
-    //FF_SubstanceData* subsPoint[12];
-
     for(i=0;i<15;i++)subsPoint[i]=&substance[i];
 
     FF_MixFillDataWithSubsData(&mix->numSubs,subsPoint,mix);
@@ -2404,7 +2421,6 @@ void FreeFluidsMainWindow::btnMixCalcCreateSys(){
     delete[] subsPoint;
     delete[] substance;
 }
-
 
 //Slot for mixture exportation
 void FreeFluidsMainWindow::btnMixCalcExportMix(){
@@ -2568,7 +2584,10 @@ void FreeFluidsMainWindow::btnMixCalcImportMix(){
     }
     if(mix->refVpEos==0)ui->cbMixCalcRefPhiSelec->setCurrentIndex(0);
     else ui->cbMixCalcRefPhiSelec->setCurrentIndex(1);
+
     cbMixCalcEosTypeLoad( ui->cbMixCalcEosTypeSelec->currentIndex());//shows the available eos for each substance
+    /*
+    */
 }
 
 //Slot for mixture bubble P calculation, and display in table
