@@ -99,6 +99,8 @@ private slots:
     void twMixCalcVLflashPT();//Slot for mixture VL flash P,T calculation, and display in table
     void mixCalcStabCheck();//Slot for checking stability of a composition
 
+    //Slot for checking stability of the results obtained
+    void mixResStabCheck();
     void on_actionDisplay_license_triggered();
 
 private:
@@ -135,14 +137,11 @@ private:
     QSqlQueryModel *mixCalcCp0Model[15];
     QTableView *tvMixCalcSelCp0[15];
     double *c;//the concentration of substances in the mixture
-    //QString eosType;
-    //enum FF_MixingRule rule;//the mixing rule to use
-    //float pintParamEos[15][15][6];//Will hold the eos interaction parameters to be used for each pair of substances
     float pintParamAct[15][15][6];//Will hold the activity interaction parameters to be used for each pair of substances
     QSqlQueryModel *mixIntParamSelModel;//model for display the interaction parameters available for the pair, in the combobox
     QTableView *tvMixIntParamSel;//table for display the interaction parameters available for the pair
 
-    int eosSel[12],cp0Sel[12];//the number of row selected(in the combobox) for eos and cp0 correlation, for each possible substance
+    int eosSel[15],cp0Sel[15];//the number of row selected(in the combobox) for eos and cp0 correlation, for each possible substance
     void getMixEosCpSel();//Pass the number of the rows selected for eos, and cp0 correlation, for each possible substance, to an array format
     void writeMixResultsTable(int *numSubs,FF_ThermoProperties *th0l,FF_PhaseThermoProp *thl,FF_ThermoProperties *th0g,FF_PhaseThermoProp *thg);//Write in the results table the thermodynamic records
 };
