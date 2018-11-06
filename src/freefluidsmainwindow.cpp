@@ -381,6 +381,9 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     //Button for mixture VL flash PT
           connect(ui->btnMixCalc2PhPTflash,SIGNAL(clicked()),this,SLOT(twMixCalcVLflashPT()));
 
+    //Button for stability check of a given composition
+          connect(ui->btnMixResStabCheck,SIGNAL(clicked()),this,SLOT(mixResStabCheck()));
+
 
     //Mixture results tab setup
     //*************************
@@ -388,7 +391,6 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     //Table widget for calculated mixture data display
     QStringList mixCalcHorLabels;
     QStringList mixCalcVerLabels;
-    mixCalcHorLabels <<"Total"<<"Gas"<<"Liquid 1"<<"Liquid 2";
     /*
     mixCalcVerLabels <<"MW"<<"P (bara)"<<"T(C)"<<"Phase fraction"<<"phi liq."<<"phi gas"<<"Z"<<"V(cm3/mol)"<<"rho(kgr/m3)"<<"H0(KJ/kgr)" <<"S0(KJ/kgr·K)"
                      <<"Cp0(KJ/kgr·K)"<<"Cv0(KJ/kgr·K)"<<"H(KJ/kgr)"<<"U(KJ/kgr)"<<"S(KJ/kgr·K)"<<"Cp(KJ/kgr·K)"<<"Cv(KJ/kgr·K)"<<"Sound S.(m/s)"<<"J.T.coeff(K/bar)"
@@ -2941,6 +2943,7 @@ void FreeFluidsMainWindow::twMixCalcVLflashPT(){
     double phiL,phiG;
     double Z,Zg;
     double beta;//gas fraction
+    double Gr;//Modified reduced gibbs energy
 
     //we clear the content of the results table
     for (i=0;i<ui->twMixCalc->rowCount();i++){
@@ -2962,8 +2965,12 @@ void FreeFluidsMainWindow::twMixCalcVLflashPT(){
     data.P=thl.P;
     data.T=thl.T;
 
+    //FF_TwoPhasesFlashPTSA(&data,thl.c,thg.c,thl.subsPhi,thg.subsPhi,&thg.fraction);
+    //return;
+
+
     if(ui->rbMixCalcStd->isChecked()) FF_VLflashPT(mix,&thl.T,&thl.P,c,thl.c,thg.c,thl.subsPhi,thg.subsPhi,&thg.fraction);
-    else if(ui->rbMixCalcGlobalOpt->isChecked()) FF_TwoPhasesFlashPTGO(&data,thl.c,thg.c,thl.subsPhi,thg.subsPhi,&thg.fraction);
+    else if(ui->rbMixCalcGlobalOpt->isChecked()) FF_TwoPhasesFlashPTSA(&data,thl.c,thg.c,thl.subsPhi,thg.subsPhi,&thg.fraction,&Gr);
 
     thl.fraction=1-thg.fraction;
 
@@ -2994,7 +3001,14 @@ void FreeFluidsMainWindow::twMixCalcVLflashPT(){
     FF_MixThermoEOS(mix,&refT,&refP,&thg);
     phiG=exp(answerG[1]+answerG[2]-1)/answerG[2];
     //printf("T:%f P:%f rhoL:%f Vg:%f state:%c phiL:%f phiG:%f\n",thl.T,thl.P,MW/answerL[0]*0.001,answerG[0],state,phiL,phiG);
+    if(ui->rbMixCalcStd->isChecked()){
+        Gr=0;
+        for(i=0;i<mix->numSubs;i++){
+            Gr=Gr+(1-thg.fraction)*thl.c[i]*(log(thl.c[i]*thl.subsPhi[i]))+thg.fraction*thg.c[i]*(log(thg.c[i]*thg.subsPhi[i]));
+        }
+    }
     writeMixResultsTable(&mix->numSubs,&th0l,&thl,&th0g,&thg);
+    ui->leMixCalcGibbs->setText(QString::number(Gr));
 
 }
 
@@ -3033,4 +3047,28 @@ void FreeFluidsMainWindow::on_actionDisplay_license_triggered()
     delete dia;
 }
 
+//Slot for checking stability of the results obtained
+void FreeFluidsMainWindow::mixResStabCheck(){
+    FF_PTXfeed data;
+    int i,useOptimizer;
+    double tpd,tpdX[15];
+    data.mix=mix;
+    data.P=1e5*ui->leMixCalcPres->text().toDouble();
+    data.T=273.15+ui->leMixCalcTemp->text().toDouble();
+    //Now we need to read the selections made for the molar fractions
+    if(ui->rbMixResPh1->isChecked()){
+        for (i=0;i< mix->numSubs;i++){
+            data.z[i]=ui->twMixCalc->item(29+i,1)->text().toDouble();//substance molar fraction
+        }
+    }
+    else if(ui->rbMixResPh2->isChecked()){
+        for (i=0;i< mix->numSubs;i++){
+            data.z[i]=ui->twMixCalc->item(29+i,2)->text().toDouble();//substance molar fraction
+        }
+    }
+    if(ui->rbMixCalcGlobalOpt->isChecked()) useOptimizer=1;
+    else useOptimizer=0;
+    FF_StabilityCheck(&data,&useOptimizer,&tpd,tpdX);
+    ui->leMixResStabResult->setText(QString::number(tpd));
 
+}
