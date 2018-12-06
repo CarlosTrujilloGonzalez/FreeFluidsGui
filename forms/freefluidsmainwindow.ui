@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1281</width>
-    <height>866</height>
+    <height>884</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>10</x>
       <y>40</y>
       <width>1271</width>
-      <height>771</height>
+      <height>781</height>
      </rect>
     </property>
     <property name="font">
@@ -4013,9 +4013,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_59">
       <property name="geometry">
        <rect>
-        <x>470</x>
+        <x>460</x>
         <y>380</y>
-        <width>111</width>
+        <width>121</width>
         <height>20</height>
        </rect>
       </property>
@@ -4026,10 +4026,10 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_60">
       <property name="geometry">
        <rect>
-        <x>340</x>
+        <x>320</x>
         <y>630</y>
-        <width>81</width>
-        <height>16</height>
+        <width>101</width>
+        <height>20</height>
        </rect>
       </property>
       <property name="text">
@@ -4052,10 +4052,10 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_61">
       <property name="geometry">
        <rect>
-        <x>340</x>
+        <x>320</x>
         <y>660</y>
-        <width>81</width>
-        <height>16</height>
+        <width>101</width>
+        <height>20</height>
        </rect>
       </property>
       <property name="text">
@@ -4078,17 +4078,17 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btnMixCalcStabCheck">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>640</x>
         <y>620</y>
         <width>91</width>
         <height>23</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Will perform the stability check using a modified reduced tangent plane distance.&lt;/p&gt;&lt;p&gt;If standard calculation is selected, initialization of the check will be done by Wilson equation.&lt;/p&gt;&lt;p&gt;If global optimizer is selected, a multi-start Nealder-Mead algorithm will be used to obtain the minimumof the tangent plane distance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Will perform the stability check using a modified reduced tangent plane distance.&lt;/p&gt;&lt;p&gt;If standard calculation is selected, initialization of the check will be done by Wilson equation.&lt;/p&gt;&lt;p&gt;If global optimizer S.A. is selected, a modified simulated annealing algorithm will be used.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="toolTipDuration">
-       <number>6000</number>
+       <number>10000</number>
       </property>
       <property name="text">
        <string>Check stability</string>
@@ -4121,7 +4121,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>550</x>
-        <y>720</y>
+        <y>730</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -4134,7 +4134,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>630</x>
-        <y>720</y>
+        <y>730</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -4147,7 +4147,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>550</x>
-        <y>690</y>
+        <y>700</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -4160,7 +4160,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>630</x>
-        <y>690</y>
+        <y>700</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -4230,20 +4230,20 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_63">
       <property name="geometry">
        <rect>
-        <x>488</x>
-        <y>8</y>
-        <width>131</width>
-        <height>16</height>
+        <x>460</x>
+        <y>10</y>
+        <width>141</width>
+        <height>20</height>
        </rect>
       </property>
       <property name="text">
-       <string>Liquid phase model:</string>
+       <string>Thermodynamic model:</string>
       </property>
      </widget>
      <widget class="QComboBox" name="cbMixCalcLiqModelSelec">
       <property name="geometry">
        <rect>
-        <x>600</x>
+        <x>610</x>
         <y>10</y>
         <width>111</width>
         <height>20</height>
@@ -4256,19 +4256,24 @@ p, li { white-space: pre-wrap; }
        <number>3000</number>
       </property>
       <property name="currentText">
-       <string>Fugacity (EOS)</string>
+       <string>gamma-phi</string>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <item>
        <property name="text">
-        <string>Activity</string>
+        <string>gamma-phi</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>Fugacity (EOS)</string>
+        <string>phi-phi</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>gamma-gamma</string>
        </property>
       </item>
      </widget>
@@ -4288,7 +4293,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcActModelSelec">
       <property name="geometry">
        <rect>
-        <x>840</x>
+        <x>860</x>
         <y>380</y>
         <width>129</width>
         <height>20</height>
@@ -4363,9 +4368,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_65">
       <property name="geometry">
        <rect>
-        <x>1040</x>
+        <x>1030</x>
         <y>380</y>
-        <width>111</width>
+        <width>121</width>
         <height>20</height>
        </rect>
       </property>
@@ -4376,7 +4381,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbMixCalcRefPhiSelec">
       <property name="geometry">
        <rect>
-        <x>1130</x>
+        <x>1140</x>
         <y>380</y>
         <width>49</width>
         <height>20</height>
@@ -4511,8 +4516,8 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>710</x>
-        <y>720</y>
-        <width>75</width>
+        <y>730</y>
+        <width>91</width>
         <height>23</height>
        </rect>
       </property>
@@ -4524,8 +4529,8 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>710</x>
-        <y>690</y>
-        <width>75</width>
+        <y>700</y>
+        <width>91</width>
         <height>23</height>
        </rect>
       </property>
@@ -4559,17 +4564,17 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btnMixCalc2PhPTflash">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>640</x>
         <y>650</y>
         <width>111</width>
         <height>23</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If standard calculation is selected, a VL flash by sucessive substitutions will be performed.&lt;/p&gt;&lt;p&gt;If Global optimizer is selected a two phases modified (without the ideal term) reduced Gibbs energy minimization will be performed using the simulated annealing methodology.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;If standard calculation is selected, a VL flash by sucessive substitutions will be performed.&lt;/p&gt;&lt;p&gt;If Global optimizer S.A. (or D.E.) is selected a two phases modified (without the ideal term) reduced Gibbs energy minimization will be performed using an improved simulated annealing methodology, or differential evolution.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="toolTipDuration">
-       <number>6000</number>
+       <number>10000</number>
       </property>
       <property name="text">
        <string>2 phases P,T flash</string>
@@ -4593,7 +4598,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>1040</x>
         <y>520</y>
-        <width>111</width>
+        <width>121</width>
         <height>33</height>
        </rect>
       </property>
@@ -4612,9 +4617,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_89">
       <property name="geometry">
        <rect>
-        <x>340</x>
-        <y>690</y>
-        <width>111</width>
+        <x>320</x>
+        <y>700</y>
+        <width>131</width>
         <height>20</height>
        </rect>
       </property>
@@ -4626,7 +4631,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>460</x>
-        <y>690</y>
+        <y>700</y>
         <width>71</width>
         <height>20</height>
        </rect>
@@ -4644,9 +4649,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_90">
       <property name="geometry">
        <rect>
-        <x>340</x>
-        <y>710</y>
-        <width>111</width>
+        <x>320</x>
+        <y>720</y>
+        <width>131</width>
         <height>20</height>
        </rect>
       </property>
@@ -4658,7 +4663,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>460</x>
-        <y>710</y>
+        <y>720</y>
         <width>71</width>
         <height>20</height>
        </rect>
@@ -4798,15 +4803,15 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>500</x>
         <y>620</y>
-        <width>111</width>
-        <height>61</height>
+        <width>131</width>
+        <height>71</height>
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Standard calculation will use isofugacity calculation for equilibrium and Wilson equation for initialization of compositions in tangent plane distance minimization.&lt;/p&gt;&lt;p&gt;Global optimizer will use simulated annealing Gibbs energy minimization for approaching the solution, followed by some loops of sucesive substitutions, for two phases flash. And a multi start Nealder-Mead algorithm for tangent plane distance minimization (it can take 10 seconds).&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Standard calculation will use isofugacity calculation for equilibrium. And Wilson equation for initialization of compositions, both for equilibrium and tangent plane distance minimization. This makes the flash algorithm not very adequate for liquid-liquid usage.&lt;/p&gt;&lt;p&gt;Global optimizer will use modified simulated annealing, or differential evolution, algorithms for Gibbs energy minimization. The differential evolution algorithm has been implemented only for two phases flash, but not for stability check.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="toolTipDuration">
-       <number>10000</number>
+       <number>12000</number>
       </property>
       <property name="title">
        <string/>
@@ -4816,7 +4821,7 @@ p, li { white-space: pre-wrap; }
         <rect>
          <x>10</x>
          <y>10</y>
-         <width>91</width>
+         <width>111</width>
          <height>17</height>
         </rect>
        </property>
@@ -4827,24 +4832,37 @@ p, li { white-space: pre-wrap; }
         <bool>true</bool>
        </property>
       </widget>
-      <widget class="QRadioButton" name="rbMixCalcGlobalOpt">
+      <widget class="QRadioButton" name="rbMixCalcGlobalOptSA">
        <property name="geometry">
         <rect>
          <x>10</x>
          <y>30</y>
-         <width>101</width>
+         <width>121</width>
          <height>17</height>
         </rect>
        </property>
        <property name="text">
-        <string>Global optimizer</string>
+        <string>Global optimizer S.A.</string>
+       </property>
+      </widget>
+      <widget class="QRadioButton" name="rbMixCalcGlobalOptDE">
+       <property name="geometry">
+        <rect>
+         <x>10</x>
+         <y>50</y>
+         <width>121</width>
+         <height>17</height>
+        </rect>
+       </property>
+       <property name="text">
+        <string>Global optimizer D.E.</string>
        </property>
       </widget>
      </widget>
      <widget class="QLineEdit" name="leMixCalcStabResult">
       <property name="geometry">
        <rect>
-        <x>760</x>
+        <x>780</x>
         <y>620</y>
         <width>81</width>
         <height>20</height>
@@ -4854,7 +4872,7 @@ p, li { white-space: pre-wrap; }
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;A tpd less than -1e-4 will indicate an inestable composition&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="toolTipDuration">
-       <number>6000</number>
+       <number>10000</number>
       </property>
       <property name="text">
        <string/>
@@ -4866,10 +4884,10 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_91">
       <property name="geometry">
        <rect>
-        <x>730</x>
+        <x>740</x>
         <y>620</y>
         <width>31</width>
-        <height>16</height>
+        <height>20</height>
        </rect>
       </property>
       <property name="text">
@@ -4941,7 +4959,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>1040</x>
         <y>570</y>
-        <width>111</width>
+        <width>121</width>
         <height>33</height>
        </rect>
       </property>
@@ -4960,11 +4978,14 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leMixCalcGibbs">
       <property name="geometry">
        <rect>
-        <x>820</x>
+        <x>850</x>
         <y>650</y>
         <width>81</width>
         <height>20</height>
        </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The global reduced resitual Gibbs energy is displayed in order to have information about the quality of the minimum.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string/>
@@ -4976,14 +4997,33 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_95">
       <property name="geometry">
        <rect>
-        <x>740</x>
+        <x>760</x>
         <y>650</y>
-        <width>71</width>
+        <width>81</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
        <string>Gibbs energy:</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btnMixCalc3PhPTflash">
+      <property name="geometry">
+       <rect>
+        <x>820</x>
+        <y>700</y>
+        <width>121</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The 3 phases flash is not yet fully implemented.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="toolTipDuration">
+       <number>6000</number>
+      </property>
+      <property name="text">
+       <string>3 phases P,T flash</string>
       </property>
      </widget>
     </widget>
@@ -5001,7 +5041,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="rowCount">
-       <number>74</number>
+       <number>76</number>
       </property>
       <property name="columnCount">
        <number>8</number>
@@ -5018,6 +5058,8 @@ p, li { white-space: pre-wrap; }
       <attribute name="verticalHeaderMinimumSectionSize">
        <number>22</number>
       </attribute>
+      <row/>
+      <row/>
       <row/>
       <row/>
       <row/>
@@ -5203,7 +5245,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>50</x>
         <y>680</y>
-        <width>131</width>
+        <width>151</width>
         <height>61</height>
        </rect>
       </property>
@@ -5251,7 +5293,7 @@ p, li { white-space: pre-wrap; }
       <widget class="QRadioButton" name="rbMixResPh3">
        <property name="geometry">
         <rect>
-         <x>70</x>
+         <x>80</x>
          <y>10</y>
          <width>101</width>
          <height>17</height>
@@ -5272,7 +5314,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Will perform the stability check using a modified reduced tangent plane distance.&lt;/p&gt;&lt;p&gt;If standard calculation is selected, initialization of the check will be done by Wilson equation.&lt;/p&gt;&lt;p&gt;If global optimizer is selected, a multi-start Nealder-Mead algorithm will be used to obtain the minimumof the tangent plane distance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Will perform the stability check of the selected phase using a modified reduced tangent plane distance. The methodology used will be the one selected in the &amp;quot;Mix Calc.&amp;quot; tab.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="toolTipDuration">
        <number>6000</number>
@@ -5341,7 +5383,7 @@ p, li { white-space: pre-wrap; }
      <rect>
       <x>864</x>
       <y>8</y>
-      <width>121</width>
+      <width>131</width>
       <height>23</height>
      </rect>
     </property>
