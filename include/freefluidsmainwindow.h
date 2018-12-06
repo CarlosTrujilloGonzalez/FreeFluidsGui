@@ -96,7 +96,8 @@ private slots:
     void twMixCalcBubbleP();//Slot for mixture bubble P calculation, and display in table
     void twMixCalcDewP();//Slot for mixture dew P calculation, and display in table
     void twMixCalcPenvelope();//Slot for the pressure envelope calculation for binary mixtures
-    void twMixCalcVLflashPT();//Slot for mixture VL flash P,T calculation, and display in table
+    void twMixCalc2PhFlashPT();//Slot for mixture VL flash P,T calculation, and display in table
+    void twMixCalc3PhFlashPT();//Slot for mixture three phases P,T flash calculation, and display in table
     void mixCalcStabCheck();//Slot for checking stability of a composition
 
     //Slot for checking stability of the results obtained
@@ -143,7 +144,8 @@ private:
 
     int eosSel[15],cp0Sel[15];//the number of row selected(in the combobox) for eos and cp0 correlation, for each possible substance
     void getMixEosCpSel();//Pass the number of the rows selected for eos, and cp0 correlation, for each possible substance, to an array format
-    void writeMixResultsTable(int *numSubs,FF_ThermoProperties *th0l,FF_PhaseThermoProp *thl,FF_ThermoProperties *th0g,FF_PhaseThermoProp *thg);//Write in the results table the thermodynamic records
+    void writeMixResultsTable(int nPhases,FF_MixData*mix,FF_ThermoProperties *th0A,FF_PhaseThermoProp *thA,FF_ThermoProperties *th0B,
+                              FF_PhaseThermoProp *thB, FF_ThermoProperties *th0C,FF_PhaseThermoProp *thC);//Write in the results table the thermodynamic records
 };
 
 #endif // FREEFLUIDSMAINWINDOW_H

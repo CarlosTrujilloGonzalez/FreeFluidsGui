@@ -379,9 +379,12 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
           connect(ui->btnMixCalcPenvelope,SIGNAL(clicked()),this,SLOT(twMixCalcPenvelope()));
 
     //Button for mixture VL flash PT
-          connect(ui->btnMixCalc2PhPTflash,SIGNAL(clicked()),this,SLOT(twMixCalcVLflashPT()));
+          connect(ui->btnMixCalc2PhPTflash,SIGNAL(clicked()),this,SLOT(twMixCalc2PhFlashPT()));
 
-    //Button for stability check of a given composition
+    //Button for mixture VL flash PT
+          connect(ui->btnMixCalc3PhPTflash,SIGNAL(clicked()),this,SLOT(twMixCalc3PhFlashPT()));
+
+    //Button for stability check of resulting phases
           connect(ui->btnMixResStabCheck,SIGNAL(clicked()),this,SLOT(mixResStabCheck()));
 
 
@@ -391,13 +394,6 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     //Table widget for calculated mixture data display
     QStringList mixCalcHorLabels;
     QStringList mixCalcVerLabels;
-    /*
-    mixCalcVerLabels <<"MW"<<"P (bara)"<<"T(C)"<<"Phase fraction"<<"phi liq."<<"phi gas"<<"Z"<<"V(cm3/mol)"<<"rho(kgr/m3)"<<"H0(KJ/kgr)" <<"S0(KJ/kgr·K)"
-                     <<"Cp0(KJ/kgr·K)"<<"Cv0(KJ/kgr·K)"<<"H(KJ/kgr)"<<"U(KJ/kgr)"<<"S(KJ/kgr·K)"<<"Cp(KJ/kgr·K)"<<"Cv(KJ/kgr·K)"<<"Sound S.(m/s)"<<"J.T.coeff(K/bar)"
-                     <<"I.T.coeff(KJ/bar)"<<"(dP/dT)V(bar/K)"<<"(dP/dV)T(bar/m3)"<< "Arr"<<"(dArr/dV)T"<<"(d2Arr/dV2)T"<<"(dArr/dT)V"<<"(d2Arr/dT2)V"
-                     <<"d2Arr/dTdV"<<"Mol fract.1"<<"Mol fract.2"<<"Mol fract.3"<<"Mol fract.4"<<"Mol fract.5"<<"Mol fract.6"<<"Mass fract.1"<<"Mass fract.2"
-                     <<"Mass fract.3"<<"Mass fract.4"<<"Mass fract.5"<<"Mass fract.6"<<"Phi 1"<<"Phi 2"<<"Phi 3"<<"Phi 4"<<"Phi 5"<<"Phi 6";
-    */
     mixCalcVerLabels <<"MW"<<"P (bara)"<<"T(K)"<<"Phase fraction"<<"phi liq."<<"phi gas"<<"Z"<<"V(cm3/mol)"<<"rho(kgr/m3)"<<"H0(KJ/kgr)" <<"S0(KJ/kgr·K)"
                      <<"Cp0(KJ/kgr·K)"<<"Cv0(KJ/kgr·K)"<<"H(KJ/kgr)"<<"U(KJ/kgr)"<<"S(KJ/kgr·K)"<<"Cp(KJ/kgr·K)"<<"Cv(KJ/kgr·K)"<<"Sound S.(m/s)"<<"J.T.coeff(K/bar)"
                      <<"I.T.coeff(KJ/bar)"<<"(dP/dT)V(bar/K)"<<"(dP/dV)T(bar/m3)"<< "Arr"<<"(dArr/dV)T"<<"(d2Arr/dV2)T"<<"(dArr/dT)V"<<"(d2Arr/dT2)V"
@@ -405,7 +401,7 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
                     <<"Mol fract.9"<<"Mol fract.10"<<"Mol fract.11"<<"Mol fract.12"<<"Mol fract.13"<<"Mol fract.14"<<"Mol fract.15"<<"Mass fract.1"<<"Mass fract.2"
                      <<"Mass fract.3"<<"Mass fract.4"<<"Mass fract.5"<<"Mass fract.6"<<"Mass fract.7"<<"Mass fract.8"<<"Mass fract.9"<<"Mass fract.10"
                     <<"Mass fract.11"<<"Mass fract.12"<<"Mass fract.13"<<"Mass fract.14"<<"Mass fract.15"<<"Phi 1"<<"Phi 2"<<"Phi 3"<<"Phi 4"<<"Phi 5"<<"Phi 6"
-                      <<"Phi 7"<<"Phi 8"<<"Phi 9"<<"Phi 10"<<"Phi 11"<<"Phi 12"<<"Phi 13"<<"Phi 14"<<"Phi 15";
+                      <<"Phi 7"<<"Phi 8"<<"Phi 9"<<"Phi 10"<<"Phi 11"<<"Phi 12"<<"Phi 13"<<"Phi 14"<<"Phi 15"<<"gE(reduced)"<<"hE(reduced)";
     ui->twMixCalc->setHorizontalHeaderLabels(mixCalcHorLabels);
     ui->twMixCalc->setVerticalHeaderLabels(mixCalcVerLabels);
     for (int i=0;i<ui->twMixCalc->columnCount();i++)for (int j=0;j<ui->twMixCalc->rowCount();j++) ui->twMixCalc->setItem(j,i,new QTableWidgetItem());
@@ -735,11 +731,11 @@ void FreeFluidsMainWindow::twSubsCalcUpdate()
             phiL=exp(answerL[1]+answerL[2]-1)/answerL[2];
             phiG=exp(answerG[1]+answerG[2]-1)/answerG[2];
             if (state=='f') phase="Calc.fail";
-            else if ((state=='U')||(state=='l')||(state=='g')) phase="Unique";
+            else if ((state=='U')||(state=='u')||(state=='l')||(state=='g')) phase="Unique";
             else if (state=='L') phase="Liquid";
             else if (state=='G') phase="Gas";
             else if (state=='E') phase="Equilibrium";
-            if ((state=='l')||(state=='L')||(state=='U')||(state=='E')){
+            if ((state=='l')||(state=='L')||(state=='U')||(state=='u')||(state=='E')){
                 thR.V=answerL[0];
                 Z=answerL[2];
             }
@@ -1887,126 +1883,188 @@ void FreeFluidsMainWindow::getMixEosCpSel(){
 }
 
 //Write in the results table the thermodynamic records
-void FreeFluidsMainWindow::writeMixResultsTable(int *numSubs,FF_ThermoProperties *th0l,FF_PhaseThermoProp *thl,FF_ThermoProperties *th0g,FF_PhaseThermoProp *thg){
-    int i;
-    ui->twMixCalc->item(0,1)->setText(QString::number(thg->MW));
-    ui->twMixCalc->item(1,1)->setText(QString::number(thg->P*0.00001));
-    ui->twMixCalc->item(2,1)->setText(QString::number(thg->T));
-    ui->twMixCalc->item(3,1)->setText(QString::number(thg->fraction));
-    ui->twMixCalc->item(7,1)->setText(QString::number(thg->V*1e6));//Molar volume cm3/mol
-    ui->twMixCalc->item(8,1)->setText(QString::number(thg->MW/thg->V*0.001));//rho kgr/m3
-    ui->twMixCalc->item(9,1)->setText(QString::number(th0g->H/th0g->MW));//H0 KJ/kgr
-    ui->twMixCalc->item(10,1)->setText(QString::number(th0g->S/th0g->MW));
-    ui->twMixCalc->item(11,1)->setText(QString::number(th0g->Cp/th0g->MW));//Cp0 KJ/kgr·K
-    ui->twMixCalc->item(12,1)->setText(QString::number(th0g->Cv/th0g->MW));//Cv0 KJ/kgr·K
-    ui->twMixCalc->item(13,1)->setText(QString::number(thg->H/thg->MW));
-    ui->twMixCalc->item(14,1)->setText(QString::number(thg->U/thg->MW));
-    ui->twMixCalc->item(15,1)->setText(QString::number(thg->S/thg->MW));
-    ui->twMixCalc->item(16,1)->setText(QString::number(thg->Cp/thg->MW));
-    ui->twMixCalc->item(17,1)->setText(QString::number(thg->Cv/thg->MW));
-    ui->twMixCalc->item(18,1)->setText(QString::number(thg->SS));
-    ui->twMixCalc->item(19,1)->setText(QString::number(thg->JT*1e5));
-    ui->twMixCalc->item(20,1)->setText(QString::number(thg->IT*1e2));
-    ui->twMixCalc->item(21,1)->setText(QString::number(thg->dP_dT*1e-5));
-    ui->twMixCalc->item(22,1)->setText(QString::number(thg->dP_dV*1e-5));
-    ui->twMixCalc->item(23,1)->setText(QString::number(thg->ArrDer[0]));
-    ui->twMixCalc->item(24,1)->setText(QString::number(thg->ArrDer[1]));
-    ui->twMixCalc->item(25,1)->setText(QString::number(thg->ArrDer[2]));
-    ui->twMixCalc->item(26,1)->setText(QString::number(thg->ArrDer[3]));
-    ui->twMixCalc->item(27,1)->setText(QString::number(thg->ArrDer[4]));
-    ui->twMixCalc->item(28,1)->setText(QString::number(thg->ArrDer[5]));
-    ui->twMixCalc->item(29,1)->setText(QString::number(thg->c[0]));
-    ui->twMixCalc->item(30,1)->setText(QString::number(thg->c[1]));
-    ui->twMixCalc->item(31,1)->setText(QString::number(thg->c[2]));
-    ui->twMixCalc->item(32,1)->setText(QString::number(thg->c[3]));
-    ui->twMixCalc->item(33,1)->setText(QString::number(thg->c[4]));
-    ui->twMixCalc->item(34,1)->setText(QString::number(thg->c[5]));
-    ui->twMixCalc->item(35,1)->setText(QString::number(thg->c[6]));
-    ui->twMixCalc->item(36,1)->setText(QString::number(thg->c[7]));
-    ui->twMixCalc->item(37,1)->setText(QString::number(thg->c[8]));
-    ui->twMixCalc->item(38,1)->setText(QString::number(thg->c[9]));
-    ui->twMixCalc->item(39,1)->setText(QString::number(thg->c[10]));
-    ui->twMixCalc->item(40,1)->setText(QString::number(thg->c[11]));
-    ui->twMixCalc->item(41,1)->setText(QString::number(thg->c[12]));
-    ui->twMixCalc->item(42,1)->setText(QString::number(thg->c[13]));
-    ui->twMixCalc->item(43,1)->setText(QString::number(thg->c[14]));
-    ui->twMixCalc->item(59,1)->setText(QString::number(thg->subsPhi[0]));
-    ui->twMixCalc->item(60,1)->setText(QString::number(thg->subsPhi[1]));
-    ui->twMixCalc->item(61,1)->setText(QString::number(thg->subsPhi[2]));
-    ui->twMixCalc->item(62,1)->setText(QString::number(thg->subsPhi[3]));
-    ui->twMixCalc->item(63,1)->setText(QString::number(thg->subsPhi[4]));
-    ui->twMixCalc->item(64,1)->setText(QString::number(thg->subsPhi[5]));
-    ui->twMixCalc->item(65,1)->setText(QString::number(thg->subsPhi[6]));
-    ui->twMixCalc->item(66,1)->setText(QString::number(thg->subsPhi[7]));
-    ui->twMixCalc->item(67,1)->setText(QString::number(thg->subsPhi[8]));
-    ui->twMixCalc->item(68,1)->setText(QString::number(thg->subsPhi[9]));
-    ui->twMixCalc->item(69,1)->setText(QString::number(thg->subsPhi[10]));
-    ui->twMixCalc->item(70,1)->setText(QString::number(thg->subsPhi[11]));
-    ui->twMixCalc->item(71,1)->setText(QString::number(thg->subsPhi[12]));
-    ui->twMixCalc->item(71,1)->setText(QString::number(thg->subsPhi[13]));
-    ui->twMixCalc->item(73,1)->setText(QString::number(thg->subsPhi[14]));
-    ui->twMixCalc->item(0,2)->setText(QString::number(thl->MW));
-    ui->twMixCalc->item(1,2)->setText(QString::number(thl->P*0.00001));
-    ui->twMixCalc->item(2,2)->setText(QString::number(thl->T));
-    ui->twMixCalc->item(3,2)->setText(QString::number(thl->fraction));
-    ui->twMixCalc->item(7,2)->setText(QString::number(thl->V*1e6));//Molar volume cm3/mol
-    ui->twMixCalc->item(8,2)->setText(QString::number(thl->MW/thl->V*0.001));//rho kgr/m3
-    ui->twMixCalc->item(9,2)->setText(QString::number(th0l->H/th0l->MW));//H0 KJ/kgr
-    ui->twMixCalc->item(10,2)->setText(QString::number(th0l->S/th0l->MW));
-    ui->twMixCalc->item(11,2)->setText(QString::number(th0l->Cp/th0l->MW));//Cp0 KJ/kgr·K
-    ui->twMixCalc->item(12,2)->setText(QString::number(th0l->Cv/th0l->MW));//Cv0 KJ/kgr·K
-    ui->twMixCalc->item(13,2)->setText(QString::number(thl->H/thl->MW));
-    ui->twMixCalc->item(14,2)->setText(QString::number(thl->U/thl->MW));
-    ui->twMixCalc->item(15,2)->setText(QString::number(thl->S/thl->MW));
-    ui->twMixCalc->item(16,2)->setText(QString::number(thl->Cp/thl->MW));
-    ui->twMixCalc->item(17,2)->setText(QString::number(thl->Cv/thl->MW));
-    ui->twMixCalc->item(18,2)->setText(QString::number(thl->SS));
-    ui->twMixCalc->item(19,2)->setText(QString::number(thl->JT*1e5));
-    ui->twMixCalc->item(20,2)->setText(QString::number(thl->IT*1e2));
-    ui->twMixCalc->item(21,2)->setText(QString::number(thl->dP_dT*1e-5));
-    ui->twMixCalc->item(22,2)->setText(QString::number(thl->dP_dV*1e-5));
-    ui->twMixCalc->item(23,2)->setText(QString::number(thl->ArrDer[0]));
-    ui->twMixCalc->item(24,2)->setText(QString::number(thl->ArrDer[1]));
-    ui->twMixCalc->item(25,2)->setText(QString::number(thl->ArrDer[2]));
-    ui->twMixCalc->item(26,2)->setText(QString::number(thl->ArrDer[3]));
-    ui->twMixCalc->item(27,2)->setText(QString::number(thl->ArrDer[4]));
-    ui->twMixCalc->item(28,2)->setText(QString::number(thl->ArrDer[5]));
-    ui->twMixCalc->item(29,2)->setText(QString::number(thl->c[0]));
-    ui->twMixCalc->item(30,2)->setText(QString::number(thl->c[1]));
-    ui->twMixCalc->item(31,2)->setText(QString::number(thl->c[2]));
-    ui->twMixCalc->item(32,2)->setText(QString::number(thl->c[3]));
-    ui->twMixCalc->item(33,2)->setText(QString::number(thl->c[4]));
-    ui->twMixCalc->item(34,2)->setText(QString::number(thl->c[5]));
-    ui->twMixCalc->item(35,2)->setText(QString::number(thl->c[6]));
-    ui->twMixCalc->item(36,2)->setText(QString::number(thl->c[7]));
-    ui->twMixCalc->item(37,2)->setText(QString::number(thl->c[8]));
-    ui->twMixCalc->item(38,2)->setText(QString::number(thl->c[9]));
-    ui->twMixCalc->item(39,2)->setText(QString::number(thl->c[10]));
-    ui->twMixCalc->item(40,2)->setText(QString::number(thl->c[11]));
-    ui->twMixCalc->item(41,2)->setText(QString::number(thl->c[12]));
-    ui->twMixCalc->item(42,2)->setText(QString::number(thl->c[13]));
-    ui->twMixCalc->item(43,2)->setText(QString::number(thl->c[14]));
-    ui->twMixCalc->item(59,2)->setText(QString::number(thl->subsPhi[0]));
-    ui->twMixCalc->item(60,2)->setText(QString::number(thl->subsPhi[1]));
-    ui->twMixCalc->item(61,2)->setText(QString::number(thl->subsPhi[2]));
-    ui->twMixCalc->item(62,2)->setText(QString::number(thl->subsPhi[3]));
-    ui->twMixCalc->item(63,2)->setText(QString::number(thl->subsPhi[4]));
-    ui->twMixCalc->item(64,2)->setText(QString::number(thl->subsPhi[5]));
-    ui->twMixCalc->item(65,2)->setText(QString::number(thl->subsPhi[6]));
-    ui->twMixCalc->item(66,2)->setText(QString::number(thl->subsPhi[7]));
-    ui->twMixCalc->item(67,2)->setText(QString::number(thl->subsPhi[8]));
-    ui->twMixCalc->item(68,2)->setText(QString::number(thl->subsPhi[9]));
-    ui->twMixCalc->item(69,2)->setText(QString::number(thl->subsPhi[10]));
-    ui->twMixCalc->item(70,2)->setText(QString::number(thl->subsPhi[11]));
-    ui->twMixCalc->item(71,2)->setText(QString::number(thl->subsPhi[12]));
-    ui->twMixCalc->item(72,2)->setText(QString::number(thl->subsPhi[13]));
-    ui->twMixCalc->item(73,2)->setText(QString::number(thl->subsPhi[14]));
+void FreeFluidsMainWindow::writeMixResultsTable(int nPhases,FF_MixData*mix,FF_ThermoProperties *th0A,FF_PhaseThermoProp *thA,FF_ThermoProperties *th0B,
+                                                FF_PhaseThermoProp *thB, FF_ThermoProperties *th0C,FF_PhaseThermoProp *thC){
+    int i,j;
+    double cm;//Massic fraction
+    //we clear the content of the table
+    for (i=0;i<ui->twMixCalc->rowCount();i++) for (j=0;j<ui->twMixCalc->columnCount();j++) ui->twMixCalc->item(i,j)->setText("");
+    ui->twMixCalc->item(0,1)->setText(QString::number(thA->MW));
+    ui->twMixCalc->item(1,1)->setText(QString::number(thA->P*0.00001));
+    ui->twMixCalc->item(2,1)->setText(QString::number(thA->T));
+    ui->twMixCalc->item(3,1)->setText(QString::number(thA->fraction));
+    if(mix->thModelActEos!=2){
+        ui->twMixCalc->item(7,1)->setText(QString::number(thA->V*1e6));//Molar volume cm3/mol
+        ui->twMixCalc->item(8,1)->setText(QString::number(thA->MW/thA->V*0.001));//rho kgr/m3
+    }
+    ui->twMixCalc->item(9,1)->setText(QString::number(th0A->H/th0A->MW));//H0 KJ/kgr
+    ui->twMixCalc->item(10,1)->setText(QString::number(th0A->S/th0A->MW));
+    ui->twMixCalc->item(11,1)->setText(QString::number(th0A->Cp/th0A->MW));//Cp0 KJ/kgr·K
+    ui->twMixCalc->item(12,1)->setText(QString::number(th0A->Cv/th0A->MW));//Cv0 KJ/kgr·K
+    if(mix->thModelActEos!=2){
+        ui->twMixCalc->item(13,1)->setText(QString::number(thA->H/thA->MW));
+        ui->twMixCalc->item(14,1)->setText(QString::number(thA->U/thA->MW));
+        ui->twMixCalc->item(15,1)->setText(QString::number(thA->S/thA->MW));
+        ui->twMixCalc->item(16,1)->setText(QString::number(thA->Cp/thA->MW));
+        ui->twMixCalc->item(17,1)->setText(QString::number(thA->Cv/thA->MW));
+        ui->twMixCalc->item(18,1)->setText(QString::number(thA->SS));
+        ui->twMixCalc->item(19,1)->setText(QString::number(thA->JT*1e5));
+        ui->twMixCalc->item(20,1)->setText(QString::number(thA->IT*1e2));
+        ui->twMixCalc->item(21,1)->setText(QString::number(thA->dP_dT*1e-5));
+        ui->twMixCalc->item(22,1)->setText(QString::number(thA->dP_dV*1e-5));
+        ui->twMixCalc->item(23,1)->setText(QString::number(thA->ArrDer[0]));
+        ui->twMixCalc->item(24,1)->setText(QString::number(thA->ArrDer[1]));
+        ui->twMixCalc->item(25,1)->setText(QString::number(thA->ArrDer[2]));
+        ui->twMixCalc->item(26,1)->setText(QString::number(thA->ArrDer[3]));
+        ui->twMixCalc->item(27,1)->setText(QString::number(thA->ArrDer[4]));
+        ui->twMixCalc->item(28,1)->setText(QString::number(thA->ArrDer[5]));
+    }
 
-    for(i=*numSubs;i<15;i++){
+    ui->twMixCalc->item(29,1)->setText(QString::number(thA->c[0]));
+    ui->twMixCalc->item(30,1)->setText(QString::number(thA->c[1]));
+    ui->twMixCalc->item(31,1)->setText(QString::number(thA->c[2]));
+    ui->twMixCalc->item(32,1)->setText(QString::number(thA->c[3]));
+    ui->twMixCalc->item(33,1)->setText(QString::number(thA->c[4]));
+    ui->twMixCalc->item(34,1)->setText(QString::number(thA->c[5]));
+    ui->twMixCalc->item(35,1)->setText(QString::number(thA->c[6]));
+    ui->twMixCalc->item(36,1)->setText(QString::number(thA->c[7]));
+    ui->twMixCalc->item(37,1)->setText(QString::number(thA->c[8]));
+    ui->twMixCalc->item(38,1)->setText(QString::number(thA->c[9]));
+    ui->twMixCalc->item(39,1)->setText(QString::number(thA->c[10]));
+    ui->twMixCalc->item(40,1)->setText(QString::number(thA->c[11]));
+    ui->twMixCalc->item(41,1)->setText(QString::number(thA->c[12]));
+    ui->twMixCalc->item(42,1)->setText(QString::number(thA->c[13]));
+    ui->twMixCalc->item(43,1)->setText(QString::number(thA->c[14]));
+    for(i=0;i<mix->numSubs;i++){
+        cm=thA->c[i]*mix->baseProp[i].MW/thA->MW;
+        ui->twMixCalc->item(44+i,1)->setText(QString::number(cm));
+    }
+    ui->twMixCalc->item(59,1)->setText(QString::number(thA->subsPhi[0]));
+    ui->twMixCalc->item(60,1)->setText(QString::number(thA->subsPhi[1]));
+    ui->twMixCalc->item(61,1)->setText(QString::number(thA->subsPhi[2]));
+    ui->twMixCalc->item(62,1)->setText(QString::number(thA->subsPhi[3]));
+    ui->twMixCalc->item(63,1)->setText(QString::number(thA->subsPhi[4]));
+    ui->twMixCalc->item(64,1)->setText(QString::number(thA->subsPhi[5]));
+    ui->twMixCalc->item(65,1)->setText(QString::number(thA->subsPhi[6]));
+    ui->twMixCalc->item(66,1)->setText(QString::number(thA->subsPhi[7]));
+    ui->twMixCalc->item(67,1)->setText(QString::number(thA->subsPhi[8]));
+    ui->twMixCalc->item(68,1)->setText(QString::number(thA->subsPhi[9]));
+    ui->twMixCalc->item(69,1)->setText(QString::number(thA->subsPhi[10]));
+    ui->twMixCalc->item(70,1)->setText(QString::number(thA->subsPhi[11]));
+    ui->twMixCalc->item(71,1)->setText(QString::number(thA->subsPhi[12]));
+    ui->twMixCalc->item(71,1)->setText(QString::number(thA->subsPhi[13]));
+    ui->twMixCalc->item(73,1)->setText(QString::number(thA->subsPhi[14]));
+    //Second phase
+    ui->twMixCalc->item(0,2)->setText(QString::number(thB->MW));
+    ui->twMixCalc->item(1,2)->setText(QString::number(thB->P*0.00001));
+    ui->twMixCalc->item(2,2)->setText(QString::number(thB->T));
+    ui->twMixCalc->item(3,2)->setText(QString::number(thB->fraction));
+    if(mix->thModelActEos==1){
+        ui->twMixCalc->item(7,2)->setText(QString::number(thB->V*1e6));//Molar volume cm3/mol
+        ui->twMixCalc->item(8,2)->setText(QString::number(thB->MW/thB->V*0.001));//rho kgr/m3
+    }
+    ui->twMixCalc->item(9,2)->setText(QString::number(th0B->H/th0B->MW));//H0 KJ/kgr
+    ui->twMixCalc->item(10,2)->setText(QString::number(th0B->S/th0B->MW));
+    ui->twMixCalc->item(11,2)->setText(QString::number(th0B->Cp/th0B->MW));//Cp0 KJ/kgr·K
+    ui->twMixCalc->item(12,2)->setText(QString::number(th0B->Cv/th0B->MW));//Cv0 KJ/kgr·K
+    if(mix->thModelActEos==1){
+        ui->twMixCalc->item(13,2)->setText(QString::number(thB->H/thB->MW));
+        ui->twMixCalc->item(14,2)->setText(QString::number(thB->U/thB->MW));
+        ui->twMixCalc->item(15,2)->setText(QString::number(thB->S/thB->MW));
+        ui->twMixCalc->item(16,2)->setText(QString::number(thB->Cp/thB->MW));
+        ui->twMixCalc->item(17,2)->setText(QString::number(thB->Cv/thB->MW));
+        ui->twMixCalc->item(18,2)->setText(QString::number(thB->SS));
+        ui->twMixCalc->item(19,2)->setText(QString::number(thB->JT*1e5));
+        ui->twMixCalc->item(20,2)->setText(QString::number(thB->IT*1e2));
+        ui->twMixCalc->item(21,2)->setText(QString::number(thB->dP_dT*1e-5));
+        ui->twMixCalc->item(22,2)->setText(QString::number(thB->dP_dV*1e-5));
+        ui->twMixCalc->item(23,2)->setText(QString::number(thB->ArrDer[0]));
+        ui->twMixCalc->item(24,2)->setText(QString::number(thB->ArrDer[1]));
+        ui->twMixCalc->item(25,2)->setText(QString::number(thB->ArrDer[2]));
+        ui->twMixCalc->item(26,2)->setText(QString::number(thB->ArrDer[3]));
+        ui->twMixCalc->item(27,2)->setText(QString::number(thB->ArrDer[4]));
+        ui->twMixCalc->item(28,2)->setText(QString::number(thB->ArrDer[5]));
+    }
+    ui->twMixCalc->item(29,2)->setText(QString::number(thB->c[0]));
+    ui->twMixCalc->item(30,2)->setText(QString::number(thB->c[1]));
+    ui->twMixCalc->item(31,2)->setText(QString::number(thB->c[2]));
+    ui->twMixCalc->item(32,2)->setText(QString::number(thB->c[3]));
+    ui->twMixCalc->item(33,2)->setText(QString::number(thB->c[4]));
+    ui->twMixCalc->item(34,2)->setText(QString::number(thB->c[5]));
+    ui->twMixCalc->item(35,2)->setText(QString::number(thB->c[6]));
+    ui->twMixCalc->item(36,2)->setText(QString::number(thB->c[7]));
+    ui->twMixCalc->item(37,2)->setText(QString::number(thB->c[8]));
+    ui->twMixCalc->item(38,2)->setText(QString::number(thB->c[9]));
+    ui->twMixCalc->item(39,2)->setText(QString::number(thB->c[10]));
+    ui->twMixCalc->item(40,2)->setText(QString::number(thB->c[11]));
+    ui->twMixCalc->item(41,2)->setText(QString::number(thB->c[12]));
+    ui->twMixCalc->item(42,2)->setText(QString::number(thB->c[13]));
+    ui->twMixCalc->item(43,2)->setText(QString::number(thB->c[14]));
+    for(i=0;i<mix->numSubs;i++){
+        cm=thB->c[i]*mix->baseProp[i].MW/thB->MW;
+        ui->twMixCalc->item(44+i,2)->setText(QString::number(cm));
+    }
+    ui->twMixCalc->item(59,2)->setText(QString::number(thB->subsPhi[0]));
+    ui->twMixCalc->item(60,2)->setText(QString::number(thB->subsPhi[1]));
+    ui->twMixCalc->item(61,2)->setText(QString::number(thB->subsPhi[2]));
+    ui->twMixCalc->item(62,2)->setText(QString::number(thB->subsPhi[3]));
+    ui->twMixCalc->item(63,2)->setText(QString::number(thB->subsPhi[4]));
+    ui->twMixCalc->item(64,2)->setText(QString::number(thB->subsPhi[5]));
+    ui->twMixCalc->item(65,2)->setText(QString::number(thB->subsPhi[6]));
+    ui->twMixCalc->item(66,2)->setText(QString::number(thB->subsPhi[7]));
+    ui->twMixCalc->item(67,2)->setText(QString::number(thB->subsPhi[8]));
+    ui->twMixCalc->item(68,2)->setText(QString::number(thB->subsPhi[9]));
+    ui->twMixCalc->item(69,2)->setText(QString::number(thB->subsPhi[10]));
+    ui->twMixCalc->item(70,2)->setText(QString::number(thB->subsPhi[11]));
+    ui->twMixCalc->item(71,2)->setText(QString::number(thB->subsPhi[12]));
+    ui->twMixCalc->item(72,2)->setText(QString::number(thB->subsPhi[13]));
+    ui->twMixCalc->item(73,2)->setText(QString::number(thB->subsPhi[14]));
+    if(nPhases>2){
+        ui->twMixCalc->item(0,3)->setText(QString::number(thB->MW));
+        ui->twMixCalc->item(1,3)->setText(QString::number(thB->P*0.00001));
+        ui->twMixCalc->item(2,3)->setText(QString::number(thB->T));
+        ui->twMixCalc->item(3,3)->setText(QString::number(thB->fraction));
+        if(mix->thModelActEos==1){
+            ui->twMixCalc->item(7,3)->setText(QString::number(thB->V*1e6));//Molar volume cm3/mol
+            ui->twMixCalc->item(8,3)->setText(QString::number(thB->MW/thB->V*0.001));//rho kgr/m3
+        }
+        ui->twMixCalc->item(9,3)->setText(QString::number(th0B->H/th0B->MW));//H0 KJ/kgr
+        ui->twMixCalc->item(10,3)->setText(QString::number(th0B->S/th0B->MW));
+        ui->twMixCalc->item(11,3)->setText(QString::number(th0B->Cp/th0B->MW));//Cp0 KJ/kgr·K
+        ui->twMixCalc->item(12,3)->setText(QString::number(th0B->Cv/th0B->MW));//Cv0 KJ/kgr·K
+        if(mix->thModelActEos==1){
+            ui->twMixCalc->item(13,3)->setText(QString::number(thB->H/thB->MW));
+            ui->twMixCalc->item(14,3)->setText(QString::number(thB->U/thB->MW));
+            ui->twMixCalc->item(15,3)->setText(QString::number(thB->S/thB->MW));
+            ui->twMixCalc->item(16,3)->setText(QString::number(thB->Cp/thB->MW));
+            ui->twMixCalc->item(17,3)->setText(QString::number(thB->Cv/thB->MW));
+            ui->twMixCalc->item(18,3)->setText(QString::number(thB->SS));
+            ui->twMixCalc->item(19,3)->setText(QString::number(thB->JT*1e5));
+            ui->twMixCalc->item(20,3)->setText(QString::number(thB->IT*1e2));
+            ui->twMixCalc->item(21,3)->setText(QString::number(thB->dP_dT*1e-5));
+            ui->twMixCalc->item(22,3)->setText(QString::number(thB->dP_dV*1e-5));
+            ui->twMixCalc->item(23,3)->setText(QString::number(thB->ArrDer[0]));
+            ui->twMixCalc->item(24,3)->setText(QString::number(thB->ArrDer[1]));
+            ui->twMixCalc->item(25,3)->setText(QString::number(thB->ArrDer[2]));
+            ui->twMixCalc->item(26,3)->setText(QString::number(thB->ArrDer[3]));
+            ui->twMixCalc->item(27,3)->setText(QString::number(thB->ArrDer[4]));
+            ui->twMixCalc->item(28,3)->setText(QString::number(thB->ArrDer[5]));
+        }
+        for(i=0;i<mix->numSubs;i++){
+            ui->twMixCalc->item(29+i,3)->setText(QString::number(thB->c[i]));
+            cm=thB->c[i]*mix->baseProp[i].MW/thB->MW;
+            ui->twMixCalc->item(44+i,3)->setText(QString::number(cm));
+            ui->twMixCalc->item(59+i,3)->setText(QString::number(thB->subsPhi[i]));
+        }
+    }
+
+    for(i=mix->numSubs;i<15;i++){
         ui->twMixCalc->item(29+i,1)->setText("");
         ui->twMixCalc->item(29+i,2)->setText("");
+        ui->twMixCalc->item(29+i,3)->setText("");
         ui->twMixCalc->item(59+i,1)->setText("");
         ui->twMixCalc->item(59+i,2)->setText("");
+        ui->twMixCalc->item(59+i,3)->setText("");
     }
 }
 
@@ -2065,7 +2123,8 @@ void  FreeFluidsMainWindow::twMixCompositionCalcFract(){
 //Slot for updating the general thermo model
 void  FreeFluidsMainWindow::cbMixCalcLiqModelLoad(int position){
     if(position==0) mix->thModelActEos=0;
-    else mix->thModelActEos=1;
+    else if(position==1) mix->thModelActEos=1;
+    else mix->thModelActEos=2;
 }
 
 
@@ -2328,10 +2387,18 @@ void FreeFluidsMainWindow::twMixIntParamEosFill(int row){
     mix->intParam[j][i][4]=mixIntParamSelModel->record(row).value("Param5i").toFloat();
     mix->intParam[j][i][5]=mixIntParamSelModel->record(row).value("Param6i").toFloat();
     //Update formula to use
+    if((mixIntParamSelModel->record(row).value("Equation").toString().toStdString()=="Pol1"))mix->intForm=FF_Pol1;
     if((mixIntParamSelModel->record(row).value("Equation").toString().toStdString()=="Pol1C"))mix->intForm=FF_Pol1C;
     if((mixIntParamSelModel->record(row).value("Equation").toString().toStdString()=="Pol1J"))mix->intForm=FF_Pol1J;
     if((mixIntParamSelModel->record(row).value("Equation").toString().toStdString()=="Pol1K"))mix->intForm=FF_Pol1K;
+    if((mixIntParamSelModel->record(row).value("Equation").toString().toStdString()=="Pol2"))mix->intForm=FF_Pol2;
+    if((mixIntParamSelModel->record(row).value("Equation").toString().toStdString()=="Pol2C"))mix->intForm=FF_Pol2C;
+    if((mixIntParamSelModel->record(row).value("Equation").toString().toStdString()=="Pol2J"))mix->intForm=FF_Pol2J;
+    if((mixIntParamSelModel->record(row).value("Equation").toString().toStdString()=="Pol2K"))mix->intForm=FF_Pol2K;
     if((mixIntParamSelModel->record(row).value("Equation").toString().toStdString()=="Pol3"))mix->intForm=FF_Pol3;
+    if((mixIntParamSelModel->record(row).value("Equation").toString().toStdString()=="Pol3C"))mix->intForm=FF_Pol3C;
+    if((mixIntParamSelModel->record(row).value("Equation").toString().toStdString()=="Pol3J"))mix->intForm=FF_Pol3J;
+    if((mixIntParamSelModel->record(row).value("Equation").toString().toStdString()=="Pol3K"))mix->intForm=FF_Pol3K;
 
     //update tablewidget to see the parameters
     for(int k=0;k<6;k++){
@@ -2482,8 +2549,7 @@ void FreeFluidsMainWindow::btnMixCalcImportMix(){
     //Now it is necessary to show the content of mix in the interface
     //clears the content of the composition table
     for (i=0;i<ui->twMixComposition->rowCount();i++) for (j=0;j<ui->twMixComposition->columnCount();j++) ui->twMixComposition->item(i,j)->setText("");
-    if(mix->thModelActEos==0)ui->cbMixCalcLiqModelSelec->setCurrentIndex(0);
-    else ui->cbMixCalcLiqModelSelec->setCurrentIndex(1);
+    ui->cbMixCalcLiqModelSelec->setCurrentIndex(mix->thModelActEos);
     switch(mix->eosType){
     case FF_NoType:
         ui->cbMixCalcEosTypeSelec->setCurrentIndex(0);
@@ -2596,8 +2662,9 @@ void FreeFluidsMainWindow::btnMixCalcImportMix(){
 void FreeFluidsMainWindow::twMixCalcBubbleP(){
     //printf("Act/Eos: %i Mixrule: %i ActModel: %i form: %i 0: %f 1: %f\n",mix->thModelActEos,mix->mixRule,mix->actModel,mix->intForm,mix->intParam[0][1][0],mix->intParam[0][1][1]);
     int i;//the loop variable
-    FF_ThermoProperties th0l,th0g;//for ideal gas properties
-    FF_PhaseThermoProp thl,thg;//here will be stored the result of the calculations for the liquid and gas phases
+    int nPhases=2;
+    FF_ThermoProperties th0l,th0g,th0C;//for ideal gas properties. C wil not be used
+    FF_PhaseThermoProp thl,thg,thC;//here will be stored the result of the calculations for the liquid and gas phases
     double refT=298.15;//reference temperature for thermodynamic properties (as ideal gas)
     double refP=1.01325e5;//reference pressure
     char option='s';//for asking for both states (liquid and gas) calculation, and state determination
@@ -2659,7 +2726,7 @@ void FreeFluidsMainWindow::twMixCalcBubbleP(){
     //printf("T:%f P:%f rhoL:%f Vg:%f state:%c phiL:%f phiG:%f\n",thl.T,thl.P,MW/answerL[0]*0.001,answerG[0],state,phiL,phiG);
     /*
     */
-    writeMixResultsTable(&mix->numSubs,&th0l,&thl,&th0g,&thg);
+    writeMixResultsTable(nPhases,mix,&th0g,&thg,&th0l,&thl,&th0C,&thC);
     ui->twMixCalc->item(5,1)->setText(QString::number(phiG));
     ui->twMixCalc->item(6,1)->setText(QString::number(Zg));
 
@@ -2671,8 +2738,9 @@ void FreeFluidsMainWindow::twMixCalcBubbleP(){
 //Slot for mixture dew P calculation, and display in table
 void FreeFluidsMainWindow::twMixCalcDewP(){
     int i;//the loop variable
-    FF_ThermoProperties th0l,th0g;
-    FF_PhaseThermoProp thl,thg;//here will be stored the result of the calculations for the liquid and gas phases
+    int nPhases=2;
+    FF_ThermoProperties th0l,th0g,th0C;
+    FF_PhaseThermoProp thl,thg,thC;//here will be stored the result of the calculations for the liquid and gas phases
     double refT=298.15;//reference temperature for thermodynamic properties (as ideal gas)
     double refP=1.01325e5;//reference pressure
     char option='s';//for asking for both states (liquid and gas) calculation, and state determination
@@ -2723,7 +2791,7 @@ void FreeFluidsMainWindow::twMixCalcDewP(){
     phiG=exp(answerG[1]+answerG[2]-1)/answerG[2];
     //printf("T:%f P:%f rhoL:%f Vg:%f state:%c phiL:%f phiG:%f\n",thl.T,thl.P,MW/answerL[0]*0.001,answerG[0],state,phiL,phiG);
 
-    writeMixResultsTable(&mix->numSubs,&th0l,&thl,&th0g,&thg);
+    writeMixResultsTable(nPhases,mix,&th0g,&thg,&th0l,&thl,&th0C,&thC);
     ui->twMixCalc->item(5,1)->setText(QString::number(phiG));
     ui->twMixCalc->item(6,1)->setText(QString::number(Zg));
 
@@ -2760,8 +2828,9 @@ void FreeFluidsMainWindow::twMixCalcPenvelope(){
 void FreeFluidsMainWindow::twMixCalcBubbleT(){
     //printf("Act/Eos: %i Mixrule: %i ActModel: %i form: %i 0: %f 1: %f\n",mix->thModelActEos,mix->mixRule,mix->actModel,mix->intForm,mix->intParam[0][1][0],mix->intParam[0][1][1]);
     int i;//the loop variable
-    FF_ThermoProperties th0l,th0g;//for ideal gas properties
-    FF_PhaseThermoProp thl,thg;//here will be stored the result of the calculations for the liquid and gas phases
+    int nPhases=2;
+    FF_ThermoProperties th0l,th0g,th0C;//for ideal gas properties
+    FF_PhaseThermoProp thl,thg,thC;//here will be stored the result of the calculations for the liquid and gas phases
     double refT=298.15;//reference temperature for thermodynamic properties (as ideal gas)
     double refP=1.01325e5;//reference pressure
     char option='s';//for asking for both states (liquid and gas) calculation, and state determination
@@ -2820,7 +2889,7 @@ void FreeFluidsMainWindow::twMixCalcBubbleT(){
     //printf("T:%f P:%f rhoL:%f Vg:%f state:%c phiL:%f phiG:%f\n",thl.T,thl.P,MW/answerL[0]*0.001,answerG[0],state,phiL,phiG);
     /*
     */
-    writeMixResultsTable(&mix->numSubs,&th0l,&thl,&th0g,&thg);
+    writeMixResultsTable(nPhases,mix,&th0g,&thg,&th0l,&thl,&th0C,&thC);
     ui->twMixCalc->item(5,1)->setText(QString::number(phiG));
     ui->twMixCalc->item(6,1)->setText(QString::number(Zg));
 
@@ -2832,8 +2901,9 @@ void FreeFluidsMainWindow::twMixCalcBubbleT(){
 void FreeFluidsMainWindow::twMixCalcDewT(){
     //printf("Act/Eos: %i Mixrule: %i ActModel: %i form: %i 0: %f 1: %f\n",mix->thModelActEos,mix->mixRule,mix->actModel,mix->intForm,mix->intParam[0][1][0],mix->intParam[0][1][1]);
     int i;//the loop variable
-    FF_ThermoProperties th0l,th0g;//for ideal gas properties
-    FF_PhaseThermoProp thl,thg;//here will be stored the result of the calculations for the liquid and gas phases
+    int nPhases=2;
+    FF_ThermoProperties th0l,th0g,th0C;//for ideal gas properties
+    FF_PhaseThermoProp thl,thg,thC;//here will be stored the result of the calculations for the liquid and gas phases
     double refT=298.15;//reference temperature for thermodynamic properties (as ideal gas)
     double refP=1.01325e5;//reference pressure
     char option='s';//for asking for both states (liquid and gas) calculation, and state determination
@@ -2892,7 +2962,7 @@ void FreeFluidsMainWindow::twMixCalcDewT(){
     //printf("T:%f P:%f rhoL:%f Vg:%f state:%c phiL:%f phiG:%f\n",thl.T,thl.P,MW/answerL[0]*0.001,answerG[0],state,phiL,phiG);
     /*
     */
-    writeMixResultsTable(&mix->numSubs,&th0l,&thl,&th0g,&thg);
+    writeMixResultsTable(nPhases,mix,&th0g,&thg,&th0l,&thl,&th0C,&thC);
     ui->twMixCalc->item(5,1)->setText(QString::number(phiG));
     ui->twMixCalc->item(6,1)->setText(QString::number(Zg));
 
@@ -2926,13 +2996,13 @@ void FreeFluidsMainWindow::twMixCalcTenvelope(){
 }
 
 //Slot for mixture VL flash P,T calculation, and display in table
-void FreeFluidsMainWindow::twMixCalcVLflashPT(){
-    //FF_VLflashPTGO();
-    FF_PTXfeed data;
+void FreeFluidsMainWindow::twMixCalc2PhFlashPT(){
+    FF_FeedData data;
     //printf("Act/Eos: %i Mixrule: %i ActModel: %i form: %i 0: %f 1: %f\n",mix->thModelActEos,mix->mixRule,mix->actModel,mix->intForm,mix->intParam[0][1][0],mix->intParam[0][1][1]);
     int i;//the loop variable
-    FF_ThermoProperties th0l,th0g;//for ideal gas properties
-    FF_PhaseThermoProp thl,thg;//here will be stored the result of the calculations for the liquid and gas phases
+    int nPhases=2;
+    FF_ThermoProperties th0A,th0B,th0C;//for ideal gas properties. C will not be used
+    FF_PhaseThermoProp thA,thB,thC;//here will be stored the result of the calculations for the gas and liquid phases
     double c[mix->numSubs];//feed concentration
     double refT=298.15;//reference temperature for thermodynamic properties (as ideal gas)
     double refP=1.01325e5;//reference pressure
@@ -2940,9 +3010,8 @@ void FreeFluidsMainWindow::twMixCalcVLflashPT(){
     char state;//we will receive here the state of the calculation
     double MW=ui->leMixCalcMWmix->text().toDouble();
     double answerL[3],answerG[3];
-    double phiL,phiG;
-    double Z,Zg;
-    double beta;//gas fraction
+    double phiA,phiB;
+    double Za,Zb;
     double Gr;//Modified reduced gibbs energy
 
     //we clear the content of the results table
@@ -2958,35 +3027,140 @@ void FreeFluidsMainWindow::twMixCalcVLflashPT(){
     }
 
     //And begin the calculations
-    th0l.MW=thl.MW=MW;
-    th0l.T=thl.T=th0g.T=thg.T=273.15+ui->leMixCalcTemp->text().toDouble();//we read the selected temperature
-    th0l.P=thl.P=th0g.P=thg.P=1e5*ui->leMixCalcPres->text().toDouble();//we read the selected pressure
+    //th0B.MW=thB.MW=MW;
+    th0B.T=thB.T=th0A.T=thA.T=273.15+ui->leMixCalcTemp->text().toDouble();//we read the selected temperature
+    th0B.P=thB.P=th0A.P=thA.P=1e5*ui->leMixCalcPres->text().toDouble();//we read the selected pressure
     data.mix=mix;
-    data.P=thl.P;
-    data.T=thl.T;
+    data.P=thB.P;
+    data.T=thB.T;
 
-    //FF_TwoPhasesFlashPTSA(&data,thl.c,thg.c,thl.subsPhi,thg.subsPhi,&thg.fraction);
-    //return;
+    if(ui->rbMixCalcStd->isChecked()) FF_TwoPhasesFlashPT(mix,&thB.T,&thB.P,c,thB.c,thA.c,thB.subsPhi,thA.subsPhi,&thA.fraction);
+    else if(ui->rbMixCalcGlobalOptSA->isChecked()) FF_TwoPhasesFlashPTSA(&data,thB.c,thA.c,thB.subsPhi,thA.subsPhi,&thA.fraction,&Gr);
+    else if(ui->rbMixCalcGlobalOptDE->isChecked()) FF_TwoPhasesFlashPTDE(&data,thB.c,thA.c,thB.subsPhi,thA.subsPhi,&thA.fraction,&Gr);
 
-
-    if(ui->rbMixCalcStd->isChecked()) FF_VLflashPT(mix,&thl.T,&thl.P,c,thl.c,thg.c,thl.subsPhi,thg.subsPhi,&thg.fraction);
-    else if(ui->rbMixCalcGlobalOpt->isChecked()) FF_TwoPhasesFlashPTSA(&data,thl.c,thg.c,thl.subsPhi,thg.subsPhi,&thg.fraction,&Gr);
-
-    thl.fraction=1-thg.fraction;
-
-
-    thl.MW=0;
-    thg.MW=0;
+    thB.fraction=1-thA.fraction;
+    thB.MW=0;
+    thA.MW=0;
     for(i=0;i<mix->numSubs;i++){
-        thl.MW=thl.MW+thl.c[i]*mix->baseProp[i].MW;
-        thg.MW=thg.MW+thg.c[i]*mix->baseProp[i].MW;
+        thB.MW=thB.MW+thB.c[i]*mix->baseProp[i].MW;
+        thA.MW=thA.MW+thA.c[i]*mix->baseProp[i].MW;
     }
-    th0l.MW=thl.MW;
-    th0g.MW=thg.MW;
+    th0B.MW=thB.MW;
+    th0A.MW=thA.MW;
+    if(mix->thModelActEos==1){//if phi-phi used, use eos for the expected liquid phase
+        option='s';
+        FF_MixVfromTPeos(mix,&thB.T,&thB.P,thB.c,&option,answerL,answerG,&state);
+        if((state=='L')||(state=='l')||(state=='U')||(state=='u')){
+            th0B.V=thB.V=answerL[0];
+            Zb=answerL[2];
+            phiB=exp(answerL[1]+answerL[2]-1)/answerL[2];
+        }
+        else if((state=='G')||(state=='g')){
+            th0B.V=thB.V=answerG[0];
+            Zb=answerG[2];
+            phiB=exp(answerG[1]+answerG[2]-1)/answerG[2];
+        }
+        FF_MixIdealThermoEOS(&mix->numSubs,mix->cp0Corr,thB.c,&refT,&refP,&th0B);
+        FF_MixThermoEOS(mix,&refT,&refP,&thB);
+    }
+    if(mix->thModelActEos!=2){//If not LLE gamma-gamma used, use eos for the expected gas phase
+        option='s';
+        FF_MixVfromTPeos(mix,&thA.T,&thA.P,thA.c,&option,answerL,answerG,&state);
+        if((state=='L')||(state=='l')||(state=='U')||(state=='u')){
+            th0A.V=thA.V=answerL[0];
+            Za=answerL[2];
+            phiA=exp(answerL[1]+answerL[2]-1)/answerL[2];
+        }
+        else if((state=='G')||(state=='g')){
+            th0A.V=thA.V=answerG[0];
+            Za=answerG[2];
+            phiA=exp(answerG[1]+answerG[2]-1)/answerG[2];
+        }
+        FF_MixIdealThermoEOS(&mix->numSubs,mix->cp0Corr,thA.c,&refT,&refP,&th0A);
+        FF_MixThermoEOS(mix,&refT,&refP,&thA);
+    }
+    if(ui->rbMixCalcStd->isChecked()){
+        Gr=0;
+        for(i=0;i<mix->numSubs;i++){
+            Gr=Gr+(1-thA.fraction)*thB.c[i]*(log(thB.c[i]*thB.subsPhi[i]))+thA.fraction*thA.c[i]*(log(thA.c[i]*thA.subsPhi[i]));
+        }
+    }
+    writeMixResultsTable(nPhases,mix,&th0A,&thA,&th0B,&thB,&th0C,&thC);
+    ui->leMixCalcGibbs->setText(QString::number(Gr));
+    if(mix->thModelActEos!=1){
+        FF_SubsActivityData actData[mix->numSubs];
+        FF_ExcessData excData;
+        //FF_Activity(mix,&thB.T,thB.c,actData);
+        FF_ActivityDerivatives(&mix->actModel,&mix->numSubs,mix->baseProp,mix->intParam,&mix->intForm,&thB.T,thB.c,actData,&excData);
+        double gE=0;
+        double hE=-thB.T*excData.dgE_dT;
+        for (i=0;i<mix->numSubs;i++){
+            gE=gE+thB.c[i]*(actData[i].lnGammaC+actData[i].lnGammaR+actData[i].lnGammaSG);
+        }
+        ui->twMixCalc->item(74,2)->setText(QString::number(gE));
+        ui->twMixCalc->item(75,2)->setText(QString::number(hE));
+    }
+}
 
-    option='l';//determine only the liquid volume
-    FF_MixVfromTPeos(mix,&thl.T,&thl.P,thl.c,&option,answerL,answerG,&state);
-    th0l.V=thl.V=answerL[0];
+//Slot for mixture three phases P,T flash calculation, and display in table
+void FreeFluidsMainWindow::twMixCalc3PhFlashPT(){
+    //FF_VLflashPTGO();
+    FF_FeedData data;
+    //printf("Act/Eos: %i Mixrule: %i ActModel: %i form: %i 0: %f 1: %f\n",mix->thModelActEos,mix->mixRule,mix->actModel,mix->intForm,mix->intParam[0][1][0],mix->intParam[0][1][1]);
+    int i;//the loop variable
+    int nPhases=3;
+    FF_ThermoProperties th0A,th0B,th0C;//for ideal gas properties
+    FF_PhaseThermoProp thA,thB,thC;//here will be stored the result of the calculations for the liquid and gas phases
+    double refT=298.15;//reference temperature for thermodynamic properties (as ideal gas)
+    double refP=1.01325e5;//reference pressure
+    char option='s';//for asking for both states (liquid and gas) calculation, and state determination
+    char state;//we will receive here the state of the calculation
+    double MW=ui->leMixCalcMWmix->text().toDouble();
+    double answerL[3],answerG[3];
+    double phiL,phiG;
+    double Z,Zg;
+    double betaA,betaB;//phase fractions
+    double Gr;//Modified reduced gibbs energy
+
+    //we clear the content of the results table
+    for (i=0;i<ui->twMixCalc->rowCount();i++){
+        ui->twMixCalc->item(i,1)->setText("");
+        ui->twMixCalc->item(i,2)->setText("");
+        ui->twMixCalc->item(i,3)->setText("");
+    }
+
+    //Now we need to read the selections made for the molar fractions
+    for (i=0;i< mix->numSubs;i++){
+        data.z[i]=ui->twMixComposition->item(i,5)->text().toDouble();//substance molar fraction
+    }
+
+    //And begin the calculations
+    th0A.MW=thA.MW=MW;
+    th0A.T=thA.T=th0B.T=thB.T=273.15+ui->leMixCalcTemp->text().toDouble();//we read the selected temperature
+    th0A.P=thA.P=th0B.P=thB.P=1e5*ui->leMixCalcPres->text().toDouble();//we read the selected pressure
+    data.mix=mix;
+    data.P=thA.P;
+    data.T=thA.T;
+
+    FF_ThreePhasesFlashPTSA(&data,thA.c,thB.c,thC.c,thA.subsPhi,thB.subsPhi,thC.subsPhi,&thA.fraction,&thB.fraction,&Gr);
+    thC.fraction=1-thA.fraction-thB.fraction;
+    thA.MW=0;
+    thB.MW=0;
+    thC.MW=0;
+    for(i=0;i<mix->numSubs;i++){
+        thA.MW=thA.MW+thA.c[i]*mix->baseProp[i].MW;
+        thB.MW=thB.MW+thB.c[i]*mix->baseProp[i].MW;
+        thC.MW=thC.MW+thC.c[i]*mix->baseProp[i].MW;
+    }
+    th0A.MW=thA.MW;
+    th0B.MW=thB.MW;
+    th0C.MW=thB.MW;
+
+    /*
+    option='s';
+    FF_MixVfromTPeos(mix,&thA.T,&thA.P,thA.c,&option,answerL,answerG,&state);
+
+    th0A.V=thA.V=answerL[0];
     Z=answerL[2];
     phiL=exp(answerL[1]+answerL[2]-1)/answerL[2];
     FF_MixIdealThermoEOS(&mix->numSubs,mix->cp0Corr,thl.c,&refT,&refP,&th0l);
@@ -2995,27 +3169,22 @@ void FreeFluidsMainWindow::twMixCalcVLflashPT(){
 
     option='g';//determine only the gas volume
     FF_MixVfromTPeos(mix,&thg.T,&thg.P,thg.c,&option,answerL,answerG,&state);
-    th0g.V=thg.V=answerG[0];
+    th0B.V=thg.V=answerG[0];
     Zg=answerG[2];
     FF_MixIdealThermoEOS(&mix->numSubs,mix->cp0Corr,thg.c,&refT,&refP,&th0g);
     FF_MixThermoEOS(mix,&refT,&refP,&thg);
     phiG=exp(answerG[1]+answerG[2]-1)/answerG[2];
     //printf("T:%f P:%f rhoL:%f Vg:%f state:%c phiL:%f phiG:%f\n",thl.T,thl.P,MW/answerL[0]*0.001,answerG[0],state,phiL,phiG);
-    if(ui->rbMixCalcStd->isChecked()){
-        Gr=0;
-        for(i=0;i<mix->numSubs;i++){
-            Gr=Gr+(1-thg.fraction)*thl.c[i]*(log(thl.c[i]*thl.subsPhi[i]))+thg.fraction*thg.c[i]*(log(thg.c[i]*thg.subsPhi[i]));
-        }
-    }
-    writeMixResultsTable(&mix->numSubs,&th0l,&thl,&th0g,&thg);
+    */
+    writeMixResultsTable(nPhases,mix,&th0A,&thA,&th0B,&thB,&th0C,&thC);
     ui->leMixCalcGibbs->setText(QString::number(Gr));
 
 }
 
 //Slot for checking stability of a composition
 void FreeFluidsMainWindow::mixCalcStabCheck(){
-    FF_PTXfeed data;
-    int i,useOptimizer;
+    FF_FeedData data;
+    int i;
     double tpd,tpdX[15];
     data.mix=mix;
     data.P=1e5*ui->leMixCalcPres->text().toDouble();
@@ -3024,10 +3193,35 @@ void FreeFluidsMainWindow::mixCalcStabCheck(){
     for (i=0;i< mix->numSubs;i++){
         data.z[i]=ui->twMixComposition->item(i,5)->text().toDouble();//substance molar fraction
     }
-    if(ui->rbMixCalcGlobalOpt->isChecked()) useOptimizer=1;
-    else useOptimizer=0;
-    FF_StabilityCheck(&data,&useOptimizer,&tpd,tpdX);
+    if(ui->rbMixCalcGlobalOptSA->isChecked()) FF_StabilityCheckSA(&data,&tpd,tpdX);
+    else FF_StabilityCheck(&data,&tpd,tpdX);
+
     ui->leMixCalcStabResult->setText(QString::number(tpd));
+
+}
+
+//Slot for checking stability of the results obtained
+void FreeFluidsMainWindow::mixResStabCheck(){
+    FF_FeedData data;
+    int i;
+    double tpd,tpdX[15];
+    data.mix=mix;
+    data.P=1e5*ui->leMixCalcPres->text().toDouble();
+    data.T=273.15+ui->leMixCalcTemp->text().toDouble();
+    //Now we need to read the selections made for the molar fractions
+    if(ui->rbMixResPh1->isChecked()){
+        for (i=0;i< mix->numSubs;i++){
+            data.z[i]=ui->twMixCalc->item(29+i,1)->text().toDouble();//substance molar fraction
+        }
+    }
+    else if(ui->rbMixResPh2->isChecked()){
+        for (i=0;i< mix->numSubs;i++){
+            data.z[i]=ui->twMixCalc->item(29+i,2)->text().toDouble();//substance molar fraction
+        }
+    }
+    if(ui->rbMixCalcGlobalOptSA->isChecked()) FF_StabilityCheckSA(&data,&tpd,tpdX);
+    else FF_StabilityCheck(&data,&tpd,tpdX);
+    ui->leMixResStabResult->setText(QString::number(tpd));
 
 }
 
@@ -3047,28 +3241,4 @@ void FreeFluidsMainWindow::on_actionDisplay_license_triggered()
     delete dia;
 }
 
-//Slot for checking stability of the results obtained
-void FreeFluidsMainWindow::mixResStabCheck(){
-    FF_PTXfeed data;
-    int i,useOptimizer;
-    double tpd,tpdX[15];
-    data.mix=mix;
-    data.P=1e5*ui->leMixCalcPres->text().toDouble();
-    data.T=273.15+ui->leMixCalcTemp->text().toDouble();
-    //Now we need to read the selections made for the molar fractions
-    if(ui->rbMixResPh1->isChecked()){
-        for (i=0;i< mix->numSubs;i++){
-            data.z[i]=ui->twMixCalc->item(29+i,1)->text().toDouble();//substance molar fraction
-        }
-    }
-    else if(ui->rbMixResPh2->isChecked()){
-        for (i=0;i< mix->numSubs;i++){
-            data.z[i]=ui->twMixCalc->item(29+i,2)->text().toDouble();//substance molar fraction
-        }
-    }
-    if(ui->rbMixCalcGlobalOpt->isChecked()) useOptimizer=1;
-    else useOptimizer=0;
-    FF_StabilityCheck(&data,&useOptimizer,&tpd,tpdX);
-    ui->leMixResStabResult->setText(QString::number(tpd));
 
-}

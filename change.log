@@ -1,3 +1,9 @@
+Version 1.1.4
+- A bug that was preventing the display of results of EOS calculation for pure substances in some situations has been corrected.
+- An improved simulation annealing algorithm is now used for both tangent plane, and global Gibbs energy, minimization. The algorithm stores the best result obtained at high temperatures and performs a final loop at low temperature to improve accuracy.
+- A differential evolution global Gibbs energy minimization algorithm is now available for two phases flashes.
+- Several mixtures files have been stored in the 'Data' subdirectory of the Windows program. The files, with '.md' extension can be imported and tested. Despite not all the data are displayed after importation (for example the selected EOS for each substance), they are inside the imported structure.
+
 Version 1.1.3
 - The multi-start Nelder-Mead algorithm, used for global Gibbs energy minimization in biphasic flash, has been replaced for a much more efficient simulated anneling algorithm, with a final smoothing of the result by some loops of successive substituion.
 - The minimum of the modified (without the ideal part) reduced global Gibbs energy is now displayed in order to compare the quality of the flashes.
