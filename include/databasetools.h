@@ -55,8 +55,6 @@ void GetCorrDataByType(const int *IdProduct,const QString *type,QSqlDatabase *db
 
 void GetCorrDataById(FF_Correlation *corr,QSqlDatabase *db);
 
-//Get default data for a SubstanceData structure from the database. This means baseProp, Unifac composition, eos and physical properties
-void GetSubsDefaultData(int id,FF_SubstanceData *subsData,QSqlDatabase *db);
 
 //Adds a new eos to the database
 void AddEosToDataBase(int idSubs,enum FF_EosType eosType,void *eosData,double *Tmin,double *Tmax, QString *description,QSqlDatabase *db);
