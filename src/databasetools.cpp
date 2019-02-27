@@ -5,7 +5,7 @@
  *      Author: Carlos Trujillo
  *
  *This file is part of the "Free Fluids" application
- *Copyright (C) 2008-2018  Carlos Trujillo Gonzalez
+ *Copyright (C) 2008-2019  Carlos Trujillo Gonzalez
 
  *This program is free software; you can redistribute it and/or
  *modify it under the terms of the GNU General Public License version 3
@@ -157,10 +157,19 @@ void GetBasicData(int id,FF_SubstanceData *subsData,QSqlDatabase *db){
     query1.exec();
     query1.first();
     strncpy(subsData->CAS,query1.value(query1.record().indexOf("CAS")).toString().toStdString().c_str(),22);
-    if(query1.value(query1.record().indexOf("Family")).toString()=="Water") subsData->baseProp.type=10;
-    else if(query1.value(query1.record().indexOf("Family")).toString()=="Alcohol") subsData->baseProp.type=11;
-    else if(query1.value(query1.record().indexOf("Family")).toString()=="Polyol") subsData->baseProp.type=12;
-    else if(query1.value(query1.record().indexOf("Family")).toString()=="Acid") subsData->baseProp.type=20;
+    if(query1.value(query1.record().indexOf("Family")).toString()=="Alkane") subsData->baseProp.type=FF_Alkane;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Alkene") subsData->baseProp.type=FF_Alkene;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Cycloalkane") subsData->baseProp.type=FF_Cycloalkane;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Aromatic") subsData->baseProp.type=FF_Aromatic;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Water") subsData->baseProp.type=FF_Water;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Alcohol") subsData->baseProp.type=FF_Alcohol;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Polyol") subsData->baseProp.type=FF_Polyol;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Ether") subsData->baseProp.type=FF_Ether;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Ketone") subsData->baseProp.type=FF_Ketone;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Acid") subsData->baseProp.type=FF_Acid;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Ester") subsData->baseProp.type=FF_Ester;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Amine") subsData->baseProp.type=FF_Amine;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Polymer") subsData->baseProp.type=FF_Polymer;
     else subsData->baseProp.type=0;
     subsData->baseProp.MW=query1.value(query1.record().indexOf("MW")).toDouble();
     subsData->baseProp.MWmono=query1.value(query1.record().indexOf("MonomerMW")).toDouble();
@@ -175,16 +184,25 @@ void GetBasicData(int id,FF_SubstanceData *subsData,QSqlDatabase *db){
     subsData->baseProp.q=query1.value(query1.record().indexOf("UniquacQ")).toDouble();
     subsData->baseProp.qRes=query1.value(query1.record().indexOf("UniquacQres")).toDouble();
     subsData->baseProp.VdWV=query1.value(query1.record().indexOf("VdWV")).toDouble();
+    subsData->baseProp.Hf0g=query1.value(query1.record().indexOf("Hf0g")).toDouble();
+    subsData->baseProp.Gf0g=query1.value(query1.record().indexOf("Gf0g")).toDouble();
+    subsData->baseProp.S0g=query1.value(query1.record().indexOf("S0g")).toDouble();
+    subsData->baseProp.Pa=query1.value(query1.record().indexOf("Pa")).toDouble();
     subsData->baseProp.Vliq=query1.value(query1.record().indexOf("Vliq")).toDouble();
     if ((subsData->baseProp.Vliq>0)&&(subsData->baseProp.VdWV>0)) subsData->baseProp.FV=subsData->baseProp.Vliq-1.2*subsData->baseProp.VdWV;
-    else subsData->baseProp.FV=0;
+    else subsData->baseProp.FV=0;//Calculation of the free volume
     subsData->baseProp.mu=query1.value(query1.record().indexOf("mu")).toDouble();
     subsData->baseProp.Q=query1.value(query1.record().indexOf("Q")).toDouble();
+    subsData->baseProp.RadGyr=query1.value(query1.record().indexOf("RadGyr")).toDouble();
+    subsData->baseProp.Tm=query1.value(query1.record().indexOf("Tm")).toDouble();
+    subsData->baseProp.Hm=query1.value(query1.record().indexOf("Hm")).toDouble();
     subsData->baseProp.Tb=query1.value(query1.record().indexOf("Tb")).toDouble();
     subsData->baseProp.Hildebrand=query1.value(query1.record().indexOf("Hildebrand")).toDouble();
     subsData->baseProp.HansenD=query1.value(query1.record().indexOf("HansenD")).toDouble();
     subsData->baseProp.HansenP=query1.value(query1.record().indexOf("HansenP")).toDouble();
     subsData->baseProp.HansenH=query1.value(query1.record().indexOf("HansenH")).toDouble();
+    subsData->RI.x=query1.value(query1.record().indexOf("RITemp")).toDouble();
+    subsData->RI.y=query1.value(query1.record().indexOf("RI")).toDouble();
     subsData->cp0.x=query1.value(query1.record().indexOf("Cp0Temp")).toDouble();
     subsData->cp0.y=query1.value(query1.record().indexOf("Cp0")).toDouble();
     subsData->vp.x=query1.value(query1.record().indexOf("VpTemp")).toDouble();
@@ -688,11 +706,6 @@ void AddEosToDataBase(int idSubs,enum FF_EosType eosType,void *eosData,double *T
 
 }
 
-//Get default data for a SubstanceData structure from the database. This means baseProp, Unifac composition, eos and physical properties
-void GetSubsDefaultData(int id,FF_SubstanceData *subsData,QSqlDatabase *db){
-    GetBasicData(id,subsData,db);
-
-}
 
 //Adds a new correlation to the database
 void AddCorrToDataBase(int idSubs,FF_Correlation *corr,double *Tmin,double *Tmax, QString *description,QSqlDatabase *db){

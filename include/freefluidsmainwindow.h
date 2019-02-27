@@ -99,6 +99,7 @@ private slots:
     void twMixCalc2PhFlashPT();//Slot for mixture VL flash P,T calculation, and display in table
     void twMixCalc3PhFlashPT();//Slot for mixture three phases P,T flash calculation, and display in table
     void mixCalcStabCheck();//Slot for checking stability of a composition
+    void mixResCalcTransport();//Slot for calculating transport properties
 
     //Slot for checking stability of the results obtained
     void mixResStabCheck();
