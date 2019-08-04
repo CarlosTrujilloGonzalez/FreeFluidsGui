@@ -1,3 +1,9 @@
+Version 1.2.0
+- Added support for liquid isothermal compressibility correlation
+- Added support for PPDS15 correlation equation
+- Added exportation of the selected substance in a format adequate for FreeFluids.MediaCommon.MediaData.DataRecord, to be used in Modelica medium definition.
+- Database enhanced to 441 substances
+
 Version 1.1.5
 - Calculation of liquid density and transport properties, with pressure correction, has been added for pure substances. The resulting data is displayed at the end of the 
  EOS results main table. If a selection has been made in the correlations tab, it is employed in the calculation. If not, it is predicted. Later a pressure 

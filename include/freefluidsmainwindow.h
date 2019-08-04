@@ -74,6 +74,7 @@ private slots:
     void twSubsToolsDoOperation();//Slot for do operation on a data column
     void btnSubsToolAddEos();//Slot for adding EOS to database
     void btnSubsToolAddCorr();//Slot for adding correlation to database
+    void btnSubsToolsExport();//Slot for exporting the substance in Modelica FreeFluids.Media format
 
     void twMixCompositionClear();//Slot for clearing content in the table
     void twMixCompositionAdd();//Slot for adding a substance to the table

@@ -217,6 +217,8 @@ void GetBasicData(int id,FF_SubstanceData *subsData,QSqlDatabase *db){
     subsData->lVisc.y=query1.value(query1.record().indexOf("LiqVisc")).toDouble();
     subsData->lThC.x=query1.value(query1.record().indexOf("LiqThCondTemp")).toDouble();
     subsData->lThC.y=query1.value(query1.record().indexOf("LiqThCond")).toDouble();
+    subsData->lIsothComp.x=query1.value(query1.record().indexOf("LiqIsothCompTemp")).toDouble();
+    subsData->lIsothComp.y=query1.value(query1.record().indexOf("LiqIsothComp")).toDouble();
     //printf("MW:%f\n",query1.value(query1.record().indexOf("MW")).toDouble());
 
     for(i=0;i<10;i++){
@@ -509,9 +511,9 @@ void GetEOSData(int *eosType,FF_SubstanceData *subsData,QSqlDatabase *db)
         subsData->swData.nSpec=query2.value(query2.record().indexOf("nSpec")).toInt();
         subsData->swData.nFinal=query2.value(query2.record().indexOf("nFinal")).toInt();
 
-        //printf("MW:%f Tc:%f Pc:%f Zc:%f tRef:%f rhoRef:%f nPol:%i nExp:%i nSpec:%i\n",subsData->swData.MW,subsData->swData.Tc,subsData->swData.Pc,subsData->swData.Zc,
-        //subsData->swData.tRef,subsData->swData.rhoRef,subsData->swData.nPol,subsData->swData.nExp,subsData->swData.nSpec);
-        //printf("N.eos:%i\n",*IdEos);
+        //printf("MW:%f Tc:%f Pc:%f Zc:%f tRef:%f rhoRef:%f nPol:%i nExp:%i nSpec:%i nFinal:%i\n",subsData->swData.MW,subsData->swData.Tc,subsData->swData.Pc,subsData->swData.Zc,
+        //subsData->swData.tRef,subsData->swData.rhoRef,subsData->swData.nPol,subsData->swData.nExp,subsData->swData.nSpec,subsData->swData.nFinal);
+        //printf("N.eos:%i\n",subsData->swData.id);
         QSqlQuery query3(*db);
         query3.prepare("SELECT * FROM SWparam WHERE (IdEos=?) ORDER BY Position");
         query3.addBindValue(subsData->swData.id);
@@ -529,16 +531,15 @@ void GetEOSData(int *eosType,FF_SubstanceData *subsData,QSqlDatabase *db)
             //printf("n:%f d:%i t:%f c:%i\n",subsData->swData.n[i-1],subsData->swData.d[i-1],subsData->swData.t[i-1],subsData->swData.c[i-1]);
             if ((i > (subsData->swData.nPol+subsData->swData.nExp)) && (i<=(subsData->swData.nPol+subsData->swData.nExp+subsData->swData.nSpec)))
             {
-               //printf("%i\n",i);
                j=i-subsData->swData.nPol-subsData->swData.nExp-1;
                subsData->swData.a[j]=query3.value(query3.record().indexOf("alpha")).toDouble();
                subsData->swData.e[j]=query3.value(query3.record().indexOf("epsilon")).toDouble();
                subsData->swData.b[j]=query3.value(query3.record().indexOf("beta")).toDouble();
                subsData->swData.g[j]=query3.value(query3.record().indexOf("gamma")).toDouble();
+               //printf("%i a:%f e:%f b:%f g:%f\n",j+1,subsData->swData.a[j],subsData->swData.e[j],subsData->swData.b[j],subsData->swData.g[j]);
             }
             if ((i > (subsData->swData.nPol+subsData->swData.nExp+subsData->swData.nSpec)) && (i<=(subsData->swData.nPol+subsData->swData.nExp+subsData->swData.nSpec+subsData->swData.nFinal)))
             {
-               //printf("%i\n",i);
                j=i-subsData->swData.nPol-subsData->swData.nExp-subsData->swData.nSpec-1;
                subsData->swData.af[j]=query3.value(query3.record().indexOf("a")).toDouble();
                subsData->swData.bf[j]=query3.value(query3.record().indexOf("b")).toDouble();
@@ -547,6 +548,8 @@ void GetEOSData(int *eosType,FF_SubstanceData *subsData,QSqlDatabase *db)
                subsData->swData.Cf[j]=query3.value(query3.record().indexOf("Cf")).toDouble();
                subsData->swData.Df[j]=query3.value(query3.record().indexOf("Df")).toDouble();
                subsData->swData.betaf[j]=query3.value(query3.record().indexOf("betaf")).toDouble();
+               //printf("%i af:%f bf:%f Af:%f Bf:%f Cf:%f Df:%f betaf:%f\n",j+1,subsData->swData.af[j],subsData->swData.bf[j],subsData->swData.Af[j],subsData->swData.Bf[j],subsData->swData.Cf[j],
+               //       subsData->swData.Df[j],subsData->swData.betaf[j]);
             }
 
 
