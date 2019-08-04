@@ -54,7 +54,7 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     }
     //QueryModel(no editable) for holding the substances list
     subsListModel=new QSqlQueryModel(this);
-    subsListModel->setQuery("SELECT Id,Name,MW from Products WHERE (Id<2001) ORDER BY Name");
+    subsListModel->setQuery("SELECT Id,Name,MW from Products WHERE (Id<2001 OR InGitHub=True) ORDER BY Name");
     //Data entry validators
     presBarValidator=new QDoubleValidator(0.0,10000.0,5,this);
     //presBarValidator->setNotation(QDoubleValidator::StandardNotation);
@@ -114,7 +114,8 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     QStringList subsCalcVertLabels;
     subsCalcVertLabels <<"T(C)"<<"Phase"<<"phi liq."<<"phi gas"<<"Z"<<"V(cm3/mol)"<<"rho(kgr/m3)"<<"H0(KJ/kgr)" <<"S0(KJ/kgr·K)"
                       <<"Cp0(KJ/kgr·K)"<<"H(KJ/kgr)"<<"U(KJ/kgr)"<<"S(KJ/kgr·K)"<<"Cp(KJ/kgr·K)"<<"Cv(KJ/kgr·K)"<<"S.S.(m/s)"<<"J.T.coeff(K/bar)"
-                       <<"I.T.coeff(KJ/bar)"<<"(dP/dT)V(bar/K)"<<"(dP/dV)T(bar/m3)"<<"Vp(bar)"<<"rho liq. sat."<<"rho gas sat."<<"Hv sat(KJ/kgr)"<< "Arr"
+                       <<"I.T.coeff(KJ/bar)"<<"(dP/dT)V(bar/K)"<<"(dP/dV)T(kgr·bar/m3)"<<"(dV/dT)P(m3/kgr·K)"<<"Isobaric expansion coef.(1/K)"
+                      <<"Isothermal compression coef.(1/Pa)"<<"Vp(bar)"<<"rho liq. sat."<<"rho gas sat."<<"Hv sat(KJ/kgr)"<<"Cp liq.sat(KJ/kgr·K)"<< "Arr"
                       <<"(dArr/dV)T"<<"(d2Arr/dV2)T"<<"(dArr/dT)V"<<"(d2Arr/dT2)V"<<"d2Arr/dTdV"<<"Liq.dens.P corrected (kg/m3)"
                      <<"Liq.dens.Rackett,P corrected"<<"Liq.dens.Tait"<<"Liq.visc.P corrected (Pa·s)"<<"Liq.Th.Cond.(W/m·K)"<<"Liq.Th.Cond. Latini"
                     <<"Surf.Tens.(N/m)"<<"Surf.tens.Sastri"<<"Surf.tens.McLeod"<<"Gas visc.P corrected (Pa·s)"<<"Gas visc.Lucas, P corrected"
@@ -203,6 +204,10 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
 
     //Button for adding correlation to database
     connect(ui->btnSubsToolsAddCorr,SIGNAL(clicked()),this,SLOT(btnSubsToolAddCorr()));
+
+    //Button for exporting the substance in Modelica FreeFluids.Media format
+    connect(ui->btnSubsToolsExport,SIGNAL(clicked()),this,SLOT(btnSubsToolsExport()));
+
 
     //Mixture calculation tab setup
     //*****************************
@@ -448,6 +453,7 @@ void FreeFluidsMainWindow::cbSubsCalcSelLoad(int position)
     subsData->lSurfTCorr.form=0;
     subsData->lThCCorr.form=0;
     subsData->lViscCorr.form=0;
+    subsData->lIsothCompCorr.form=0;
     subsData->sCpCorr.form=0;
     subsData->sDensCorr.form=0;
     subsData->cubicData.eos=FF_IdealGas;
@@ -461,25 +467,35 @@ void FreeFluidsMainWindow::cbSubsCalcSelLoad(int position)
     ui->chbSubsCalcCubic->setChecked(false);
     ui->chbSubsCalcSaft->setChecked(false);
     ui->chbSubsCalcSW->setChecked(false);
+
+    ui->leSubsToolsCp0Corr->setText("");
     ui->leSubsToolsLdensCorr->setText("");
     ui->leSubsToolsVpCorr->setText("");
+    ui->leSubsToolsBtCorr->setText("");
     ui->leSubsToolsHvCorr->setText("");
     ui->leSubsToolsLCpCorr->setText("");
+    ui->leSubsToolsLTfromHCorr->setText("");
     ui->leSubsToolsLviscCorr->setText("");
     ui->leSubsToolsLthCCorr->setText("");
     ui->leSubsToolsLsurfTCorr->setText("");
+    ui->leSubsToolsLisothCompCorr->setText("");
     ui->leSubsToolsGdensCorr->setText("");
     ui->leSubsToolsGviscCorr->setText("");
     ui->leSubsToolsGthCCorr->setText("");
     ui->leSubsToolsSdensCorr->setText("");
     ui->leSubsToolsSCpCorr->setText("");
+
+    ui->chbSubsToolsCp0->setChecked(false);
     ui->chbSubsToolsLdens->setChecked(false);
     ui->chbSubsToolsVp->setChecked(false);
+    ui->chbSubsToolsBt->setChecked(false);
     ui->chbSubsToolsHv->setChecked(false);
     ui->chbSubsToolsLCp->setChecked(false);
+    ui->chbSubsToolsLTfromH->setChecked(false);
     ui->chbSubsToolsLvisc->setChecked(false);
     ui->chbSubsToolsLthC->setChecked(false);
     ui->chbSubsToolsLsurfT->setChecked(false);
+    ui->chbSubsToolsLisothComp->setChecked(false);
     ui->chbSubsToolsGdens->setChecked(false);
     ui->chbSubsToolsGvisc->setChecked(false);
     ui->chbSubsToolsGthC->setChecked(false);
@@ -559,7 +575,7 @@ void FreeFluidsMainWindow::cbSubsCalcSelLoad(int position)
     //ui->lineEdit->setText(subsListModel->record(position).value("Name").toString());
     //Query for loading available correlation parameters for the selected substance
     queryCorr.prepare("SELECT PhysProp.Property AS Property, CorrelationEquations.Equation AS Equation, CorrelationParam.Reference AS Reference, "
-                      "CorrelationParam.Tmin AS Tmin, CorrelationParam.Tmax AS Tmax, CorrelationParam.Id AS Id "
+                      "CorrelationParam.Tmin AS Tmin, CorrelationParam.Tmax AS Tmax, CorrelationParam.Correct AS OK, CorrelationParam.Preferred AS Best, CorrelationParam.Id AS Id "
                       "FROM PhysProp INNER JOIN (CorrelationEquations INNER JOIN (Correlations INNER JOIN CorrelationParam ON "
                       "Correlations.Number = CorrelationParam.NumCorrelation) ON CorrelationEquations.Id = Correlations.IdEquation) "
                       "ON PhysProp.Id = Correlations.IdPhysProp WHERE (((CorrelationParam.IdProduct)=?))ORDER BY Property;");
@@ -567,7 +583,7 @@ void FreeFluidsMainWindow::cbSubsCalcSelLoad(int position)
     queryCorr.addBindValue(subsListModel->record(position).value("Id"));
     queryCorr.exec();
     subsToolsCorrModel->setQuery(queryCorr);
-    tvSubsToolsSelCorr->setColumnHidden(5,true);
+    tvSubsToolsSelCorr->setColumnHidden(7,true);
     tvSubsToolsSelCorr->resizeColumnsToContents();
 }
 //Substance calculation tab functions
@@ -654,7 +670,8 @@ void FreeFluidsMainWindow::twSubsCalcUpdate()
     QString phase;
     double Z;
     double Vp;
-    double Hv;
+    double Hv;//vaporization enthalpy
+    double lCpSat;//cp of saturated liquid
     double ArrDerivatives[6];
     FF_CubicParam param;
 
@@ -716,6 +733,7 @@ void FreeFluidsMainWindow::twSubsCalcUpdate()
                 thVp.V=answerLVp[0];
                 FF_ExtResidualThermoEOS(&subsData->model,&subsData->saftData,&thVp);//with the liquid volume we calculate the residual thermo properties
                 Hv=Hv-thVp.H;//vaporization enthalpy is the difference
+                lCpSat=thVp.Cp+th0.Cp;
             }
         }
         else if(subsData->model==FF_SWtype){
@@ -752,6 +770,7 @@ void FreeFluidsMainWindow::twSubsCalcUpdate()
                 thVp.V=answerLVp[0];
                 FF_ExtResidualThermoEOS(&subsData->model,&subsData->swData,&thVp);//with the liquid volume we calculate the residual thermo properties
                 Hv=Hv-thVp.H;//vaporization enthalpy is the difference
+                lCpSat=thVp.Cp+th0.Cp;
             }
         }
         else{
@@ -790,6 +809,7 @@ void FreeFluidsMainWindow::twSubsCalcUpdate()
                 thVp.V=answerLVp[0];
                 FF_ExtResidualThermoEOS(&subsData->model,&subsData->cubicData,&thVp);//with the liquid volume we calculate the residual thermo properties
                 Hv=Hv-thVp.H;//vaporization enthalpy is the difference
+                lCpSat=thVp.Cp+th0.Cp;
             }
         }
 
@@ -813,83 +833,87 @@ void FreeFluidsMainWindow::twSubsCalcUpdate()
         ui->twSubsCalc->item(16,i)->setText(QString::number(thR.JT*1e5));
         ui->twSubsCalc->item(17,i)->setText(QString::number(thR.IT*1e2));
         ui->twSubsCalc->item(18,i)->setText(QString::number(thR.dP_dT*1e-5));
-        ui->twSubsCalc->item(19,i)->setText(QString::number(thR.dP_dV*1e-5));
+        ui->twSubsCalc->item(19,i)->setText(QString::number(thR.dP_dV*1e-5*subsData->baseProp.MW/1000));
+        ui->twSubsCalc->item(20,i)->setText(QString::number(-thR.dP_dT/thR.dP_dV*1000/subsData->baseProp.MW));//(dV/dT)P
+        ui->twSubsCalc->item(21,i)->setText(QString::number(-thR.dP_dT/(thR.dP_dV*thR.V)));
+        ui->twSubsCalc->item(22,i)->setText(QString::number(-1/(thR.dP_dV*thR.V)));//Isothermal compressibility
         if (Vp>0){
-            ui->twSubsCalc->item(20,i)->setText(QString::number(Vp/100000));//Vapor pressure bar
-            ui->twSubsCalc->item(21,i)->setText(QString::number(MW/answerLVp[0]/1000));//liquid rho at Vp kgr/m3
-            ui->twSubsCalc->item(22,i)->setText(QString::number(MW/answerGVp[0]/1000));//gas rho at Vp kgr/m3
-            ui->twSubsCalc->item(23,i)->setText(QString::number(Hv/MW));//Saturated vaporization enthalpy
+            ui->twSubsCalc->item(23,i)->setText(QString::number(Vp/100000));//Vapor pressure bar
+            ui->twSubsCalc->item(24,i)->setText(QString::number(MW/answerLVp[0]/1000));//liquid rho at Vp kgr/m3
+            ui->twSubsCalc->item(25,i)->setText(QString::number(MW/answerGVp[0]/1000));//gas rho at Vp kgr/m3
+            ui->twSubsCalc->item(26,i)->setText(QString::number(Hv/MW));//Saturated vaporization enthalpy
+            ui->twSubsCalc->item(27,i)->setText(QString::number(lCpSat/MW));//Saturated liquid heat capacity
         }
-        ui->twSubsCalc->item(24,i)->setText(QString::number(ArrDerivatives[0]));
-        ui->twSubsCalc->item(25,i)->setText(QString::number(ArrDerivatives[1]));
-        ui->twSubsCalc->item(26,i)->setText(QString::number(ArrDerivatives[2]));
-        ui->twSubsCalc->item(27,i)->setText(QString::number(ArrDerivatives[3]));
-        ui->twSubsCalc->item(28,i)->setText(QString::number(ArrDerivatives[4]));
-        ui->twSubsCalc->item(29,i)->setText(QString::number(ArrDerivatives[5]));
+        ui->twSubsCalc->item(28,i)->setText(QString::number(ArrDerivatives[0]));
+        ui->twSubsCalc->item(29,i)->setText(QString::number(ArrDerivatives[1]));
+        ui->twSubsCalc->item(30,i)->setText(QString::number(ArrDerivatives[2]));
+        ui->twSubsCalc->item(31,i)->setText(QString::number(ArrDerivatives[3]));
+        ui->twSubsCalc->item(32,i)->setText(QString::number(ArrDerivatives[4]));
+        ui->twSubsCalc->item(33,i)->setText(QString::number(ArrDerivatives[5]));
 
         //Correlations data
         if(subsData->lDensCorr.form>0){
             FF_PhysPropCorr(&subsData->lDensCorr.form,subsData->lDensCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&lplDens);
             if(thR.P>Vp) FF_LiqDensChuehPrausnitz(&subsData->baseProp,&thR.T,&thR.P,&Vp,&lplDens,&lDens);
             else lDens=lplDens;
-            ui->twSubsCalc->item(30,i)->setText(QString::number(lDens));
+            ui->twSubsCalc->item(34,i)->setText(QString::number(lDens));
         }
         FF_LiqDensSatRackett(&subsData->baseProp,&subsData->lDens.x,&subsData->lDens.y,&thR.T,&lplDens);
         if(thR.P>Vp) FF_LiqDensChuehPrausnitz(&subsData->baseProp,&thR.T,&thR.P,&Vp,&lplDens,&lDens);
         else lDens=lplDens;
-        ui->twSubsCalc->item(31,i)->setText(QString::number(lDens));
-
+        ui->twSubsCalc->item(35,i)->setText(QString::number(lDens));
+        //Tait density calculation is missing here
         if(subsData->lViscCorr.form>0){
             FF_PhysPropCorr(&subsData->lViscCorr.form,subsData->lViscCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&lplVisc);
             FF_LiqViscPcorLucas(&thR.T,&thR.P,&Vp,&subsData->baseProp,&lplVisc,&lVisc);
-            ui->twSubsCalc->item(33,i)->setText(QString::number(lVisc));
+            ui->twSubsCalc->item(37,i)->setText(QString::number(lVisc));
         }
 
         if(subsData->lThCCorr.form>0){
             FF_PhysPropCorr(&subsData->lThCCorr.form,subsData->lThCCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&lThCond);
-            ui->twSubsCalc->item(34,i)->setText(QString::number(lThCond));
+            ui->twSubsCalc->item(38,i)->setText(QString::number(lThCond));
         }
         FF_LiquidThCondLatini(&thR.T,&subsData->baseProp,&lThCond);
-        ui->twSubsCalc->item(35,i)->setText(QString::number(lThCond));
+        ui->twSubsCalc->item(39,i)->setText(QString::number(lThCond));
 
         if(subsData->lSurfTCorr.form>0){
             FF_PhysPropCorr(&subsData->lSurfTCorr.form,subsData->lSurfTCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&surfTens);
-            ui->twSubsCalc->item(36,i)->setText(QString::number(surfTens));
+            ui->twSubsCalc->item(40,i)->setText(QString::number(surfTens));
         }
         FF_SurfTensSastri(&thR.T,&subsData->baseProp,&surfTens);
-        ui->twSubsCalc->item(37,i)->setText(QString::number(surfTens));
+        ui->twSubsCalc->item(41,i)->setText(QString::number(surfTens));
         FF_SurfTensMcLeod(&thR.T,subsData,&surfTens);
-        ui->twSubsCalc->item(38,i)->setText(QString::number(surfTens));
+        ui->twSubsCalc->item(42,i)->setText(QString::number(surfTens));
 
 
         if(subsData->gViscCorr.form>0){
             FF_PhysPropCorr(&subsData->gViscCorr.form,subsData->gViscCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&lpgVisc);
             FF_GasViscTPcpLucas(&thR.T,&thR.P,&subsData->baseProp,&lpgVisc,&gVisc);
             //FF_GasViscTVcpChung(&thR.T,&thR.V,&subsData->baseProp,&lpgVisc,&gVisc);
-            ui->twSubsCalc->item(39,i)->setText(QString::number(gVisc));
+            ui->twSubsCalc->item(43,i)->setText(QString::number(gVisc));
         }
 
         lpgVisc=0;
         ldgVisc=0;
         //FF_GasViscTVcpChung(&thR.T,&thR.V,&subsData->baseProp,&ldgVisc,&gVisc);
         FF_GasViscTPcpLucas(&thR.T,&thR.P,&subsData->baseProp,&lpgVisc,&gVisc);
-        ui->twSubsCalc->item(40,i)->setText(QString::number(gVisc));
+        ui->twSubsCalc->item(44,i)->setText(QString::number(gVisc));
 
         if(subsData->gThCCorr.form>0){
             FF_PhysPropCorr(&subsData->gThCCorr.form,subsData->gThCCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&ldgThC);
             FF_GasThCondTVcorChung(&thR.T,&thR.V,&subsData->baseProp,&ldgThC,&gThC);
-            ui->twSubsCalc->item(41,i)->setText(QString::number(gThC));
+            ui->twSubsCalc->item(45,i)->setText(QString::number(gThC));
         }
         FF_GasLpThCondTCpChung(&thR.T,&th0.Cp,&subsData->baseProp,&ldgThC);
         FF_GasThCondTVcorChung(&thR.T,&thR.V,&subsData->baseProp,&ldgThC,&gThC);
-        ui->twSubsCalc->item(42,i)->setText(QString::number(gThC));
+        ui->twSubsCalc->item(46,i)->setText(QString::number(gThC));
 
         if(subsData->lCpCorr.form>0){
             FF_PhysPropCorr(&subsData->lCpCorr.form,subsData->lCpCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&lCp);
-            ui->twSubsCalc->item(43,i)->setText(QString::number(lCp));
+            ui->twSubsCalc->item(47,i)->setText(QString::number(lCp));
         }
         FF_LiqCpBondi(subsData,&thR.T,&lCp);
-        ui->twSubsCalc->item(44,i)->setText(QString::number(lCp));
+        ui->twSubsCalc->item(48,i)->setText(QString::number(lCp));
     }
 
 
@@ -1036,19 +1060,27 @@ void FreeFluidsMainWindow::btnSubsCalcTransfer(){
     int i,n=4;
     for (i=0;i<11;i++)ui->twSubsTools->item(i,0)->setText(QString::number(ui->twSubsCalc->item(0,i)->text().toDouble()+273.15));//We fill the temperatures
     if (ui->chbSubsCalcTransfVp->isChecked()==true){
-        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(QString::number(ui->twSubsCalc->item(20,i)->text().toDouble()*1e5));
+        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(QString::number(ui->twSubsCalc->item(23,i)->text().toDouble()*1e5));
     n=5;
     }
     if (ui->chbSubsCalcTransfSLd->isChecked()==true){
-        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(ui->twSubsCalc->item(21,i)->text());
+        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(ui->twSubsCalc->item(24,i)->text());
     n=5;
     }
     if (ui->chbSubsCalcTransfSGd->isChecked()==true){
-        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(ui->twSubsCalc->item(22,i)->text());
+        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(ui->twSubsCalc->item(25,i)->text());
+    n=5;
+    }
+    if (ui->chbSubsCalcTransfSLCp->isChecked()==true){
+        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(QString::number(ui->twSubsCalc->item(27,i)->text().toDouble()*1e3));
     n=5;
     }
     if (ui->chbSubsCalcTransfHv->isChecked()==true){
-        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(QString::number(ui->twSubsCalc->item(23,i)->text().toDouble()*1e3));
+        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(QString::number(ui->twSubsCalc->item(26,i)->text().toDouble()*1e3));
+    n=5;
+    }
+    if (ui->chbSubsCalcTransfIsoTComp->isChecked()==true){
+        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(QString::number(ui->twSubsCalc->item(22,i)->text().toDouble()));
     n=5;
     }
 }
@@ -1057,15 +1089,14 @@ void FreeFluidsMainWindow::btnSubsCalcTransfer(){
 //*****************************
 
 //Slot for correlation selection load on substance and screen
+/*Receives the selected position of the combobox. Retrieves the correlation number. Gets the correlation from the database.
+  Adds the data to the correspondig correlation of the substance*/
 void FreeFluidsMainWindow::cbSubsToolsCorrLoad(int position){
     QString corrProp;
     FF_Correlation corr;
     corrProp=subsToolsCorrModel->record(position).value("Property").toString();
     corr.id=subsToolsCorrModel->record(ui->cbSubsToolsSelCorr->currentIndex()).value("Id").toInt();
     GetCorrDataById(&corr,&db);
-
-//****************************
-//============================
 
     if (corrProp=="Cp0"){
         subsData->cp0Corr=corr;
@@ -1091,7 +1122,7 @@ void FreeFluidsMainWindow::cbSubsToolsCorrLoad(int position){
         //subs->BtCorr=corr;
         subsData->btCorr=corr;
         ui->leSubsToolsBtCorr->setText(subsToolsCorrModel->record(position).value("Reference").toString());
-        ui->chbSubsToolsBt->setChecked(true);
+        //ui->chbSubsToolsBt->setChecked(true);
     }
     else if (corrProp=="HvSat"){
             subsData->hVsatCorr=corr;
@@ -1102,6 +1133,10 @@ void FreeFluidsMainWindow::cbSubsToolsCorrLoad(int position){
             subsData->lCpCorr=corr;
             ui->leSubsToolsLCpCorr->setText(subsToolsCorrModel->record(position).value("Reference").toString());
             ui->chbSubsToolsLCp->setChecked(true);
+    }
+    else if (corrProp=="LTfromH"){
+            subsData->lTfromHCorr=corr;
+            ui->leSubsToolsLTfromHCorr->setText(subsToolsCorrModel->record(position).value("Reference").toString());
     }
     else if (corrProp=="Lvisc"){
             subsData->lViscCorr=corr;
@@ -1117,6 +1152,11 @@ void FreeFluidsMainWindow::cbSubsToolsCorrLoad(int position){
             subsData->lSurfTCorr=corr;
             ui->leSubsToolsLsurfTCorr->setText(subsToolsCorrModel->record(position).value("Reference").toString());
             ui->chbSubsToolsLsurfT->setChecked(true);
+    }
+    else if (corrProp=="LisothComp"){
+            subsData->lIsothCompCorr=corr;
+            ui->leSubsToolsLisothCompCorr->setText(subsToolsCorrModel->record(position).value("Reference").toString());
+            ui->chbSubsToolsLisothComp->setChecked(true);
     }
     else if (corrProp=="GdensSat"){
             subsData->gDensCorr=corr;
@@ -1160,84 +1200,109 @@ void FreeFluidsMainWindow::btnSubsToolsFillTable(){
     for (i=0;i<nPoints;i++) T[i]=minT+i*Tincrement;
     int initRow=ui->leSubsToolsInitRow->text().toInt();
     for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,0)->setText(QString::number(T[i-initRow+1]));//We fill the temperatures
+    /*
     if (ui->chbSubsToolsCp0->isChecked()==true){
         FF_PhysPropCorr(&subsData->cp0Corr.form,subsData->cp0Corr.coef,&subsData->baseProp.MW,&nPoints,T,y);
         ui->twSubsTools->horizontalHeaderItem(n)->setText("Cp0");
         for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the vapor pressure
-    n++;
+        n++;
+    }
+    */
+    if (ui->chbSubsToolsCp0->isChecked()==true){
+        double H[nPoints],S[nPoints];
+        FF_PhysPropCorr(&subsData->cp0Corr.form,subsData->cp0Corr.coef,&subsData->baseProp.MW,&nPoints,T,y);
+        ui->twSubsTools->horizontalHeaderItem(n)->setText("Cp0");
+        for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the vapor pressure
+        n++;
+        FF_SpecificEnthalpyEntropyCorr(&subsData->cp0Corr.form,subsData->cp0Corr.coef,&subsData->baseProp.MW,&nPoints,T,H,S);
+        ui->twSubsTools->horizontalHeaderItem(n)->setText("H0");
+        for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(H[i-initRow+1]));//We fill H0
+        n++;
+        ui->twSubsTools->horizontalHeaderItem(n)->setText("S0");
+        for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(S[i-initRow+1]));//We fill S0
+        n++;
     }
     if (ui->chbSubsToolsVp->isChecked()==true){
         FF_PhysPropCorr(&subsData->vpCorr.form,subsData->vpCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);
         ui->twSubsTools->horizontalHeaderItem(n)->setText("Vapor press.");
         for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the vapor pressure
-    n++;
+        n++;
     }
-    /*if (ui->chbSubsToolsBt->isChecked()==true){
-        FF_PhysPropCorr(&subs->btCorr.form,subs->btCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);
-        ui->twSubsTools->horizontalHeaderItem(n)->setText("Boil T.");
-        for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the boiling temperature
-    n++;
-    }*/
     if (ui->chbSubsToolsLdens->isChecked()==true){
         if (subsData->baseProp.MWmono>0) FF_PhysPropCorr(&subsData->lDensCorr.form,subsData->lDensCorr.coef,&subsData->baseProp.MWmono,&nPoints,T,y);
         else FF_PhysPropCorr(&subsData->lDensCorr.form,subsData->lDensCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);//we call the calculation routine
         ui->twSubsTools->horizontalHeaderItem(n)->setText("Liq.dens.");
         for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the liquid density
-    n++;
+        n++;
     }
     if (ui->chbSubsToolsHv->isChecked()==true){
         FF_PhysPropCorr(&subsData->hVsatCorr.form,subsData->hVsatCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);
         ui->twSubsTools->horizontalHeaderItem(n)->setText("Hv");
         for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the heat of vaporization
-    n++;
+        n++;
     }
-    if (ui->chbSubsToolsLCp->isChecked()==true){
+    if ((ui->chbSubsToolsLCp->isChecked()==true)&&(n<4)){
+        double H[nPoints],S[nPoints];
         FF_PhysPropCorr(&subsData->lCpCorr.form,subsData->lCpCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);
         ui->twSubsTools->horizontalHeaderItem(n)->setText("Liq.Cp");
         for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the liquid Cp
-    n++;
-    }
+        n++;
+        FF_SpecificEnthalpyEntropyCorr(&subsData->lCpCorr.form,subsData->lCpCorr.coef,&subsData->baseProp.MW,&nPoints,T,H,S);
+        ui->twSubsTools->horizontalHeaderItem(n)->setText("Liq.H");
+        for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(H[i-initRow+1]));//We fill the liquid H
+        n++;
+        ui->twSubsTools->horizontalHeaderItem(n)->setText("Liq.S");
+        for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(S[i-initRow+1]));//We fill the liquid S
+        n++;
+    }    
     if (ui->chbSubsToolsLvisc->isChecked()==true){
         FF_PhysPropCorr(&subsData->lViscCorr.form,subsData->lViscCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);
         ui->twSubsTools->horizontalHeaderItem(n)->setText("Liq.visc.");
         for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the liquid viscosity
-    n++;
+        n++;
     }
     if ((ui->chbSubsToolsLthC->isChecked()==true)&&(n<6)){
         FF_PhysPropCorr(&subsData->lThCCorr.form,subsData->lThCCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);
         ui->twSubsTools->horizontalHeaderItem(n)->setText("Liq.th.cond.");
         for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the liquid thermal conductivity
-    n++;
+        n++;
     }
     if ((ui->chbSubsToolsLsurfT->isChecked()==true)&&(n<6)){
         FF_PhysPropCorr(&subsData->lSurfTCorr.form,subsData->lSurfTCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);
         ui->twSubsTools->horizontalHeaderItem(n)->setText("Liq.s.tens.");
         for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the surface tension
-    n++;
+        n++;
     }
+    if ((ui->chbSubsToolsLisothComp->isChecked()==true)&&(n<6)){
+        FF_PhysPropCorr(&subsData->lIsothCompCorr.form,subsData->lIsothCompCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);
+        ui->twSubsTools->horizontalHeaderItem(n)->setText("Liq.isot.comp.");
+        for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the liquid isothermal compressibility
+        n++;
+    }
+
     if ((ui->chbSubsToolsGdens->isChecked()==true)&&(n<6)){
         FF_PhysPropCorr(&subsData->gDensCorr.form,subsData->gDensCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);
         ui->twSubsTools->horizontalHeaderItem(n)->setText("Gas dens.");
         for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the gas saturated density
-    n++;
+        n++;
     }
     if ((ui->chbSubsToolsGvisc->isChecked()==true)&&(n<6)){
         FF_PhysPropCorr(&subsData->gViscCorr.form,subsData->gViscCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);
         ui->twSubsTools->horizontalHeaderItem(n)->setText("Gas visc.");
         for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the gas viscosity
-    n++;
+        n++;
     }
     if ((ui->chbSubsToolsGthC->isChecked()==true)&&(n<6)){
         FF_PhysPropCorr(&subsData->gThCCorr.form,subsData->gThCCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);
         ui->twSubsTools->horizontalHeaderItem(n)->setText("Gas th.con.");
         for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the gas thermal conductivity
-    n++;
+        n++;
     }
     if ((ui->chbSubsToolsSdens->isChecked()==true)&&(n<6)){
         FF_PhysPropCorr(&subsData->sDensCorr.form,subsData->sDensCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);
         ui->twSubsTools->horizontalHeaderItem(n)->setText("Sol.dens.");
         for (i=initRow-1;i<(initRow-1+nPoints);i++)ui->twSubsTools->item(i,n)->setText(QString::number(y[i-initRow+1]));//We fill the solid density
-    n++;
+        n++;
     }
     if ((ui->chbSubsToolsSCp->isChecked()==true)&&(n<6)){
         FF_PhysPropCorr(&subsData->sCpCorr.form,subsData->sCpCorr.coef,&subsData->baseProp.MW,&nPoints,T,y);
@@ -1322,6 +1387,7 @@ void FreeFluidsMainWindow::cbSubsToolsSelOptCorr(int position){
     case FF_DIPPR106Hv:
     case FF_DIPPR106Ld:
     case FF_DIPPR106SurfT:
+    case FF_PPDS15:
         ui->twSubsToolsCoefPrep->item(0,5)->setText(ui->leSubsToolsTc->text());
         ui->twSubsToolsCoefPrep->item(1,5)->setText(ui->leSubsToolsTc->text());
         ui->twSubsToolsCoefPrep->item(2,5)->setText(ui->leSubsToolsTc->text());
@@ -1403,6 +1469,7 @@ void FreeFluidsMainWindow::btnSubsToolsFindCorr(){
     case FF_Wagner25:
     case FF_Wagner36:
     case FF_WagnerGd:
+    case FF_PPDS15:
         numCoef=6;
         break;
     case FF_Rackett:
@@ -1899,30 +1966,201 @@ void FreeFluidsMainWindow::btnSubsToolAddCorr(){
     case 5://Liquid Cp DIPPR100
         corr.form=17;
         break;
-    case 6://Liq. density DIPPR106
+    case 6://Liquid Cp PPDS15
+        corr.form=19;
+        break;
+    case 7://Liquid T from H DIPPR100
+        corr.form=140;
+        break;
+    case 8://Liq. density DIPPR106
         corr.form=47;
         break;
-    case 7://Liq. viscosity DIPPR101
+    case 9://Liq. density DIPPR116
+        corr.form=46;
+        break;
+    case 10://Liq. isothermal compressibility DIPPR100
+        corr.form=150;
+        break;
+    case 11://Liq. isothermal compressibility PPDS15
+        corr.form=151;
+        break;
+    case 12://Liq. viscosity DIPPR101
         corr.form=30;
         break;
-    case 8://Liq. thermal cond. DIPPR100
+    case 13://Liq. thermal cond. DIPPR100
         corr.form=50;
         break;
-    case 9://Liq.surf.tension DIPPR100
+    case 14://Liq.surf.tension DIPPR100
         corr.form=60;
         break;
-    case 10://Gas sat. density modified Wagner-Pruss
+    case 15://Gas sat. density modified Wagner-Pruss
         corr.form=101;
         break;
-    case 11://Gas viscosity DIPPR100
+    case 16://Gas viscosity DIPPR100
         corr.form=111;
         break;
-    case 12://Gas thermal cond.DIPPR100
+    case 17://Gas thermal cond.DIPPR100
         corr.form=121;
+        break;
+    case 18://Solid density DIPPR100
+        corr.form=71;
+        break;
+    case 19://Solid Cp DIPPR100
+        corr.form=82;
         break;
     }
     AddCorrToDataBase(subsData->id,&corr,&lowLimit,&highLimit,&comment,&db);
 }
+
+//Slot for exporting the substance in Modelica FreeFluids.Media format
+void FreeFluidsMainWindow::btnSubsToolsExport(){
+    QString subsName = QInputDialog::getText(this, tr("QInputDialog::getText()"), tr("Substance name:"));
+    QFileDialog *dia = new QFileDialog(this,"Choose directory and file name");
+    //dia->setNameFilter("*.mo");
+    dia->showNormal();
+    QString fileName;
+    if (dia->exec())
+        fileName = dia->selectedFiles().first();
+    std::cout<<fileName.toStdString()<<std::endl;
+    QFile *file=new QFile(fileName,this);
+    if (file->open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream out(file);
+        out.setRealNumberNotation(QTextStream::ScientificNotation);
+        out<<"  constant DataRecord "<<subsName.toUtf8()<<"(\n    MW = "<<subsData->baseProp.MW;
+        out<<", Tc = "<<subsData->baseProp.Tc<<", Pc = "<<subsData->baseProp.Pc<<", Vc = "<<subsData->baseProp.Vc<<", Zc = "<<subsData->baseProp.Zc;
+        out<<", w = "<<subsData->baseProp.w;
+        if (subsData->lIsothComp.y>0) out<<", IsothComp = "<<subsData->lIsothComp.y<<",\n";
+        else  out<<",\n";
+
+        out<<"    Cp0Corr = "<<subsData->cp0Corr.form<<", Cp0Coef = {"<<subsData->cp0Corr.coef[0]<<", "<<subsData->cp0Corr.coef[1]<<", ";
+        out<<subsData->cp0Corr.coef[2]<<", "<<subsData->cp0Corr.coef[3]<<", "<<subsData->cp0Corr.coef[4]<<", "<<subsData->cp0Corr.coef[5]<<", ";
+        out<<subsData->cp0Corr.coef[6]<<", "<<subsData->cp0Corr.coef[7]<<", "<<subsData->cp0Corr.coef[8]<<", "<<subsData->cp0Corr.coef[9]<<", ";
+        out<<subsData->cp0Corr.coef[10]<<", "<<subsData->cp0Corr.coef[11]<<", "<<subsData->cp0Corr.coef[12]<<"}, ";
+        out<<"Cp0LimI = "<<subsData->cp0Corr.limI<<", Cp0LimS = "<<subsData->cp0Corr.limS<<",\n";
+
+        out<<"    VpCorr = "<<subsData->vpCorr.form<<", VpCoef = {"<<subsData->vpCorr.coef[0]<<", "<<subsData->vpCorr.coef[1]<<", ";
+        out<<subsData->vpCorr.coef[2]<<", "<<subsData->vpCorr.coef[3]<<", "<<subsData->vpCorr.coef[4]<<", "<<subsData->vpCorr.coef[5]<<"}, ";
+        out<<"VpLimI = "<<subsData->vpCorr.limI<<", VpLimS = "<<subsData->vpCorr.limS<<",\n";
+
+        out<<"    BtCorr = "<<subsData->btCorr.form<<", BtCoef = {"<<subsData->btCorr.coef[0]<<", "<<subsData->btCorr.coef[1]<<", ";
+        out<<subsData->btCorr.coef[2]<<", "<<subsData->btCorr.coef[3]<<", "<<subsData->btCorr.coef[4]<<", "<<subsData->btCorr.coef[5]<<"}, ";
+        out<<"BtLimI = "<<subsData->btCorr.limI<<", BtLimS = "<<subsData->btCorr.limS<<",\n";
+
+        out<<"    HvCorr = "<<subsData->hVsatCorr.form<<", HvCoef = {"<<subsData->hVsatCorr.coef[0]<<", "<<subsData->hVsatCorr.coef[1]<<", ";
+        out<<subsData->hVsatCorr.coef[2]<<", "<<subsData->hVsatCorr.coef[3]<<", "<<subsData->hVsatCorr.coef[4]<<", "<<subsData->hVsatCorr.coef[5]<<"}, ";
+        out<<"HvLimI = "<<subsData->hVsatCorr.limI<<", HvLimS = "<<subsData->hVsatCorr.limS<<",\n";
+
+        out<<"    lDensCorr = "<<subsData->lDensCorr.form<<", lDensCoef = {"<<subsData->lDensCorr.coef[0]<<", "<<subsData->lDensCorr.coef[1]<<", ";
+        out<<subsData->lDensCorr.coef[2]<<", "<<subsData->lDensCorr.coef[3]<<", "<<subsData->lDensCorr.coef[4]<<", "<<subsData->lDensCorr.coef[5]<<"}, ";
+        out<<"lDensLimI = "<<subsData->lDensCorr.limI<<", lDensLimS = "<<subsData->lDensCorr.limS<<",\n";
+
+        out<<"    lCpCorr = "<<subsData->lCpCorr.form<<", lCpCoef = {"<<subsData->lCpCorr.coef[0]<<", "<<subsData->lCpCorr.coef[1]<<", ";
+        out<<subsData->lCpCorr.coef[2]<<", "<<subsData->lCpCorr.coef[3]<<", "<<subsData->lCpCorr.coef[4]<<", "<<subsData->lCpCorr.coef[5]<<"}, ";
+        out<<"lCpLimI = "<<subsData->lCpCorr.limI<<", lCpLimS = "<<subsData->lCpCorr.limS<<",\n";
+
+        out<<"    lTfromHsatCorr = "<<subsData->lTfromHCorr.form<<", lTfromHsatCoef = {"<<subsData->lTfromHCorr.coef[0]<<", "<<subsData->lTfromHCorr.coef[1]<<", ";
+        out<<subsData->lTfromHCorr.coef[2]<<", "<<subsData->lTfromHCorr.coef[3]<<", "<<subsData->lTfromHCorr.coef[4]<<", "<<subsData->lTfromHCorr.coef[5]<<"}, ";
+        out<<"lTfromHsatLimI = "<<subsData->lTfromHCorr.limI<<", lTfromHsatLimS = "<<subsData->lTfromHCorr.limS<<",\n";
+
+        out<<"    lViscCorr = "<<subsData->lViscCorr.form<<", lViscCoef = {"<<subsData->lViscCorr.coef[0]<<", "<<subsData->lViscCorr.coef[1]<<", ";
+        out<<subsData->lViscCorr.coef[2]<<", "<<subsData->lViscCorr.coef[3]<<", "<<subsData->lViscCorr.coef[4]<<", "<<subsData->lViscCorr.coef[5]<<"}, ";
+        out<<"lViscLimI = "<<subsData->lViscCorr.limI<<", lViscLimS = "<<subsData->lViscCorr.limS<<",\n";
+
+        out<<"    lThCondCorr = "<<subsData->lThCCorr.form<<", lThCondCoef = {"<<subsData->lThCCorr.coef[0]<<", "<<subsData->lThCCorr.coef[1]<<", ";
+        out<<subsData->lThCCorr.coef[2]<<", "<<subsData->lThCCorr.coef[3]<<", "<<subsData->lThCCorr.coef[4]<<", "<<subsData->lThCCorr.coef[5]<<"}, ";
+        out<<"lThCondLimI = "<<subsData->lThCCorr.limI<<", lThCondLimS = "<<subsData->lThCCorr.limS<<",\n";
+
+        out<<"    lSurfTensCorr = "<<subsData->lSurfTCorr.form<<", lSurfTensCoef = {"<<subsData->lSurfTCorr.coef[0]<<", "<<subsData->lSurfTCorr.coef[1]<<", ";
+        out<<subsData->lSurfTCorr.coef[2]<<", "<<subsData->lSurfTCorr.coef[3]<<", "<<subsData->lSurfTCorr.coef[4]<<", "<<subsData->lSurfTCorr.coef[5]<<"}, ";
+        out<<"lSurfTensLimI = "<<subsData->lSurfTCorr.limI<<", lSurfTensLimS = "<<subsData->lSurfTCorr.limS<<",\n";
+
+        out<<"    lIsothCompCorr = "<<subsData->lIsothCompCorr.form<<", lIsothCompCoef = {"<<subsData->lIsothCompCorr.coef[0]<<", "<<subsData->lIsothCompCorr.coef[1]<<", ";
+        out<<subsData->lIsothCompCorr.coef[2]<<", "<<subsData->lIsothCompCorr.coef[3]<<", "<<subsData->lIsothCompCorr.coef[4]<<", "<<subsData->lIsothCompCorr.coef[5]<<"}, ";
+        out<<"lIsothCompLimI = "<<subsData->lIsothCompCorr.limI<<", lIsothCompLimS = "<<subsData->lIsothCompCorr.limS<<",\n";
+
+        out<<"    vSatDensCorr = "<<subsData->gDensCorr.form<<", vSatDensCoef = {"<<subsData->gDensCorr.coef[0]<<", "<<subsData->gDensCorr.coef[1]<<", ";
+        out<<subsData->gDensCorr.coef[2]<<", "<<subsData->gDensCorr.coef[3]<<", "<<subsData->gDensCorr.coef[4]<<", "<<subsData->gDensCorr.coef[5]<<"}, ";
+        out<<"vSatDensLimI = "<<subsData->gDensCorr.limI<<", vSatDensLimS = "<<subsData->gDensCorr.limS<<",\n";
+
+        out<<"    vViscCorr = "<<subsData->gViscCorr.form<<", vViscCoef = {"<<subsData->gViscCorr.coef[0]<<", "<<subsData->gViscCorr.coef[1]<<", ";
+        out<<subsData->gViscCorr.coef[2]<<", "<<subsData->gViscCorr.coef[3]<<", "<<subsData->gViscCorr.coef[4]<<", "<<subsData->gViscCorr.coef[5]<<"}, ";
+        out<<"vViscLimI = "<<subsData->gViscCorr.limI<<", vViscLimS = "<<subsData->gViscCorr.limS<<",\n";
+
+        out<<"    vThCondCorr = "<<subsData->gThCCorr.form<<", vThCondCoef = {"<<subsData->gThCCorr.coef[0]<<", "<<subsData->gThCCorr.coef[1]<<", ";
+        out<<subsData->gThCCorr.coef[2]<<", "<<subsData->gThCCorr.coef[3]<<", "<<subsData->gThCCorr.coef[4]<<", "<<subsData->gThCCorr.coef[5]<<"}, ";
+        out<<"vThCondLimI = "<<subsData->gThCCorr.limI<<", vThCondLimS = "<<subsData->gThCCorr.limS<<"); \n";
+
+/*
+        out<<"  package "<<subsName.toUtf8()<<"\n";
+        //ui->twSubsCalc->item(i,j)->text().toUtf8()
+        out<<"    extends TMedium(final mediumName = '"<<subsName.toUtf8()<<"', final singleState = false, data.MW = "<<subsData->baseProp.MW;
+        out<<", data.Tc = "<<subsData->baseProp.Tc<<", data.Pc = "<<subsData->baseProp.Pc<<", data.Zc = "<<subsData->baseProp.Zc;
+        out<<", data.w = "<<subsData->baseProp.w<<", data.IsothCompr = "<<subsData->lIsothComp.y<<",\n";
+
+        out<<"    data.Cp0(corr = "<<subsData->cp0Corr.form<<", coef = {"<<subsData->cp0Corr.coef[0]<<", "<<subsData->cp0Corr.coef[1]<<", ";
+        out<<subsData->cp0Corr.coef[2]<<", "<<subsData->cp0Corr.coef[3]<<", "<<subsData->cp0Corr.coef[4]<<", "<<subsData->cp0Corr.coef[5]<<", ";
+        out<<subsData->cp0Corr.coef[6]<<", "<<subsData->cp0Corr.coef[7]<<", "<<subsData->cp0Corr.coef[8]<<", "<<subsData->cp0Corr.coef[9]<<", ";
+        out<<subsData->cp0Corr.coef[10]<<", "<<subsData->cp0Corr.coef[11]<<", "<<subsData->cp0Corr.coef[12]<<"}, ";
+        out<<"limI = "<<subsData->cp0Corr.limI<<", limS = "<<subsData->cp0Corr.limS<<"),\n";
+
+        out<<"    data.Vp(corr = "<<subsData->vpCorr.form<<", coef = {"<<subsData->vpCorr.coef[0]<<", "<<subsData->vpCorr.coef[1]<<", ";
+        out<<subsData->vpCorr.coef[2]<<", "<<subsData->vpCorr.coef[3]<<", "<<subsData->vpCorr.coef[4]<<", "<<subsData->vpCorr.coef[5]<<"}, ";
+        out<<"limI = "<<subsData->vpCorr.limI<<", limS = "<<subsData->vpCorr.limS<<"),\n";
+
+        out<<"    data.Bt(corr = "<<subsData->btCorr.form<<", coef = {"<<subsData->btCorr.coef[0]<<", "<<subsData->btCorr.coef[1]<<", ";
+        out<<subsData->btCorr.coef[2]<<", "<<subsData->btCorr.coef[3]<<", "<<subsData->btCorr.coef[4]<<", "<<subsData->btCorr.coef[5]<<"}, ";
+        out<<"limI = "<<subsData->btCorr.limI<<", limS = "<<subsData->btCorr.limS<<"),\n";
+
+        out<<"    data.Hv(corr = "<<subsData->hVsatCorr.form<<", coef = {"<<subsData->hVsatCorr.coef[0]<<", "<<subsData->hVsatCorr.coef[1]<<", ";
+        out<<subsData->hVsatCorr.coef[2]<<", "<<subsData->hVsatCorr.coef[3]<<", "<<subsData->hVsatCorr.coef[4]<<", "<<subsData->hVsatCorr.coef[5]<<"}, ";
+        out<<"limI = "<<subsData->hVsatCorr.limI<<", limS = "<<subsData->hVsatCorr.limS<<"),\n";
+
+        out<<"    data.liqDens(corr = "<<subsData->lDensCorr.form<<", coef = {"<<subsData->lDensCorr.coef[0]<<", "<<subsData->lDensCorr.coef[1]<<", ";
+        out<<subsData->lDensCorr.coef[2]<<", "<<subsData->lDensCorr.coef[3]<<", "<<subsData->lDensCorr.coef[4]<<", "<<subsData->lDensCorr.coef[5]<<"}, ";
+        out<<"limI = "<<subsData->lDensCorr.limI<<", limS = "<<subsData->lDensCorr.limS<<"),\n";
+
+        out<<"    data.liqCp(corr = "<<subsData->lCpCorr.form<<", coef = {"<<subsData->lCpCorr.coef[0]<<", "<<subsData->lCpCorr.coef[1]<<", ";
+        out<<subsData->lCpCorr.coef[2]<<", "<<subsData->lCpCorr.coef[3]<<", "<<subsData->lCpCorr.coef[4]<<", "<<subsData->lCpCorr.coef[5]<<"}, ";
+        out<<"limI = "<<subsData->lCpCorr.limI<<", limS = "<<subsData->lCpCorr.limS<<"),\n";
+
+        out<<"    data.liqTfromHsat(corr = "<<subsData->lTfromHCorr.form<<", coef = {"<<subsData->lTfromHCorr.coef[0]<<", "<<subsData->lTfromHCorr.coef[1]<<", ";
+        out<<subsData->lTfromHCorr.coef[2]<<", "<<subsData->lTfromHCorr.coef[3]<<", "<<subsData->lTfromHCorr.coef[4]<<", "<<subsData->lTfromHCorr.coef[5]<<"}, ";
+        out<<"limI = "<<subsData->lTfromHCorr.limI<<", limS = "<<subsData->lTfromHCorr.limS<<"),\n";
+
+        out<<"    data.liqVisc(corr = "<<subsData->lViscCorr.form<<", coef = {"<<subsData->lViscCorr.coef[0]<<", "<<subsData->lViscCorr.coef[1]<<", ";
+        out<<subsData->lViscCorr.coef[2]<<", "<<subsData->lViscCorr.coef[3]<<", "<<subsData->lViscCorr.coef[4]<<", "<<subsData->lViscCorr.coef[5]<<"}, ";
+        out<<"limI = "<<subsData->lViscCorr.limI<<", limS = "<<subsData->lViscCorr.limS<<"),\n";
+
+        out<<"    data.liqThCond(corr = "<<subsData->lThCCorr.form<<", coef = {"<<subsData->lThCCorr.coef[0]<<", "<<subsData->lThCCorr.coef[1]<<", ";
+        out<<subsData->lThCCorr.coef[2]<<", "<<subsData->lThCCorr.coef[3]<<", "<<subsData->lThCCorr.coef[4]<<", "<<subsData->lThCCorr.coef[5]<<"}, ";
+        out<<"limI = "<<subsData->lThCCorr.limI<<", limS = "<<subsData->lThCCorr.limS<<"),\n";
+
+        out<<"    data.liqSurfTens(corr = "<<subsData->lSurfTCorr.form<<", coef = {"<<subsData->lSurfTCorr.coef[0]<<", "<<subsData->lSurfTCorr.coef[1]<<", ";
+        out<<subsData->lSurfTCorr.coef[2]<<", "<<subsData->lSurfTCorr.coef[3]<<", "<<subsData->lSurfTCorr.coef[4]<<", "<<subsData->lSurfTCorr.coef[5]<<"}, ";
+        out<<"limI = "<<subsData->lSurfTCorr.limI<<", limS = "<<subsData->lSurfTCorr.limS<<"),\n";
+
+        out<<"    data.liqIsothComp(corr = "<<subsData->lIsothCompCorr.form<<", coef = {"<<subsData->lIsothCompCorr.coef[0]<<", "<<subsData->lIsothCompCorr.coef[1]<<", ";
+        out<<subsData->lIsothCompCorr.coef[2]<<", "<<subsData->lIsothCompCorr.coef[3]<<", "<<subsData->lIsothCompCorr.coef[4]<<", "<<subsData->lIsothCompCorr.coef[5]<<"}, ";
+        out<<"limI = "<<subsData->lIsothCompCorr.limI<<", limS = "<<subsData->lIsothCompCorr.limS<<"),\n";
+
+        out<<"    data.vapSatDens(corr = "<<subsData->gDensCorr.form<<", coef = {"<<subsData->gDensCorr.coef[0]<<", "<<subsData->gDensCorr.coef[1]<<", ";
+        out<<subsData->gDensCorr.coef[2]<<", "<<subsData->gDensCorr.coef[3]<<", "<<subsData->gDensCorr.coef[4]<<", "<<subsData->gDensCorr.coef[5]<<"}, ";
+        out<<"limI = "<<subsData->gDensCorr.limI<<", limS = "<<subsData->gDensCorr.limS<<"),\n";
+
+        out<<"    data.vapVisc(corr = "<<subsData->gViscCorr.form<<", coef = {"<<subsData->gViscCorr.coef[0]<<", "<<subsData->gViscCorr.coef[1]<<", ";
+        out<<subsData->gViscCorr.coef[2]<<", "<<subsData->gViscCorr.coef[3]<<", "<<subsData->gViscCorr.coef[4]<<", "<<subsData->gViscCorr.coef[5]<<"}, ";
+        out<<"limI = "<<subsData->gViscCorr.limI<<", limS = "<<subsData->gViscCorr.limS<<"),\n";
+
+        out<<"    data.vapThCond(corr = "<<subsData->gThCCorr.form<<", coef = {"<<subsData->gThCCorr.coef[0]<<", "<<subsData->gThCCorr.coef[1]<<", ";
+        out<<subsData->gThCCorr.coef[2]<<", "<<subsData->gThCCorr.coef[3]<<", "<<subsData->gThCCorr.coef[4]<<", "<<subsData->gThCCorr.coef[5]<<"}, ";
+        out<<"limI = "<<subsData->gThCCorr.limI<<", limS = "<<subsData->gThCCorr.limS<<")); \n";
+        out<<"  end "<<subsName.toUtf8()<<";\n";*/
+    }
+    file->close();
+    delete dia;
+    delete file;
+}
+
 
 //Mixture calculation tab setup
 //*****************************

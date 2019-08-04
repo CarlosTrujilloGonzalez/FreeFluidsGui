@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1281</width>
-    <height>884</height>
+    <width>1280</width>
+    <height>892</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -20,7 +20,7 @@
       <x>10</x>
       <y>40</y>
       <width>1271</width>
-      <height>791</height>
+      <height>801</height>
      </rect>
     </property>
     <property name="font">
@@ -156,7 +156,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#000000;&quot;&gt;Calculation is done at specified P, between T limits, and written to the table&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#000000;&quot;&gt;11 calculations will be done at specified P, between the initial and final temperatures, and the results written to the table.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>Calculate</string>
@@ -177,8 +177,11 @@ p, li { white-space: pre-wrap; }
         <pointsize>8</pointsize>
        </font>
       </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The first rows will contain the daba obtained by the EOS. After the reduced residual Helmholtz energy (Arr) derivatives, you will find a comparison, for several properties, between the results from the correlations selected in the &amp;quot;Substance Correlations/Tools&amp;quot; tab, corrected for the influence of pressure if needed, and some predictive methods. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
       <property name="rowCount">
-       <number>45</number>
+       <number>49</number>
       </property>
       <property name="columnCount">
        <number>11</number>
@@ -195,6 +198,10 @@ p, li { white-space: pre-wrap; }
       <attribute name="verticalHeaderMinimumSectionSize">
        <number>20</number>
       </attribute>
+      <row/>
+      <row/>
+      <row/>
+      <row/>
       <row/>
       <row/>
       <row/>
@@ -334,6 +341,9 @@ p, li { white-space: pre-wrap; }
         <height>20</height>
        </rect>
       </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QLineEdit" name="leSubsCalcMW">
       <property name="geometry">
@@ -343,6 +353,9 @@ p, li { white-space: pre-wrap; }
         <width>71</width>
         <height>20</height>
        </rect>
+      </property>
+      <property name="readOnly">
+       <bool>true</bool>
       </property>
      </widget>
      <widget class="QLabel" name="label_8">
@@ -386,7 +399,7 @@ p, li { white-space: pre-wrap; }
        </font>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#000000;&quot;&gt;Select the known variables, fill them with data, and click the calculate button&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#000000;&quot;&gt;Select the known variables, fill them with data, and click the calculate button. You will get the unknown variables.&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_10">
@@ -518,6 +531,9 @@ p, li { white-space: pre-wrap; }
         <height>20</height>
        </rect>
       </property>
+      <property name="readOnly">
+       <bool>true</bool>
+      </property>
      </widget>
      <widget class="QLabel" name="label_15">
       <property name="geometry">
@@ -610,7 +626,7 @@ p, li { white-space: pre-wrap; }
        <string>Calc.Saturation Prop.</string>
       </property>
       <property name="checked">
-       <bool>true</bool>
+       <bool>false</bool>
       </property>
      </widget>
      <widget class="QCheckBox" name="chbSubsCalcCubic">
@@ -729,9 +745,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btnSubsCalcExportSubs">
       <property name="geometry">
        <rect>
-        <x>976</x>
-        <y>72</y>
-        <width>121</width>
+        <x>980</x>
+        <y>70</y>
+        <width>171</width>
         <height>25</height>
        </rect>
       </property>
@@ -739,7 +755,7 @@ p, li { white-space: pre-wrap; }
        <string extracomment="Exports slected substances with the EOS and correlations charged">&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; color:#000000;&quot;&gt;Exports selected substance charged data as FF_SubstanceData structure,for C or Modelica use&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
-       <string>Export substance</string>
+       <string>Export substance as structure</string>
       </property>
      </widget>
      <widget class="Line" name="line">
@@ -823,27 +839,27 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="text">
-       <string>Sat.gas dens.</string>
+       <string>Sat.gas d.</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="chbSubsCalcTransfHv">
+     <widget class="QCheckBox" name="chbSubsCalcTransfSLCp">
       <property name="geometry">
        <rect>
         <x>88</x>
         <y>664</y>
-        <width>57</width>
+        <width>71</width>
         <height>17</height>
        </rect>
       </property>
       <property name="text">
-       <string>Hv</string>
+       <string>Sat.liq.Cp</string>
       </property>
      </widget>
      <widget class="QPushButton" name="btnSubsCalcTransfer">
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>688</y>
+        <y>720</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -853,6 +869,32 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="text">
        <string>Transfer</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="chbSubsCalcTransfIsoTComp">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>690</y>
+        <width>101</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Isoth.compres.</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="chbSubsCalcTransfHv">
+      <property name="geometry">
+       <rect>
+        <x>120</x>
+        <y>690</y>
+        <width>57</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Hv</string>
       </property>
      </widget>
     </widget>
@@ -867,9 +909,9 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>710</x>
-        <y>280</y>
-        <width>541</width>
-        <height>297</height>
+        <y>290</y>
+        <width>551</width>
+        <height>291</height>
        </rect>
       </property>
       <property name="font">
@@ -970,7 +1012,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>190</x>
-        <y>0</y>
+        <y>10</y>
         <width>241</width>
         <height>21</height>
        </rect>
@@ -993,8 +1035,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_19">
       <property name="geometry">
        <rect>
-        <x>0</x>
-        <y>30</y>
+        <x>10</x>
+        <y>40</y>
         <width>631</width>
         <height>21</height>
        </rect>
@@ -1006,7 +1048,7 @@ p, li { white-space: pre-wrap; }
        </font>
       </property>
       <property name="text">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-size:7pt; font-weight:600; color:#000000;&quot;&gt;Option A: Fill table from correlations stored in the database. It will be filled in SI units (kgr, not moles)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#000000;&quot;&gt;Option A: Select a correlation from the DB and press &amp;quot;Fill Table&amp;quot; . It will be filled in SI units (kgr, not moles)&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_20">
@@ -1035,6 +1077,9 @@ p, li { white-space: pre-wrap; }
        <font>
         <pointsize>7</pointsize>
        </font>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select the correlation you want to charge in the substance in order to make calculations or for exportation&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
      </widget>
      <widget class="QLabel" name="label_21">
@@ -1248,7 +1293,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>350</x>
-        <y>510</y>
+        <y>540</y>
         <width>105</width>
         <height>23</height>
        </rect>
@@ -1264,7 +1309,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>440</x>
-        <y>460</y>
+        <y>490</y>
         <width>101</width>
         <height>21</height>
        </rect>
@@ -1277,7 +1322,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>540</x>
-        <y>460</y>
+        <y>490</y>
         <width>21</width>
         <height>20</height>
        </rect>
@@ -1290,7 +1335,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>580</x>
-        <y>460</y>
+        <y>490</y>
         <width>51</width>
         <height>21</height>
        </rect>
@@ -1303,7 +1348,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>630</x>
-        <y>460</y>
+        <y>490</y>
         <width>21</width>
         <height>20</height>
        </rect>
@@ -1316,7 +1361,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>160</x>
-        <y>510</y>
+        <y>540</y>
         <width>153</width>
         <height>22</height>
        </rect>
@@ -1516,12 +1561,27 @@ p, li { white-space: pre-wrap; }
         <string>Wagner gas dens.</string>
        </property>
       </item>
+      <item>
+       <property name="text">
+        <string>-Tait</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>-Ext. Wagner</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>PPDS15</string>
+       </property>
+      </item>
      </widget>
      <widget class="QLabel" name="label_31">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>510</y>
+        <y>540</y>
         <width>151</width>
         <height>21</height>
        </rect>
@@ -1534,7 +1594,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>720</y>
+        <y>750</y>
         <width>105</width>
         <height>21</height>
        </rect>
@@ -1547,7 +1607,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>120</x>
-        <y>720</y>
+        <y>750</y>
         <width>73</width>
         <height>20</height>
        </rect>
@@ -1560,7 +1620,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>202</x>
-        <y>720</y>
+        <y>750</y>
         <width>73</width>
         <height>20</height>
        </rect>
@@ -1573,7 +1633,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>282</x>
-        <y>720</y>
+        <y>750</y>
         <width>73</width>
         <height>20</height>
        </rect>
@@ -1586,7 +1646,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>362</x>
-        <y>720</y>
+        <y>750</y>
         <width>73</width>
         <height>20</height>
        </rect>
@@ -1599,7 +1659,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>442</x>
-        <y>720</y>
+        <y>750</y>
         <width>73</width>
         <height>20</height>
        </rect>
@@ -1612,7 +1672,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>700</x>
-        <y>720</y>
+        <y>750</y>
         <width>81</width>
         <height>20</height>
        </rect>
@@ -1625,7 +1685,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>650</x>
-        <y>720</y>
+        <y>750</y>
         <width>51</width>
         <height>21</height>
        </rect>
@@ -1638,7 +1698,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>340</y>
+        <y>370</y>
         <width>691</width>
         <height>97</height>
        </rect>
@@ -1789,7 +1849,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>260</y>
+        <y>290</y>
         <width>701</width>
         <height>41</height>
        </rect>
@@ -1820,8 +1880,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btnSubsToolsClearTable">
       <property name="geometry">
        <rect>
-        <x>678</x>
-        <y>586</y>
+        <x>684</x>
+        <y>600</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -1853,7 +1913,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>540</y>
+        <y>570</y>
         <width>671</width>
         <height>71</height>
        </rect>
@@ -1866,7 +1926,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>20</x>
-        <y>660</y>
+        <y>690</y>
         <width>111</width>
         <height>21</height>
        </rect>
@@ -1879,7 +1939,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>4</x>
-        <y>684</y>
+        <y>714</y>
         <width>201</width>
         <height>22</height>
        </rect>
@@ -2024,7 +2084,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>446</x>
-        <y>676</y>
+        <y>706</y>
         <width>97</width>
         <height>23</height>
        </rect>
@@ -2040,7 +2100,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>480</y>
+        <y>510</y>
         <width>671</width>
         <height>21</height>
        </rect>
@@ -2212,7 +2272,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>440</y>
+        <y>470</y>
         <width>701</width>
         <height>21</height>
        </rect>
@@ -2225,7 +2285,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>280</x>
-        <y>310</y>
+        <y>340</y>
         <width>91</width>
         <height>31</height>
        </rect>
@@ -2241,7 +2301,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>860</x>
-        <y>720</y>
+        <y>750</y>
         <width>71</width>
         <height>20</height>
        </rect>
@@ -2263,7 +2323,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>790</x>
-        <y>720</y>
+        <y>750</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -2276,7 +2336,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>1050</x>
-        <y>720</y>
+        <y>750</y>
         <width>71</width>
         <height>20</height>
        </rect>
@@ -2295,7 +2355,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>940</x>
-        <y>720</y>
+        <y>750</y>
         <width>111</width>
         <height>21</height>
        </rect>
@@ -2308,7 +2368,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>1200</x>
-        <y>720</y>
+        <y>750</y>
         <width>57</width>
         <height>20</height>
        </rect>
@@ -2327,7 +2387,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>1130</x>
-        <y>720</y>
+        <y>750</y>
         <width>73</width>
         <height>21</height>
        </rect>
@@ -2339,8 +2399,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsVdWV">
       <property name="geometry">
        <rect>
-        <x>679</x>
-        <y>230</y>
+        <x>50</x>
+        <y>260</y>
         <width>71</width>
         <height>20</height>
        </rect>
@@ -2358,8 +2418,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_53">
       <property name="geometry">
        <rect>
-        <x>640</x>
-        <y>230</y>
+        <x>11</x>
+        <y>260</y>
         <width>41</width>
         <height>21</height>
        </rect>
@@ -2450,7 +2510,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>650</x>
-        <y>150</y>
+        <y>170</y>
         <width>73</width>
         <height>17</height>
        </rect>
@@ -2463,7 +2523,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>730</x>
-        <y>150</y>
+        <y>170</y>
         <width>185</width>
         <height>20</height>
        </rect>
@@ -2475,14 +2535,17 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsLCpCorr">
       <property name="geometry">
        <rect>
-        <x>730</x>
+        <x>714</x>
         <y>130</y>
-        <width>185</width>
+        <width>201</width>
         <height>20</height>
        </rect>
       </property>
       <property name="text">
        <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
       </property>
      </widget>
      <widget class="QCheckBox" name="chbSubsToolsLCp">
@@ -2502,7 +2565,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>730</x>
-        <y>170</y>
+        <y>190</y>
         <width>185</width>
         <height>20</height>
        </rect>
@@ -2515,7 +2578,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>650</x>
-        <y>170</y>
+        <y>190</y>
         <width>73</width>
         <height>17</height>
        </rect>
@@ -2528,7 +2591,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>730</x>
-        <y>190</y>
+        <y>210</y>
         <width>185</width>
         <height>20</height>
        </rect>
@@ -2541,7 +2604,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>650</x>
-        <y>190</y>
+        <y>210</y>
         <width>73</width>
         <height>17</height>
        </rect>
@@ -2566,8 +2629,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="chbSubsToolsGvisc">
       <property name="geometry">
        <rect>
-        <x>920</x>
-        <y>30</y>
+        <x>930</x>
+        <y>50</y>
         <width>73</width>
         <height>17</height>
        </rect>
@@ -2579,8 +2642,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="chbSubsToolsGthC">
       <property name="geometry">
        <rect>
-        <x>920</x>
-        <y>50</y>
+        <x>930</x>
+        <y>70</y>
         <width>81</width>
         <height>17</height>
        </rect>
@@ -2592,8 +2655,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsGviscCorr">
       <property name="geometry">
        <rect>
-        <x>1010</x>
-        <y>30</y>
+        <x>1020</x>
+        <y>50</y>
         <width>201</width>
         <height>20</height>
        </rect>
@@ -2605,8 +2668,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsGthCCorr">
       <property name="geometry">
        <rect>
-        <x>1010</x>
-        <y>50</y>
+        <x>1020</x>
+        <y>70</y>
         <width>201</width>
         <height>20</height>
        </rect>
@@ -2618,8 +2681,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="chbSubsToolsLdensRa">
       <property name="geometry">
        <rect>
-        <x>920</x>
-        <y>110</y>
+        <x>930</x>
+        <y>130</y>
         <width>101</width>
         <height>17</height>
        </rect>
@@ -2631,8 +2694,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsLdensTref">
       <property name="geometry">
        <rect>
-        <x>1068</x>
-        <y>110</y>
+        <x>1080</x>
+        <y>130</y>
         <width>49</width>
         <height>20</height>
        </rect>
@@ -2644,8 +2707,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsLdensDref">
       <property name="geometry">
        <rect>
-        <x>1156</x>
-        <y>110</y>
+        <x>1170</x>
+        <y>130</y>
         <width>57</width>
         <height>20</height>
        </rect>
@@ -2657,8 +2720,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_70">
       <property name="geometry">
        <rect>
-        <x>1036</x>
-        <y>110</y>
+        <x>1046</x>
+        <y>130</y>
         <width>33</width>
         <height>21</height>
        </rect>
@@ -2670,8 +2733,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_71">
       <property name="geometry">
        <rect>
-        <x>1124</x>
-        <y>110</y>
+        <x>1134</x>
+        <y>130</y>
         <width>33</width>
         <height>21</height>
        </rect>
@@ -2683,9 +2746,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="chbSubsToolsVpAmbrose">
       <property name="geometry">
        <rect>
-        <x>920</x>
-        <y>130</y>
-        <width>161</width>
+        <x>930</x>
+        <y>150</y>
+        <width>131</width>
         <height>17</height>
        </rect>
       </property>
@@ -2696,8 +2759,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="chbSubsToolsSdens">
       <property name="geometry">
        <rect>
-        <x>920</x>
-        <y>70</y>
+        <x>930</x>
+        <y>90</y>
         <width>73</width>
         <height>17</height>
        </rect>
@@ -2709,8 +2772,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsSdensCorr">
       <property name="geometry">
        <rect>
-        <x>1010</x>
-        <y>70</y>
+        <x>1020</x>
+        <y>90</y>
         <width>201</width>
         <height>20</height>
        </rect>
@@ -2722,8 +2785,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsSCpCorr">
       <property name="geometry">
        <rect>
-        <x>1000</x>
-        <y>90</y>
+        <x>1010</x>
+        <y>110</y>
         <width>211</width>
         <height>20</height>
        </rect>
@@ -2735,8 +2798,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="chbSubsToolsSCp">
       <property name="geometry">
        <rect>
-        <x>920</x>
-        <y>90</y>
+        <x>930</x>
+        <y>110</y>
         <width>65</width>
         <height>17</height>
        </rect>
@@ -2748,8 +2811,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="chbSubsToolsVpRiedel">
       <property name="geometry">
        <rect>
-        <x>920</x>
-        <y>150</y>
+        <x>930</x>
+        <y>170</y>
         <width>121</width>
         <height>17</height>
        </rect>
@@ -2761,8 +2824,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsVpTref">
       <property name="geometry">
        <rect>
-        <x>1080</x>
-        <y>150</y>
+        <x>1090</x>
+        <y>170</y>
         <width>49</width>
         <height>20</height>
        </rect>
@@ -2771,24 +2834,11 @@ p, li { white-space: pre-wrap; }
        <string>0</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_72">
-      <property name="geometry">
-       <rect>
-        <x>1140</x>
-        <y>150</y>
-        <width>31</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>Vp r.</string>
-      </property>
-     </widget>
      <widget class="QLineEdit" name="leSubsToolsVpPref">
       <property name="geometry">
        <rect>
-        <x>1170</x>
-        <y>150</y>
+        <x>1180</x>
+        <y>170</y>
         <width>61</width>
         <height>20</height>
        </rect>
@@ -2797,24 +2847,11 @@ p, li { white-space: pre-wrap; }
        <string>101325</string>
       </property>
      </widget>
-     <widget class="QLabel" name="label_73">
-      <property name="geometry">
-       <rect>
-        <x>1040</x>
-        <y>150</y>
-        <width>31</width>
-        <height>21</height>
-       </rect>
-      </property>
-      <property name="text">
-       <string>T.ref</string>
-      </property>
-     </widget>
      <widget class="QLineEdit" name="leSubsToolsCoef5">
       <property name="geometry">
        <rect>
         <x>522</x>
-        <y>720</y>
+        <y>750</y>
         <width>73</width>
         <height>20</height>
        </rect>
@@ -2826,8 +2863,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btnSubsToolsExchangeCols">
       <property name="geometry">
        <rect>
-        <x>764</x>
-        <y>586</y>
+        <x>770</x>
+        <y>600</y>
         <width>101</width>
         <height>23</height>
        </rect>
@@ -2842,8 +2879,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsColA">
       <property name="geometry">
        <rect>
-        <x>872</x>
-        <y>586</y>
+        <x>878</x>
+        <y>600</y>
         <width>21</width>
         <height>20</height>
        </rect>
@@ -2855,8 +2892,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsColB">
       <property name="geometry">
        <rect>
-        <x>904</x>
-        <y>586</y>
+        <x>910</x>
+        <y>600</y>
         <width>21</width>
         <height>20</height>
        </rect>
@@ -2869,7 +2906,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>500</x>
-        <y>630</y>
+        <y>660</y>
         <width>151</width>
         <height>21</height>
        </rect>
@@ -2881,8 +2918,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_75">
       <property name="geometry">
        <rect>
-        <x>896</x>
-        <y>586</y>
+        <x>902</x>
+        <y>600</y>
         <width>16</width>
         <height>16</height>
        </rect>
@@ -2894,8 +2931,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_76">
       <property name="geometry">
        <rect>
-        <x>938</x>
-        <y>586</y>
+        <x>960</x>
+        <y>600</y>
         <width>49</width>
         <height>16</height>
        </rect>
@@ -2907,8 +2944,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QSpinBox" name="spbSubsToolsCol">
       <property name="geometry">
        <rect>
-        <x>986</x>
-        <y>586</y>
+        <x>1008</x>
+        <y>600</y>
         <width>33</width>
         <height>22</height>
        </rect>
@@ -2923,10 +2960,10 @@ p, li { white-space: pre-wrap; }
      <widget class="QGroupBox" name="groupBox_2">
       <property name="geometry">
        <rect>
-        <x>1020</x>
-        <y>580</y>
+        <x>1050</x>
+        <y>590</y>
         <width>97</width>
-        <height>33</height>
+        <height>41</height>
        </rect>
       </property>
       <property name="title">
@@ -2936,8 +2973,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsOp">
       <property name="geometry">
        <rect>
-        <x>1138</x>
-        <y>586</y>
+        <x>1160</x>
+        <y>600</y>
         <width>57</width>
         <height>20</height>
        </rect>
@@ -2949,8 +2986,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QPushButton" name="btnSubsToolsDoOp">
       <property name="geometry">
        <rect>
-        <x>1198</x>
-        <y>586</y>
+        <x>1220</x>
+        <y>600</y>
         <width>33</width>
         <height>23</height>
        </rect>
@@ -2966,7 +3003,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>460</x>
-        <y>630</y>
+        <y>660</y>
         <width>33</width>
         <height>22</height>
        </rect>
@@ -2982,7 +3019,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>292</x>
-        <y>624</y>
+        <y>654</y>
         <width>151</width>
         <height>17</height>
        </rect>
@@ -2995,7 +3032,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>300</x>
-        <y>640</y>
+        <y>670</y>
         <width>141</width>
         <height>17</height>
        </rect>
@@ -3007,8 +3044,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_79">
       <property name="geometry">
        <rect>
-        <x>980</x>
-        <y>250</y>
+        <x>910</x>
+        <y>270</y>
         <width>71</width>
         <height>21</height>
        </rect>
@@ -3021,7 +3058,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>210</x>
-        <y>660</y>
+        <y>690</y>
         <width>191</width>
         <height>21</height>
        </rect>
@@ -3034,7 +3071,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>230</x>
-        <y>680</y>
+        <y>710</y>
         <width>57</width>
         <height>21</height>
        </rect>
@@ -3047,7 +3084,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>276</x>
-        <y>680</y>
+        <y>710</y>
         <width>51</width>
         <height>22</height>
        </rect>
@@ -3069,7 +3106,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>366</x>
-        <y>676</y>
+        <y>706</y>
         <width>51</width>
         <height>22</height>
        </rect>
@@ -3091,7 +3128,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>346</x>
-        <y>676</y>
+        <y>706</y>
         <width>33</width>
         <height>21</height>
        </rect>
@@ -3104,7 +3141,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>788</x>
-        <y>680</y>
+        <y>700</y>
         <width>101</width>
         <height>23</height>
        </rect>
@@ -3123,7 +3160,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>754</x>
-        <y>624</y>
+        <y>644</y>
         <width>491</width>
         <height>20</height>
        </rect>
@@ -3142,7 +3179,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>692</x>
-        <y>624</y>
+        <y>644</y>
         <width>65</width>
         <height>21</height>
        </rect>
@@ -3155,7 +3192,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>692</x>
-        <y>648</y>
+        <y>668</y>
         <width>51</width>
         <height>21</height>
        </rect>
@@ -3168,7 +3205,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>740</x>
-        <y>650</y>
+        <y>670</y>
         <width>65</width>
         <height>20</height>
        </rect>
@@ -3181,7 +3218,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>890</x>
-        <y>650</y>
+        <y>670</y>
         <width>65</width>
         <height>20</height>
        </rect>
@@ -3194,7 +3231,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>836</x>
-        <y>650</y>
+        <y>670</y>
         <width>51</width>
         <height>21</height>
        </rect>
@@ -3207,7 +3244,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>1100</x>
-        <y>650</y>
+        <y>670</y>
         <width>141</width>
         <height>22</height>
        </rect>
@@ -3244,7 +3281,32 @@ p, li { white-space: pre-wrap; }
       </item>
       <item>
        <property name="text">
+        <string>Liq.Cp PPDS15</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Liq T from H DIPPR100</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
         <string>Liq.Dens. DIPPR106</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Liq.Dens. DIPPR116</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Liq.Isoth.Comp. DIPPR100</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Liq.Isoth.Comp. PPDS15 </string>
        </property>
       </item>
       <item>
@@ -3269,17 +3331,17 @@ p, li { white-space: pre-wrap; }
       </item>
       <item>
        <property name="text">
-        <string>Gas Visc. DIPPR10</string>
+        <string>Gas Visc. DIPPR100</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>Gas Th.Cond. DIPPR10</string>
+        <string>Gas Th.Cond. DIPPR100</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>Sol.Dens.DiPPR100</string>
+        <string>Sol.Dens.DIPPR100</string>
        </property>
       </item>
       <item>
@@ -3292,7 +3354,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>982</x>
-        <y>650</y>
+        <y>670</y>
         <width>105</width>
         <height>21</height>
        </rect>
@@ -3305,7 +3367,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>1120</x>
-        <y>680</y>
+        <y>700</y>
         <width>101</width>
         <height>23</height>
        </rect>
@@ -3375,8 +3437,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsGdensCorr">
       <property name="geometry">
        <rect>
-        <x>1030</x>
-        <y>10</y>
+        <x>1040</x>
+        <y>30</y>
         <width>181</width>
         <height>20</height>
        </rect>
@@ -3388,8 +3450,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QCheckBox" name="chbSubsToolsGdens">
       <property name="geometry">
        <rect>
-        <x>920</x>
-        <y>10</y>
+        <x>930</x>
+        <y>30</y>
         <width>101</width>
         <height>17</height>
        </rect>
@@ -3402,7 +3464,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>676</x>
-        <y>610</y>
+        <y>630</y>
         <width>581</width>
         <height>20</height>
        </rect>
@@ -3418,7 +3480,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>676</x>
-        <y>700</y>
+        <y>720</y>
         <width>581</width>
         <height>20</height>
        </rect>
@@ -3434,7 +3496,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>670</x>
-        <y>620</y>
+        <y>640</y>
         <width>16</width>
         <height>91</height>
        </rect>
@@ -3450,7 +3512,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>1250</x>
-        <y>620</y>
+        <y>640</y>
         <width>20</width>
         <height>91</height>
        </rect>
@@ -3465,8 +3527,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QRadioButton" name="rbSubsToolsMultiply">
       <property name="geometry">
        <rect>
-        <x>1034</x>
-        <y>594</y>
+        <x>1056</x>
+        <y>608</y>
         <width>91</width>
         <height>17</height>
        </rect>
@@ -3478,8 +3540,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QRadioButton" name="rbSubsToolsAdd">
       <property name="geometry">
        <rect>
-        <x>1034</x>
-        <y>578</y>
+        <x>1056</x>
+        <y>592</y>
         <width>82</width>
         <height>17</height>
        </rect>
@@ -3492,7 +3554,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>620</y>
+        <y>650</y>
         <width>101</width>
         <height>21</height>
        </rect>
@@ -3505,7 +3567,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>450</y>
+        <y>480</y>
         <width>411</width>
         <height>41</height>
        </rect>
@@ -3518,7 +3580,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>110</x>
-        <y>620</y>
+        <y>650</y>
         <width>21</width>
         <height>20</height>
        </rect>
@@ -3530,8 +3592,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsMu">
       <property name="geometry">
        <rect>
-        <x>809</x>
-        <y>230</y>
+        <x>189</x>
+        <y>260</y>
         <width>71</width>
         <height>20</height>
        </rect>
@@ -3549,8 +3611,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_93">
       <property name="geometry">
        <rect>
-        <x>760</x>
-        <y>230</y>
+        <x>140</x>
+        <y>260</y>
         <width>51</width>
         <height>21</height>
        </rect>
@@ -3562,8 +3624,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_94">
       <property name="geometry">
        <rect>
-        <x>921</x>
-        <y>230</y>
+        <x>301</x>
+        <y>260</y>
         <width>41</width>
         <height>21</height>
        </rect>
@@ -3575,8 +3637,8 @@ p, li { white-space: pre-wrap; }
      <widget class="QLineEdit" name="leSubsToolsQ">
       <property name="geometry">
        <rect>
-        <x>960</x>
-        <y>230</y>
+        <x>340</x>
+        <y>260</y>
         <width>71</width>
         <height>20</height>
        </rect>
@@ -3589,6 +3651,195 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="text">
        <string>0</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btnSubsToolsExport">
+      <property name="geometry">
+       <rect>
+        <x>1090</x>
+        <y>250</y>
+        <width>81</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="toolTip">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exports the selected substance, with the selected correlations, in Modelica  FreeFluids.Media format. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+      <property name="text">
+       <string>Media format</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="chbSubsToolsLTfromH">
+      <property name="geometry">
+       <rect>
+        <x>650</x>
+        <y>150</y>
+        <width>81</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Liq.T from H</string>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="leSubsToolsLTfromHCorr">
+      <property name="geometry">
+       <rect>
+        <x>734</x>
+        <y>150</y>
+        <width>181</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_36">
+      <property name="geometry">
+       <rect>
+        <x>1030</x>
+        <y>220</y>
+        <width>221</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600; color:#000000;&quot;&gt;Export substace for Modelica usage&lt;/span&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_96">
+      <property name="geometry">
+       <rect>
+        <x>1150</x>
+        <y>170</y>
+        <width>31</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Vp r.</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="label_97">
+      <property name="geometry">
+       <rect>
+        <x>1050</x>
+        <y>170</y>
+        <width>31</width>
+        <height>21</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>T.ref</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_7">
+      <property name="geometry">
+       <rect>
+        <x>1010</x>
+        <y>210</y>
+        <width>251</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <property name="lineWidth">
+       <number>1</number>
+      </property>
+      <property name="midLineWidth">
+       <number>0</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+     </widget>
+     <widget class="Line" name="line_9">
+      <property name="geometry">
+       <rect>
+        <x>1000</x>
+        <y>220</y>
+        <width>20</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <property name="lineWidth">
+       <number>1</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="Line" name="line_10">
+      <property name="geometry">
+       <rect>
+        <x>1250</x>
+        <y>220</y>
+        <width>20</width>
+        <height>71</height>
+       </rect>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <property name="lineWidth">
+       <number>1</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
+      </property>
+     </widget>
+     <widget class="QLineEdit" name="leSubsToolsLisothCompCorr">
+      <property name="geometry">
+       <rect>
+        <x>754</x>
+        <y>230</y>
+        <width>221</width>
+        <height>20</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="chbSubsToolsLisothComp">
+      <property name="geometry">
+       <rect>
+        <x>650</x>
+        <y>230</y>
+        <width>91</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Liq.isoth.comp</string>
+      </property>
+     </widget>
+     <widget class="Line" name="line_11">
+      <property name="geometry">
+       <rect>
+        <x>940</x>
+        <y>590</y>
+        <width>20</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="frameShadow">
+       <enum>QFrame::Sunken</enum>
+      </property>
+      <property name="lineWidth">
+       <number>1</number>
+      </property>
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
      </widget>
     </widget>
@@ -5397,6 +5648,12 @@ p, li { white-space: pre-wrap; }
       <pointsize>10</pointsize>
      </font>
     </property>
+    <property name="toolTip">
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Select here the substance you want to use for calculations in the &amp;quot;Substance EOS Calc.&amp;quot; or &amp;quot;Substance Correlations/Tools&amp;quot; tabs. Or the substance you want to add to a mixture in the &amp;quot;Mixture Calc.&amp;quot; tab. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+    </property>
+    <property name="toolTipDuration">
+     <number>-1</number>
+    </property>
    </widget>
    <widget class="QLabel" name="label">
     <property name="geometry">
@@ -5406,6 +5663,9 @@ p, li { white-space: pre-wrap; }
       <width>71</width>
       <height>16</height>
      </rect>
+    </property>
+    <property name="toolTip">
+     <string/>
     </property>
     <property name="text">
      <string>Select subst.:</string>
@@ -5424,7 +5684,7 @@ p, li { white-space: pre-wrap; }
      </rect>
     </property>
     <property name="toolTip">
-     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Add the selected substance to the mixture&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+     <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Will add the selected substance to the mixture definition at the &amp;quot;Mixture Calc.&amp;quot; tab.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
     </property>
     <property name="toolTipDuration">
      <number>6000</number>
@@ -5439,7 +5699,7 @@ p, li { white-space: pre-wrap; }
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1281</width>
+     <width>1280</width>
      <height>21</height>
     </rect>
    </property>
