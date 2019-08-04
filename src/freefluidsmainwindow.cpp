@@ -54,7 +54,7 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     }
     //QueryModel(no editable) for holding the substances list
     subsListModel=new QSqlQueryModel(this);
-    subsListModel->setQuery("SELECT Id,Name,MW from Products WHERE (Id<2001 OR InGitHub=True) ORDER BY Name");
+    subsListModel->setQuery("SELECT Id,Name,MW from Products ORDER BY Name");
     //Data entry validators
     presBarValidator=new QDoubleValidator(0.0,10000.0,5,this);
     //presBarValidator->setNotation(QDoubleValidator::StandardNotation);
