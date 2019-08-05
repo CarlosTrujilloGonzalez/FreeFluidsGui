@@ -1,3 +1,10 @@
+Version 1.2.2
+- Change in the NULL condition of some fields of the SqLite database, that were aborting the insertion of new correlations and EOS.
+ This is an old bug that I had not observed till now.
+
+Version 1.2.1
+- Correction in the query of substances to obtain compatibility with SqLite
+
 Version 1.2.0
 - Added support for liquid isothermal compressibility correlation
 - Added support for PPDS15 correlation equation
