@@ -167,7 +167,7 @@ p, li { white-space: pre-wrap; }
        <rect>
         <x>184</x>
         <y>120</y>
-        <width>1061</width>
+        <width>1071</width>
         <height>609</height>
        </rect>
       </property>
@@ -181,7 +181,7 @@ p, li { white-space: pre-wrap; }
        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;The first rows will contain the daba obtained by the EOS. After the reduced residual Helmholtz energy (Arr) derivatives, you will find a comparison, for several properties, between the results from the correlations selected in the &amp;quot;Substance Correlations/Tools&amp;quot; tab, corrected for the influence of pressure if needed, and some predictive methods. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="rowCount">
-       <number>49</number>
+       <number>51</number>
       </property>
       <property name="columnCount">
        <number>11</number>
@@ -247,6 +247,8 @@ p, li { white-space: pre-wrap; }
       <row/>
       <row/>
       <row/>
+      <row/>
+      <row/>
       <column/>
       <column/>
       <column/>
@@ -262,7 +264,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_5">
       <property name="geometry">
        <rect>
-        <x>20</x>
+        <x>10</x>
         <y>10</y>
         <width>73</width>
         <height>16</height>
@@ -278,7 +280,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbSubsCalcSelEOS">
       <property name="geometry">
        <rect>
-        <x>100</x>
+        <x>70</x>
         <y>10</y>
         <width>561</width>
         <height>20</height>
@@ -296,9 +298,9 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbSubsCalcSelCp0">
       <property name="geometry">
        <rect>
-        <x>772</x>
+        <x>732</x>
         <y>10</y>
-        <width>451</width>
+        <width>521</width>
         <height>22</height>
        </rect>
       </property>
@@ -306,14 +308,14 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_6">
       <property name="geometry">
        <rect>
-        <x>670</x>
+        <x>650</x>
         <y>10</y>
-        <width>97</width>
+        <width>81</width>
         <height>16</height>
        </rect>
       </property>
       <property name="text">
-       <string>Select Cp0 form.:</string>
+       <string>Sel. Cp0 form.:</string>
       </property>
       <property name="buddy">
        <cstring>cbSubsCalcSelSubs</cstring>
@@ -859,7 +861,7 @@ p, li { white-space: pre-wrap; }
       <property name="geometry">
        <rect>
         <x>40</x>
-        <y>720</y>
+        <y>740</y>
         <width>75</width>
         <height>23</height>
        </rect>
@@ -871,23 +873,23 @@ p, li { white-space: pre-wrap; }
        <string>Transfer</string>
       </property>
      </widget>
-     <widget class="QCheckBox" name="chbSubsCalcTransfIsoTComp">
+     <widget class="QCheckBox" name="chbSubsCalcTransfLnBulkModR">
       <property name="geometry">
        <rect>
         <x>10</x>
-        <y>690</y>
+        <y>720</y>
         <width>101</width>
         <height>17</height>
        </rect>
       </property>
       <property name="text">
-       <string>Isoth.compres.</string>
+       <string>Ln of red.bulk mod.</string>
       </property>
      </widget>
      <widget class="QCheckBox" name="chbSubsCalcTransfHv">
       <property name="geometry">
        <rect>
-        <x>120</x>
+        <x>10</x>
         <y>690</y>
         <width>57</width>
         <height>17</height>
@@ -895,6 +897,22 @@ p, li { white-space: pre-wrap; }
       </property>
       <property name="text">
        <string>Hv</string>
+      </property>
+     </widget>
+     <widget class="QCheckBox" name="chbSubsCalcTransfDens">
+      <property name="geometry">
+       <rect>
+        <x>90</x>
+        <y>690</y>
+        <width>89</width>
+        <height>17</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Density</string>
+      </property>
+      <property name="checked">
+       <bool>false</bool>
       </property>
      </widget>
     </widget>
@@ -3243,15 +3261,20 @@ p, li { white-space: pre-wrap; }
      <widget class="QComboBox" name="cbSubsToolsSelAddCorr">
       <property name="geometry">
        <rect>
-        <x>1100</x>
+        <x>1080</x>
         <y>670</y>
-        <width>141</width>
+        <width>171</width>
         <height>22</height>
        </rect>
       </property>
       <item>
        <property name="text">
         <string>Cp0 DIPPR100</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>Cp0 DIPPR107</string>
        </property>
       </item>
       <item>
@@ -3301,12 +3324,12 @@ p, li { white-space: pre-wrap; }
       </item>
       <item>
        <property name="text">
-        <string>Liq.Isoth.Comp. DIPPR100</string>
+        <string>Liq.Bulk mod.R. DIPPR100</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>Liq.Isoth.Comp. PPDS15 </string>
+        <string>-</string>
        </property>
       </item>
       <item>
@@ -3353,7 +3376,7 @@ p, li { white-space: pre-wrap; }
      <widget class="QLabel" name="label_85">
       <property name="geometry">
        <rect>
-        <x>982</x>
+        <x>970</x>
         <y>670</y>
         <width>105</width>
         <height>21</height>
@@ -3663,7 +3686,7 @@ p, li { white-space: pre-wrap; }
        </rect>
       </property>
       <property name="toolTip">
-       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exports the selected substance, with the selected correlations, in Modelica  FreeFluids.Media format. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+       <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Exports the selected substance, with the selected correlations, in the format needed for Modelica usage. &lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
       </property>
       <property name="text">
        <string>Media format</string>
@@ -3797,7 +3820,7 @@ p, li { white-space: pre-wrap; }
        <enum>Qt::Vertical</enum>
       </property>
      </widget>
-     <widget class="QLineEdit" name="leSubsToolsLisothCompCorr">
+     <widget class="QLineEdit" name="leSubsToolsLbulkModRCorr">
       <property name="geometry">
        <rect>
         <x>754</x>
@@ -3810,17 +3833,17 @@ p, li { white-space: pre-wrap; }
        <string/>
       </property>
      </widget>
-     <widget class="QCheckBox" name="chbSubsToolsLisothComp">
+     <widget class="QCheckBox" name="chbSubsToolsLbulkModR">
       <property name="geometry">
        <rect>
         <x>650</x>
         <y>230</y>
-        <width>91</width>
+        <width>101</width>
         <height>17</height>
        </rect>
       </property>
       <property name="text">
-       <string>Liq.isoth.comp</string>
+       <string>Liq.red.bulk mod.</string>
       </property>
      </widget>
      <widget class="Line" name="line_11">

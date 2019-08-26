@@ -1,3 +1,9 @@
+Version 1.3.0
+- Modified exportation in Modelica Media format.
+- Added management for the calculation of coefficients for the reduced bulk modulus of the liquid.
+- Database modification for storing reduced bulk modulus information.
+- Some bugs correction. 
+
 Version 1.2.2
 - Change in the NULL condition of some fields of the SqLite database, that were aborting the insertion of new correlations and EOS.
  This is an old bug that I had not observed till now.
