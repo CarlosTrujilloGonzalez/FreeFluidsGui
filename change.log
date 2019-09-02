@@ -1,3 +1,6 @@
+Version 1.4.0
+- Small bug correction.
+
 Version 1.3.0
 - Modified exportation in Modelica Media format.
 - Added management for the calculation of coefficients for the reduced bulk modulus of the liquid.
