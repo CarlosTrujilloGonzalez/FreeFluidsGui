@@ -708,11 +708,10 @@ void FreeFluidsMainWindow::twSubsCalcUpdate()
         thR.P=1e5*ui->leSubsCalcPres->text().toDouble();//we read the selected pressure. Necessary to do each time, because it is changed
         if(subsData->model==FF_SAFTtype){
             FF_VfromTPeos(&subsData->model,&thR.T,&thR.P,&subsData->saftData,&option,answerL,answerG,&state);//Volume, Arr, Z and fugacity coeff. retrieval
-            //return;
             phiL=exp(answerL[1]+answerL[2]-1)/answerL[2];
             phiG=exp(answerG[1]+answerG[2]-1)/answerG[2];
             if (state=='f') phase="Calc.fail";
-            else if ((state=='U')||(state=='l')||(state=='g')) phase="Unique";
+            else if ((state=='U')||(state=='u')||(state=='l')||(state=='g')) phase="Unique";
             else if (state=='L') phase="Liquid";
             else if (state=='G') phase="Gas";
             else if (state=='E') phase="Equilibrium";
