@@ -1975,8 +1975,8 @@ void FreeFluidsMainWindow::btnSubsToolAddCorr(){
         corr.form=24;
         break;
     case 3://Vp DIPPR101
-        break;
         corr.form=20;
+        break;
     case 4://Boil temp. Polynomia2
         corr.form=130;
         break;
