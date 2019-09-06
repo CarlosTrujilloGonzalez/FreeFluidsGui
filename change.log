@@ -1,3 +1,6 @@
+Version 1.4.3
+-New compilation of the Windows executable. The previous one was made with some calculations dissabled.
+
 Version 1.4.2
 - New compilation of the Windows executable, due to a problem in FreeFluidsC that was limiting the number of multiparameter EOS terms. 
 
