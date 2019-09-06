@@ -1,5 +1,8 @@
+Version 1.4.2
+- New compilation of the Windows executable, due to a problem in FreeFluidsC that was limiting the number of multiparameter EOS terms. 
+
 Version 1.4.1
-- Bug correction. It was not possible to save vapor pressure correlations usinf DIPPR 101
+- Bug correction. It was not possible to save vapor pressure correlations using DIPPR 101
 
 Version 1.4.0
 - Small bug correction.
