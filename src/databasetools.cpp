@@ -156,6 +156,7 @@ void GetBasicData(int id,FF_SubstanceData *subsData,QSqlDatabase *db){
     query1.addBindValue(id);
     query1.exec();
     query1.first();
+    strncpy(subsData->name,query1.value(query1.record().indexOf("Name")).toString().toStdString().c_str(),50);
     strncpy(subsData->CAS,query1.value(query1.record().indexOf("CAS")).toString().toStdString().c_str(),22);
     if(query1.value(query1.record().indexOf("Family")).toString()=="Alkane") subsData->baseProp.type=FF_Alkane;
     else if(query1.value(query1.record().indexOf("Family")).toString()=="Alkene") subsData->baseProp.type=FF_Alkene;
@@ -170,6 +171,8 @@ void GetBasicData(int id,FF_SubstanceData *subsData,QSqlDatabase *db){
     else if(query1.value(query1.record().indexOf("Family")).toString()=="Ester") subsData->baseProp.type=FF_Ester;
     else if(query1.value(query1.record().indexOf("Family")).toString()=="Amine") subsData->baseProp.type=FF_Amine;
     else if(query1.value(query1.record().indexOf("Family")).toString()=="Polymer") subsData->baseProp.type=FF_Polymer;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Haloalkane") subsData->baseProp.type=FF_HaloAlkane;
+    else if(query1.value(query1.record().indexOf("Family")).toString()=="Haloalkene") subsData->baseProp.type=FF_HaloAlkene;
     else subsData->baseProp.type=FF_NoFamily;
     subsData->baseProp.MW=query1.value(query1.record().indexOf("MW")).toDouble();
     subsData->baseProp.MWmono=query1.value(query1.record().indexOf("MonomerMW")).toDouble();

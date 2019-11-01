@@ -75,6 +75,8 @@ private slots:
     void btnSubsToolAddEos();//Slot for adding EOS to database
     void btnSubsToolAddCorr();//Slot for adding correlation to database
     void btnSubsToolsExport();//Slot for exporting the substance in Modelica FreeFluids.Media format
+    void btnSubsToolsKeepRef();//Slot for storing the reference substance for corresponding states calculation
+    void btnSubsToolsDoCScalc();//Slot for performing the corresponding states calculation
 
     void twMixCompositionClear();//Slot for clearing content in the table
     void twMixCompositionAdd();//Slot for adding a substance to the table
@@ -101,6 +103,7 @@ private slots:
     void twMixCalc3PhFlashPT();//Slot for mixture three phases P,T flash calculation, and display in table
     void mixCalcStabCheck();//Slot for checking stability of a composition
     void mixResCalcTransport();//Slot for calculating transport properties
+    void btnSubsToolsPropaneRef();//Slot for storing propane as reference in corresponding states
 
     //Slot for checking stability of the results obtained
     void mixResStabCheck();
@@ -118,6 +121,7 @@ private:
 
     //Substance calculation usage
     FF_SubstanceData *subsData;//To hold substance information, for substance calculation or addition to mixture
+    FF_SubstanceData *subsDataRef;//To hold reference substance information, for corresponding states calculation
     QSqlQueryModel *subsCalcEOSModel;
     QTableView *tvSubsCalcSelEOS;
     QSqlQueryModel *subsCalcCp0Model;
