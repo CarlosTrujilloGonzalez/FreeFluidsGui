@@ -72,6 +72,7 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     //************
 
     subsData = new FF_SubstanceData;
+    subsDataRef= new FF_SubstanceData;
     mix = new FF_MixData;
     //fill with 0 the eos binary interaction parameters array
     for(int i=0;i<15;i++) for(int j=0;j<15;j++) for(int k=0;k<6;k++) mix->intParam[i][j][k]=0;
@@ -116,7 +117,9 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     subsCalcVertLabels <<"T(C)"<<"Phase"<<"phi liq."<<"phi gas"<<"Z"<<"V(cm3/mol)"<<"rho(kgr/m3)"<<"H0(KJ/kgr)" <<"S0(KJ/kgr·K)"
                       <<"Cp0(KJ/kgr·K)"<<"H(KJ/kgr)"<<"U(KJ/kgr)"<<"S(KJ/kgr·K)"<<"Cp(KJ/kgr·K)"<<"Cv(KJ/kgr·K)"<<"S.S.(m/s)"<<"J.T.coeff(K/bar)"
                        <<"I.T.coeff(KJ/bar)"<<"(dP/dT)V(bar/K)"<<"(dP/dV)T(kgr·bar/m3)"<<"(dV/dT)P(m3/kgr·K)"<<"Isobaric expansion coef.(1/K)"
-                      <<"Isothermal compression coef.(1/Pa)"<<"Ln of reduced bulk modulus"<<"Vp(bar)"<<"rho liq. sat."<<"rho gas sat."<<"Hv sat(KJ/kgr)"<<"Cp liq.sat(KJ/kgr·K)"<< "Arr"
+                      <<"Isothermal compression coef.(1/Pa)"<<"Ln of reduced bulk modulus"<<"Vp(bar)"<<"rho liq. sat."<<"rho gas sat."
+                     <<"H liq. sat.(KJ/kg)"<<"H gas sat.(KJ/kg)"<<"S liq. sat.(KJ/kg·K)"<<"S gas sat.(KJ/kg·K)"
+                     <<"Hv sat(KJ/kgr)"<<"Cp liq.sat(KJ/kgr·K)"<<"Arr liq.saturated (red.res. Helmhotz)"<<" "<< "Arr (reduced residual Helmhotz)"
                       <<"(dArr/dV)T"<<"(d2Arr/dV2)T"<<"(dArr/dT)V"<<"(d2Arr/dT2)V"<<"d2Arr/dTdV"<<"Liq.dens.P corrected (kg/m3)"
                      <<"Liq.dens.Rackett,P corrected"<<"Liq.dens.Tait"<<"Liq.visc.P corrected (Pa·s)"<<"Liq.Th.Cond.(W/m·K)"<<"Liq.Th.Cond. Latini"
                     <<"Surf.Tens.(N/m)"<<"Surf.tens.Sastri"<<"Surf.tens.McLeod"<<"Gas visc.P corrected (Pa·s)"<<"Gas visc.Lucas, P corrected"
@@ -209,6 +212,14 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     //Button for exporting the substance in Modelica FreeFluids.Media format
     connect(ui->btnSubsToolsExport,SIGNAL(clicked()),this,SLOT(btnSubsToolsExport()));
 
+    //Button for storing the reference substance for corresponding states calculations
+    connect(ui->btnSubsToolsKeepRef,SIGNAL(clicked()),this,SLOT(btnSubsToolsKeepRef()));
+
+    //Button for performing corresponding states calculations
+    connect(ui->btnSubsToolsDoCScalc,SIGNAL(clicked()),this,SLOT(btnSubsToolsDoCScalc()));
+
+    //Button for storing propane as reference substance for corresponding states calculation
+    connect(ui->btnSubsToolsPropaneRef,SIGNAL(clicked()),this,SLOT(btnSubsToolsPropaneRef()));
 
     //Mixture calculation tab setup
     //*****************************
@@ -428,6 +439,7 @@ FreeFluidsMainWindow::~FreeFluidsMainWindow()
 {
     delete ui;
     delete subsData;
+    delete subsDataRef;
     //delete[] substance;
     //delete[] subsPoint;
     delete mix;
@@ -446,6 +458,8 @@ void FreeFluidsMainWindow::cbSubsCalcSelLoad(int position)
     delete subsData;
     subsData= new FF_SubstanceData;
     subsData->id=subsListModel->record(position).value("Id").toInt();
+    subsData->refT=0.0;
+    subsData->refP=101325;
     subsData->vpCorr.form=0;
     subsData->btCorr.form=0;
     subsData->cp0Corr.form=0;
@@ -462,6 +476,7 @@ void FreeFluidsMainWindow::cbSubsCalcSelLoad(int position)
     subsData->lBulkModRCorr.form=0;
     subsData->sCpCorr.form=0;
     subsData->sDensCorr.form=0;
+    subsData->model=FF_NoType;
     subsData->cubicData.eos=FF_IdealGas;
     subsData->saftData.eos=FF_IdealGas;
     subsData->swData.eos=FF_IdealGas;
@@ -662,8 +677,6 @@ void FreeFluidsMainWindow::twSubsCalcUpdate()
 
     //And now we make calculations
     FF_ThermoProperties th0,thR,thVp;//here will be stored the result of the calculations
-    double refT=298.15;//reference temperature for thermodynamic properties (as ideal gas)
-    double refP=1.01325e5;//reference pressure
     char option='s';//for asking for both states (liquid and gas) calculation, and state determination
     char state;//we will recive here the state of the calculation
     double MW;//molecular weight
@@ -676,9 +689,12 @@ void FreeFluidsMainWindow::twSubsCalcUpdate()
     double phiL,phiG;
     QString phase;
     double Z;
-    double Vp;
+    double Vp,Tminus,VpMinus,dVp_dT;
     double Hv;//vaporization enthalpy
     double lCpSat;//cp of saturated liquid
+    double lCsigma;//specific heat capacity of liquid along saturation line
+    double lHsat,gHsat,lSsat,gSsat;//saturated enthalpies and entropies
+    double ArrLsat, ZLsat;//Saturated liquid reduced residual Helmholtz
     double ArrDerivatives[6];
     FF_CubicParam param;
 
@@ -688,135 +704,74 @@ void FreeFluidsMainWindow::twSubsCalcUpdate()
     lpgVisc=0;
     ldgVisc=0;
 
-    if(subsData->model==FF_SAFTtype){
-        MW=subsData->saftData.MW;
-        FF_TbEOS(&subsData->model,&thR.P,&subsData->saftData,&Tb);//boiling point calculation
-    }
-    else if(subsData->model==FF_SWtype){
-        MW=subsData->swData.MW;
-        FF_TbEOS(&subsData->model,&thR.P,&subsData->swData,&Tb);//boiling point calculation
-    }
-    else{
-        MW=subsData->cubicData.MW;
-        FF_TbEOS(&subsData->model,&thR.P,&subsData->cubicData,&Tb);//boiling point calculation
-    }
+    if(subsData->model==FF_SAFTtype) MW=subsData->saftData.MW;
+    else if(subsData->model==FF_SWtype) MW=subsData->swData.MW;
+    else MW=subsData->cubicData.MW;
+    //FF_TbEOSs(&thR.P,subsData,&Tb);//boiling point calculation
     th0.MW=thR.MW=MW;
     ui->leSubsCalcMW->setText(QString::number(MW));
     ui->leSubsCalcTb->setText(QString::number(Tb-273.15));
     for (i=0;i<11;i++) {
         th0.T=thVp.T=thR.T=initT+i*Tincrement;
         thR.P=1e5*ui->leSubsCalcPres->text().toDouble();//we read the selected pressure. Necessary to do each time, because it is changed
-        if(subsData->model==FF_SAFTtype){
-            FF_VfromTPeos(&subsData->model,&thR.T,&thR.P,&subsData->saftData,&option,answerL,answerG,&state);//Volume, Arr, Z and fugacity coeff. retrieval
-            phiL=exp(answerL[1]+answerL[2]-1)/answerL[2];
-            phiG=exp(answerG[1]+answerG[2]-1)/answerG[2];
-            if (state=='f') phase="Calc.fail";
-            else if ((state=='U')||(state=='u')||(state=='l')||(state=='g')) phase="Unique";
-            else if (state=='L') phase="Liquid";
-            else if (state=='G') phase="Gas";
-            else if (state=='E') phase="Equilibrium";
-            if ((state=='l')||(state=='L')||(state=='U')||(state=='E')){
-                thR.V=answerL[0];
-                Z=answerL[2];
-            }
-            else if ((state=='g')||(state=='G')){
-                thR.V=answerG[0];
-                Z=answerG[2];
-            }
-            //printf("state:%c\n",state);
-             th0.V=thR.V;
-            FF_IdealThermoEOS(&subsData->cp0Corr.form,subsData->cp0Corr.coef,&refT,&refP,&th0);
-            FF_ThermoEOS(&subsData->model,&subsData->saftData,&subsData->cp0Corr.form,subsData->cp0Corr.coef,&refT,&refP,&thR);
-            FF_ArrDerSAFT(&thR.T,&thR.V,&subsData->saftData,ArrDerivatives);
-            if (ui->chbSubsCalcSatProp->isChecked()) FF_VpEOS(&subsData->model,&thR.T,&subsData->saftData,&Vp);//Vapor pressure calculation
-            else Vp=0;
-            if ((Vp>0) && (Vp<subsData->saftData.Pc)){//If Vp has been calculated as is lower than Pc
-                FF_VfromTPeos(&subsData->model,&thR.T,&Vp,&subsData->saftData,&option,answerLVp,answerGVp,&state);//We calculate liquid and gas volumes at Vp
-                thVp.T=thR.T;
-                thVp.V=answerGVp[0];
-                FF_ExtResidualThermoEOS(&subsData->model,&subsData->saftData,&thVp);//with the gas volume we calculate the residual thermo properties
-                Hv=thVp.H;
-                thVp.V=answerLVp[0];
-                FF_ExtResidualThermoEOS(&subsData->model,&subsData->saftData,&thVp);//with the liquid volume we calculate the residual thermo properties
-                Hv=Hv-thVp.H;//vaporization enthalpy is the difference
-                lCpSat=thVp.Cp+th0.Cp;
-            }
+
+        FF_VfromTPeosS(&thR.T,&thR.P,subsData,&option,answerL,answerG,&state);//Volume, Arr, Z and fugacity coeff. retrieval
+        phiL=exp(answerL[1]+answerL[2]-1)/answerL[2];
+        phiG=exp(answerG[1]+answerG[2]-1)/answerG[2];
+        if (state=='f') phase="Calc.fail";
+        else if ((state=='U')||(state=='l')||(state=='g')) phase="Unique";
+        else if (state=='L') phase="Liquid";
+        else if (state=='G') phase="Gas";
+        else if (state=='E') phase="Equilibrium";
+        if ((state=='l')||(state=='L')||(state=='U')||(state=='E')){
+            thR.V=answerL[0];
+            Z=answerL[2];
         }
-        else if(subsData->model==FF_SWtype){
-            FF_VfromTPeos(&subsData->model,&thR.T,&thR.P,&subsData->swData,&option,answerL,answerG,&state);//Volume, Arr, Z and fugacity coeff. retrieval
-            phiL=exp(answerL[1]+answerL[2]-1)/answerL[2];
-            phiG=exp(answerG[1]+answerG[2]-1)/answerG[2];
-            if (state=='f') phase="Calc.fail";
-            else if ((state=='U')||(state=='l')||(state=='g')) phase="Unique";
-            else if (state=='L') phase="Liquid";
-            else if (state=='G') phase="Gas";
-            else if (state=='E') phase="Equilibrium";
-            if ((state=='l')||(state=='L')||(state=='U')||(state=='E')){
-                thR.V=answerL[0];
-                Z=answerL[2];
-            }
-            else if ((state=='g')||(state=='G')){
-                thR.V=answerG[0];
-                Z=answerG[2];
-            }
-            //printf("state:%c\n",state);
-            th0.V=thR.V;
-            if (subsData->swData.eos==FF_IAPWS95) FF_IdealThermoWater(&th0);
-            else FF_IdealThermoEOS(&subsData->cp0Corr.form,subsData->cp0Corr.coef,&refT,&refP,&th0);
-            FF_ThermoEOS(&subsData->model,&subsData->swData,&subsData->cp0Corr.form,subsData->cp0Corr.coef,&refT,&refP,&thR);
-            FF_ArrDerSWTV(&thR.T,&thR.V,&subsData->swData,ArrDerivatives);
-            if (ui->chbSubsCalcSatProp->isChecked()) FF_VpEOS(&subsData->model,&thR.T,&subsData->swData,&Vp);//Vapor pressure calculation
-            else Vp=0;
-            if ((Vp>0) && (Vp<subsData->swData.Pc)){//If Vp has been calculated as is lower than Pc
-                FF_VfromTPeos(&subsData->model,&thR.T,&Vp,&subsData->swData,&option,answerLVp,answerGVp,&state);//We calculate liquid and gas volumes at Vp
-                thVp.T=thR.T;
-                thVp.V=answerGVp[0];
-                FF_ExtResidualThermoEOS(&subsData->model,&subsData->swData,&thVp);//with the gas volume we calculate the residual thermo properties
-                Hv=thVp.H;
-                thVp.V=answerLVp[0];
-                FF_ExtResidualThermoEOS(&subsData->model,&subsData->swData,&thVp);//with the liquid volume we calculate the residual thermo properties
-                Hv=Hv-thVp.H;//vaporization enthalpy is the difference
-                lCpSat=thVp.Cp+th0.Cp;
-            }
+        else if ((state=='g')||(state=='G')){
+            thR.V=answerG[0];
+            Z=answerG[2];
+        }
+        //printf("state:%c\n",state);
+        th0.V=thR.V;
+        if (subsData->swData.eos==FF_IAPWS95) FF_IdealThermoWater(&th0);
+        else FF_IdealThermoEOS(&subsData->cp0Corr.form,subsData->cp0Corr.coef,&subsData->refT,&subsData->refP,&th0);
+        FF_ThermoEOSs(subsData,&thR);
+        if (ui->chbSubsCalcSatProp->isChecked()){
+            FF_VpEOSs(&thR.T,subsData,&Vp);//Vapor pressure calculation
+            Tminus=thR.T-0.01;
+            FF_VpEOSs(&Tminus,subsData,&VpMinus);
+            dVp_dT=(Vp-VpMinus)/(thR.T-Tminus);
         }
         else{
-            FF_VfromTPeos(&subsData->model,&thR.T,&thR.P,&subsData->cubicData,&option,answerL,answerG,&state);//Volume, Arr, Z and fugacity coeff. retrieval
-            //printf("T:%f P:%f Vl:%f Zl:%f Vg:%f Zg:%f\n",thR.T,thR.P,answerL[0],answerL[2],answerG[0],answerG[2]);
-            phiL=exp(answerL[1]+answerL[2]-1)/answerL[2];
-            phiG=exp(answerG[1]+answerG[2]-1)/answerG[2];
-            if (state=='f') phase="Calc.fail";
-            else if ((state=='U')||(state=='u')||(state=='l')||(state=='g')) phase="Unique";
-            else if (state=='L') phase="Liquid";
-            else if (state=='G') phase="Gas";
-            else if (state=='E') phase="Equilibrium";
-            if ((state=='l')||(state=='L')||(state=='U')||(state=='u')||(state=='E')){
-                thR.V=answerL[0];
-                Z=answerL[2];
-            }
-            else if ((state=='g')||(state=='G')){
-                thR.V=answerG[0];
-                Z=answerG[2];
-            }
-            //printf("state:%c\n",state);
-            th0.V=thR.V;
-            FF_IdealThermoEOS(&subsData->cp0Corr.form,subsData->cp0Corr.coef,&refT,&refP,&th0);
-            FF_ThermoEOS(&subsData->model,&subsData->cubicData,&subsData->cp0Corr.form,subsData->cp0Corr.coef,&refT,&refP,&thR);
+            Vp=0;
+            dVp_dT=0;
+        }
+        if(subsData->model==FF_SAFTtype) FF_ArrDerSAFT(&thR.T,&thR.V,&subsData->saftData,ArrDerivatives);
+        else if(subsData->model==FF_SWtype) FF_ArrDerSWTV(&thR.T,&thR.V,&subsData->swData,ArrDerivatives);
+        else{
             FF_FixedParamCubic(&subsData->cubicData,&param);
             FF_ThetaDerivCubic(&thR.T,&subsData->cubicData,&param);
             FF_ArrDerCubic(&thR.T,&thR.V,&param,ArrDerivatives);
-            if (ui->chbSubsCalcSatProp->isChecked()) FF_VpEOS(&subsData->model,&thR.T,&subsData->cubicData,&Vp);//Vapor pressure calculation
-            else Vp=0;
-            if ((Vp>0) && (Vp<subsData->cubicData.Pc)){//If Vp has been calculated as is lower than Pc
-                FF_VfromTPeos(&subsData->model,&thR.T,&Vp,&subsData->cubicData,&option,answerLVp,answerGVp,&state);//We calculate liquid and gas volumes at Vp
-                thVp.T=thR.T;
-                thVp.V=answerGVp[0];
-                FF_ExtResidualThermoEOS(&subsData->model,&subsData->cubicData,&thVp);//with the gas volume we calculate the residual thermo properties
-                Hv=thVp.H;
-                thVp.V=answerLVp[0];
-                FF_ExtResidualThermoEOS(&subsData->model,&subsData->cubicData,&thVp);//with the liquid volume we calculate the residual thermo properties
-                Hv=Hv-thVp.H;//vaporization enthalpy is the difference
-                lCpSat=thVp.Cp+th0.Cp;
-            }
+        }
+
+        if ((Vp>0) && (Vp<1e10)){//If Vp has been calculated as is lower than Pc
+
+            FF_VfromTPeosS(&thR.T,&Vp,subsData,&option,answerLVp,answerGVp,&state);//We calculate liquid and gas volumes at Vp
+            thVp.T=thR.T;
+            thVp.V=answerGVp[0];
+            FF_ExtResidualThermoEOSs(subsData,&thVp);//with the gas volume we calculate the residual thermo properties
+            gHsat=thVp.H+th0.H;
+            gSsat=thVp.S+th0.S-R*log(Vp/ thR.P);
+            Hv=thVp.H;
+
+            thVp.V=answerLVp[0];
+            FF_ExtResidualThermoEOSs(subsData,&thVp);//with the liquid volume we calculate the residual thermo properties
+            lHsat=thVp.H+th0.H;
+            lSsat=thVp.S+th0.S-R*log(Vp/ thR.P);
+            Hv=Hv-thVp.H;//vaporization enthalpy is the difference
+            lCpSat=thVp.Cp+th0.Cp;
+            ArrLsat=thVp.A/(R*thVp.T);
+            ZLsat=thVp.P*thVp.V/(R*thVp.T);
         }
 
         //here we write the results to the table
@@ -848,80 +803,87 @@ void FreeFluidsMainWindow::twSubsCalcUpdate()
             ui->twSubsCalc->item(24,i)->setText(QString::number(Vp/100000));//Vapor pressure bar
             ui->twSubsCalc->item(25,i)->setText(QString::number(MW/answerLVp[0]/1000));//liquid rho at Vp kgr/m3
             ui->twSubsCalc->item(26,i)->setText(QString::number(MW/answerGVp[0]/1000));//gas rho at Vp kgr/m3
-            ui->twSubsCalc->item(27,i)->setText(QString::number(Hv/MW));//Saturated vaporization enthalpy
-            ui->twSubsCalc->item(28,i)->setText(QString::number(lCpSat/MW));//Saturated liquid heat capacity
+            ui->twSubsCalc->item(27,i)->setText(QString::number(lHsat/MW));//sat.liquid enthalpy (KJ/kg)
+            ui->twSubsCalc->item(28,i)->setText(QString::number(gHsat/MW));//sat.gas enthalpy (KJ/kg)
+            ui->twSubsCalc->item(29,i)->setText(QString::number(lSsat/MW));//sat.liquid entropy (KJ/kg·K)
+            ui->twSubsCalc->item(30,i)->setText(QString::number(gSsat/MW));//sat.gas entropy (KJ/kg·K)
+            ui->twSubsCalc->item(31,i)->setText(QString::number(Hv/MW));//Saturated vaporization enthalpy
+            ui->twSubsCalc->item(32,i)->setText(QString::number(lCpSat/MW));//Saturated liquid heat capacity
+            ui->twSubsCalc->item(33,i)->setText(QString::number(ArrLsat));//Saturated liquid reduced residual Helmholtz
+            ui->twSubsCalc->item(34,i)->setText(QString::number((lCpSat+dVp_dT*(answerLVp[0]+thR.T*thVp.dP_dT/thVp.dP_dV))/MW));//liquid heat capacity along saturationline
         }
-        ui->twSubsCalc->item(29,i)->setText(QString::number(ArrDerivatives[0]));
-        ui->twSubsCalc->item(30,i)->setText(QString::number(ArrDerivatives[1]));
-        ui->twSubsCalc->item(31,i)->setText(QString::number(ArrDerivatives[2]));
-        ui->twSubsCalc->item(32,i)->setText(QString::number(ArrDerivatives[3]));
-        ui->twSubsCalc->item(33,i)->setText(QString::number(ArrDerivatives[4]));
-        ui->twSubsCalc->item(34,i)->setText(QString::number(ArrDerivatives[5]));
+        ui->twSubsCalc->item(35,i)->setText(QString::number(ArrDerivatives[0]));
+        ui->twSubsCalc->item(36,i)->setText(QString::number(ArrDerivatives[1]));
+        ui->twSubsCalc->item(37,i)->setText(QString::number(ArrDerivatives[2]));
+        ui->twSubsCalc->item(38,i)->setText(QString::number(ArrDerivatives[3]));
+        ui->twSubsCalc->item(39,i)->setText(QString::number(ArrDerivatives[4]));
+        ui->twSubsCalc->item(40,i)->setText(QString::number(ArrDerivatives[5]));
 
         //Correlations data
         if(subsData->lDensCorr.form>0){
             FF_PhysPropCorr(&subsData->lDensCorr.form,subsData->lDensCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&lplDens);
             if(thR.P>Vp) FF_LiqDensChuehPrausnitz(&subsData->baseProp,&thR.T,&thR.P,&Vp,&lplDens,&lDens);
             else lDens=lplDens;
-            ui->twSubsCalc->item(35,i)->setText(QString::number(lDens));
+            ui->twSubsCalc->item(41,i)->setText(QString::number(lDens));
         }
         FF_LiqDensSatRackett(&subsData->baseProp,&subsData->lDens.x,&subsData->lDens.y,&thR.T,&lplDens);
         if(thR.P>Vp) FF_LiqDensChuehPrausnitz(&subsData->baseProp,&thR.T,&thR.P,&Vp,&lplDens,&lDens);
         else lDens=lplDens;
-        ui->twSubsCalc->item(36,i)->setText(QString::number(lDens));
+        ui->twSubsCalc->item(42,i)->setText(QString::number(lDens));
         //Tait density calculation is missing here
         if(subsData->lViscCorr.form>0){
             FF_PhysPropCorr(&subsData->lViscCorr.form,subsData->lViscCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&lplVisc);
             FF_LiqViscPcorLucas(&thR.T,&thR.P,&Vp,&subsData->baseProp,&lplVisc,&lVisc);
-            ui->twSubsCalc->item(38,i)->setText(QString::number(lVisc));
+            ui->twSubsCalc->item(44,i)->setText(QString::number(lVisc));
         }
 
         if(subsData->lThCCorr.form>0){
             FF_PhysPropCorr(&subsData->lThCCorr.form,subsData->lThCCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&lThCond);
-            ui->twSubsCalc->item(39,i)->setText(QString::number(lThCond));
+            ui->twSubsCalc->item(45,i)->setText(QString::number(lThCond));
         }
         FF_LiquidThCondLatini(&thR.T,&subsData->baseProp,&lThCond);
-        ui->twSubsCalc->item(40,i)->setText(QString::number(lThCond));
+        ui->twSubsCalc->item(46,i)->setText(QString::number(lThCond));
 
         if(subsData->lSurfTCorr.form>0){
             FF_PhysPropCorr(&subsData->lSurfTCorr.form,subsData->lSurfTCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&surfTens);
-            ui->twSubsCalc->item(41,i)->setText(QString::number(surfTens));
+            ui->twSubsCalc->item(47,i)->setText(QString::number(surfTens));
         }
         FF_SurfTensSastri(&thR.T,&subsData->baseProp,&surfTens);
-        ui->twSubsCalc->item(42,i)->setText(QString::number(surfTens));
+        ui->twSubsCalc->item(48,i)->setText(QString::number(surfTens));
         FF_SurfTensMcLeod(&thR.T,subsData,&surfTens);
-        ui->twSubsCalc->item(43,i)->setText(QString::number(surfTens));
+        ui->twSubsCalc->item(49,i)->setText(QString::number(surfTens));
 
 
         if(subsData->gViscCorr.form>0){
             FF_PhysPropCorr(&subsData->gViscCorr.form,subsData->gViscCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&lpgVisc);
             FF_GasViscTPcpLucas(&thR.T,&thR.P,&subsData->baseProp,&lpgVisc,&gVisc);
             //FF_GasViscTVcpChung(&thR.T,&thR.V,&subsData->baseProp,&lpgVisc,&gVisc);
-            ui->twSubsCalc->item(44,i)->setText(QString::number(gVisc));
+            ui->twSubsCalc->item(50,i)->setText(QString::number(gVisc));
         }
 
         lpgVisc=0;
         ldgVisc=0;
         //FF_GasViscTVcpChung(&thR.T,&thR.V,&subsData->baseProp,&ldgVisc,&gVisc);
         FF_GasViscTPcpLucas(&thR.T,&thR.P,&subsData->baseProp,&lpgVisc,&gVisc);
-        ui->twSubsCalc->item(45,i)->setText(QString::number(gVisc));
+        ui->twSubsCalc->item(51,i)->setText(QString::number(gVisc));
 
         if(subsData->gThCCorr.form>0){
             FF_PhysPropCorr(&subsData->gThCCorr.form,subsData->gThCCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&ldgThC);
             FF_GasThCondTVcorChung(&thR.T,&thR.V,&subsData->baseProp,&ldgThC,&gThC);
-            ui->twSubsCalc->item(46,i)->setText(QString::number(gThC));
+            ui->twSubsCalc->item(52,i)->setText(QString::number(gThC));
         }
-        FF_GasLpThCondTCpChung(&thR.T,&th0.Cp,&subsData->baseProp,&ldgThC);
+        double CpSI=th0.Cp*1000/MW;
+        FF_GasLpThCondTCpChung(&thR.T,&CpSI,&subsData->baseProp,&ldgThC);
         FF_GasThCondTVcorChung(&thR.T,&thR.V,&subsData->baseProp,&ldgThC,&gThC);
-        ui->twSubsCalc->item(47,i)->setText(QString::number(gThC));
+        ui->twSubsCalc->item(53,i)->setText(QString::number(gThC));
 
         if(subsData->lCpCorr.form>0){
             FF_PhysPropCorr(&subsData->lCpCorr.form,subsData->lCpCorr.coef,&subsData->baseProp.MW,&nPoints,&thR.T,&lCp);
-            ui->twSubsCalc->item(48,i)->setText(QString::number(lCp));
+            ui->twSubsCalc->item(54,i)->setText(QString::number(lCp));
         }
         FF_LiqCpBondi(subsData,&thR.T,&lCp);
-        ui->twSubsCalc->item(49,i)->setText(QString::number(lCp));
-        ui->twSubsCalc->item(50,i)->setText(QString::number(thR.T));
+        ui->twSubsCalc->item(55,i)->setText(QString::number(lCp));
+        ui->twSubsCalc->item(56,i)->setText(QString::number(thR.T));
     }
 
 
@@ -1035,15 +997,35 @@ void FreeFluidsMainWindow::twSubsCalcExport()
 
 //Slot for substance exportation in binary format
 void FreeFluidsMainWindow::btnSubsCalcExportSubs(){
-    QFileDialog *dia = new QFileDialog(this,"Choose directory and file name");
+    QString subsName = QInputDialog::getText(this, tr("QInputDialog::getText()"), tr("Substance name (Compatible with Modelica):"));
+    QString subsDescription = QInputDialog::getText(this, tr("QInputDialog::getText()"), tr("Description for better identification:"));
+
+    QFileDialog *dia = new QFileDialog(this,"Choose directory and file name without extension");
+    //dia->setNameFilter("*.mo");
     dia->showNormal();
-    QString fileName;
+    QString fileName,fileBinary,fileText;
     if (dia->exec())
         fileName = dia->selectedFiles().first();
+    std::cout<<fileName.toStdString()<<std::endl;
+    fileBinary=fileName+".sd";
+    fileText=fileName+".txt";
+
+    QFile *file=new QFile(fileText,this);
+    if (file->open(QFile::WriteOnly | QFile::Truncate)) {
+        QTextStream out(file);
+        out.setRealNumberNotation(QTextStream::ScientificNotation);
+        out<<"//To be copied in the FreeFluids.ExternalMedia.Fluids package. Later you can delete this file\n";
+        out<<"  package "<<subsName.toUtf8()<<"\n    extends ExternalTPMedium(final mediumName = \""<<subsName.toUtf8()<<"\",\n";
+        out<<" fluidK(casRegistryNumber = \""<<subsData->CAS<<"\", description = \""<<subsDescription.toUtf8()<<"\", molarMass = "<<subsData->baseProp.MW<<"),\n";
+        out<<" final onePhase=false, thermoModel=1, refState=2);\n  end "<<subsName.toUtf8()<<";";
+    }
+    file->close();
+    delete file;
+
 
     FILE *outfile;
     // open file for writing
-    outfile = fopen (fileName.toStdString().c_str(),"wb");
+    outfile = fopen (fileBinary.toStdString().c_str(),"wb");
     if (outfile == NULL)
     {
         fprintf(stderr, "\nError opend file\n");
@@ -1060,6 +1042,7 @@ void FreeFluidsMainWindow::btnSubsCalcExportSubs(){
     }
     fwrite (subsData, sizeof(FF_SubstanceData), 1, outfile);
     fclose(outfile);
+
     delete dia;
 }
 
@@ -1080,11 +1063,27 @@ void FreeFluidsMainWindow::btnSubsCalcTransfer(){
     n=5;
     }
     if (ui->chbSubsCalcTransfSLCp->isChecked()==true){
+        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(QString::number(ui->twSubsCalc->item(32,i)->text().toDouble()*1e3));
+    n=5;
+    }
+    if (ui->chbSubsCalcTransfSLH->isChecked()==true){
+        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(QString::number(ui->twSubsCalc->item(27,i)->text().toDouble()*1e3));
+    n=5;
+    }
+    if (ui->chbSubsCalcTransfSGH->isChecked()==true){
         for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(QString::number(ui->twSubsCalc->item(28,i)->text().toDouble()*1e3));
     n=5;
     }
+    if (ui->chbSubsCalcTransfSLS->isChecked()==true){
+        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(QString::number(ui->twSubsCalc->item(29,i)->text().toDouble()*1e3));
+    n=5;
+    }
+    if (ui->chbSubsCalcTransfSGS->isChecked()==true){
+        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(QString::number(ui->twSubsCalc->item(30,i)->text().toDouble()*1e3));
+    n=5;
+    }
     if (ui->chbSubsCalcTransfHv->isChecked()==true){
-        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(QString::number(ui->twSubsCalc->item(27,i)->text().toDouble()*1e3));
+        for (i=0;i<11;i++)ui->twSubsTools->item(i,n)->setText(QString::number(ui->twSubsCalc->item(31,i)->text().toDouble()*1e3));
     n=5;
     }
     if (ui->chbSubsCalcTransfDens->isChecked()==true){
@@ -2059,9 +2058,9 @@ void FreeFluidsMainWindow::btnSubsToolsExport(){
     if (file->open(QFile::WriteOnly | QFile::Truncate)) {
         QTextStream out(file);
         out.setRealNumberNotation(QTextStream::ScientificNotation);
-        out<<"//To be copied in the FreeFluids.MediaCommon.MediaData package\n";
+        out<<"//To be copied in the FreeFluids.MediaCommon.MediaDataAL/MZ package\n";
         out<<"  constant FreeFluids.MediaCommon.DataRecord "<<subsName.toUtf8()<<"(\n    name = \""<<subsName.toUtf8()<<"\", description = \""<<subsDescription.toUtf8();
-        out<<"\", CAS = \""<<subsData->CAS<<"\", family = "<<subsData->baseProp.type<<", MW = "<<subsData->baseProp.MW;
+        out<<"\", CAS = \""<<subsData->CAS<<"\", family = "<<subsData->baseProp.type<<", MW = "<<subsData->baseProp.MW<<", molarMass = "<<subsData->baseProp.MW*1e-3;
         out<<", Tc = "<<subsData->baseProp.Tc<<", Pc = "<<subsData->baseProp.Pc<<", Vc = "<<subsData->baseProp.Vc<<", Zc = "<<subsData->baseProp.Zc;
         out<<", w = "<<subsData->baseProp.w<<", Tb = "<<subsData->baseProp.Tb;
         if (subsData->baseProp.mu<1.0e2) out<<", mu = "<<subsData->baseProp.mu;
@@ -2142,9 +2141,9 @@ void FreeFluidsMainWindow::btnSubsToolsExport(){
         }
         out<<"); \n\n";
 
-        out<<"//To be copied in the FreeFluids.TMedia package\n";
+        out<<"//To be copied in the FreeFluids.TMedia.Fluids package. Please change MediaData by MediaDataAL or MediaDataMZ as needed.\n";
         out<<"  package "<<subsName.toUtf8()<<"\n    extends TMedium(final mediumName = \""<<subsName.toUtf8()<<"\", final singleState = false,";
-        out<<" data = FreeFluids.MediaCommon.MediaData."<<subsName.toUtf8()<<",reference_T=273.15);\n  end "<<subsName.toUtf8()<<";";
+        out<<" fluidConstants = {FreeFluids.MediaCommon.MediaData."<<subsName.toUtf8()<<"}, refState=\"IIR\", reference_T=273.15);\n  end "<<subsName.toUtf8()<<";";
 
     }
     file->close();
@@ -2152,7 +2151,135 @@ void FreeFluidsMainWindow::btnSubsToolsExport(){
     delete file;
 }
 
+//Slot for storing the reference substance for corresponding states calculation
+void FreeFluidsMainWindow::btnSubsToolsKeepRef(){
+    QString fileName="kkkkk.kk";
+    FILE *outfile;
+    outfile = fopen (fileName.toStdString().c_str(),"wb");
+    if (outfile == NULL)
+    {
+        fprintf(stderr, "\nError opend file\n");
+        exit (1);
+    }
+    fwrite (subsData, sizeof(FF_SubstanceData), 1, outfile);
+    fclose(outfile);
+    outfile = fopen (fileName.toStdString().c_str(),"rb");
+    if (outfile == NULL)
+    {
+        fprintf(stderr, "\nError opend file\n");
+        exit (1);
+    }
+    fread(subsDataRef, sizeof(FF_SubstanceData), 1, outfile);
+    fclose(outfile);
 
+    ui->leSubsToolsRefSubs->setText(QString::fromStdString(subsDataRef->name));
+}
+
+//Slot for storing propane as reference in corresponding states
+
+void FreeFluidsMainWindow::btnSubsToolsPropaneRef(){
+    FF_Correlation corr;
+
+    if (ui->cbSubsToolsSelRefSubs->currentText().toStdString()=="Propane"){
+    subsDataRef->id=760;//Id of propane in the database
+    GetBasicData(subsDataRef->id,subsDataRef,&db);
+    subsDataRef->model=FF_SAFTtype;
+    subsDataRef->saftData.id=222;//Id of the SAFT type equation parameters for propane
+    GetEOSData(&subsDataRef->model,subsDataRef,&db);
+    subsDataRef->model=FF_SWtype;
+    subsDataRef->swData.id=845;//Id of the SW equation parameters for propane
+    GetEOSData(&subsDataRef->model,subsDataRef,&db);
+    corr.id=16372;//Cp0 correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->cp0Corr=corr;
+    corr.id=12843;//Liquid visc. correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->lViscCorr=corr;
+    corr.id=13450;//Liquid th. conductivity correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->lThCCorr=corr;
+    corr.id=12173;//Vapor pressure correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->vpCorr=corr;
+    corr.id=11262;//Liquid saturated density correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->lDensCorr=corr;
+    }
+    else if (ui->cbSubsToolsSelRefSubs->currentText().toStdString()=="R134A"){
+    subsDataRef->id=8268;//Id of R134A in the database
+    GetBasicData(subsDataRef->id,subsDataRef,&db);
+    subsDataRef->model=FF_SAFTtype;
+    subsDataRef->saftData.id=998;//Id of the SAFT type equation parameters for R134A
+    GetEOSData(&subsDataRef->model,subsDataRef,&db);
+    subsDataRef->model=FF_SWtype;
+    subsDataRef->swData.id=871;//Id of the SW equation parameters for R134A
+    GetEOSData(&subsDataRef->model,subsDataRef,&db);
+    corr.id=10772;//Cp0 correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->cp0Corr=corr;
+    corr.id=16494;//Liquid visc. correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->lViscCorr=corr;
+    corr.id=16501;//Liquid th. conductivity correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->lThCCorr=corr;
+    corr.id=16498;//Vapor pressure correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->vpCorr=corr;
+    corr.id=16499;//Liquid saturated density correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->lDensCorr=corr;
+    }
+    else if (ui->cbSubsToolsSelRefSubs->currentText().toStdString()=="Ethylene glycol"){
+    subsDataRef->id=61;//Id of Ethylene glycol in the database
+    GetBasicData(subsDataRef->id,subsDataRef,&db);
+    subsDataRef->model=FF_SAFTtype;
+    subsDataRef->saftData.id=952;//Id of the SAFT type equation parameters for EG
+    GetEOSData(&subsDataRef->model,subsDataRef,&db);
+    corr.id=9011;//Cp0 correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->cp0Corr=corr;
+    corr.id=13088;//Liquid visc. correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->lViscCorr=corr;
+    corr.id=13423;//Liquid th. conductivity correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->lThCCorr=corr;
+    corr.id=12129;//Vapor pressure correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->vpCorr=corr;
+    corr.id=258;//Liquid saturated density correlation
+    GetCorrDataById(&corr,&db);
+    subsDataRef->lDensCorr=corr;
+    }
+    ui->leSubsToolsRefSubs->setText(QString::fromStdString(subsDataRef->name));
+}
+
+//Slot for performing the corresponding states calculation
+void FreeFluidsMainWindow::btnSubsToolsDoCScalc(){
+    /*
+    double Ttest=260.0;
+    double rhoTest=12390.0;
+    double eta[3];
+    FF_ViscosityTDens(1,&Ttest,&rhoTest,eta);
+    printf("etaI:%f etaF:%f etaB:%f etaR:%f eta:%f\n",eta[0],eta[1],eta[2],eta[1]+eta[2],eta[0]+eta[1]+eta[2]);
+    return;*/
+
+    double T;
+    double result[2];
+    int i;
+    i=0;
+    ui->twSubsTools->horizontalHeaderItem(0)->setText("T(K)");
+    ui->twSubsTools->horizontalHeaderItem(1)->setText("liq.visc.(Pa·s)");
+    ui->twSubsTools->horizontalHeaderItem(2)->setText("liq.th.cond.(W/m·K)");
+    while(ui->twSubsTools->item(i,0)->text()>""){
+        T=T=ui->twSubsTools->item(i,0)->text().toDouble();//Selected temperature
+        FF_CorrespondingStatesSat(subsData,subsDataRef,&T,result);
+        ui->twSubsTools->item(i,1)->setText(QString::number(result[0]));
+        ui->twSubsTools->item(i,2)->setText(QString::number(result[1]));
+        i++;
+    }
+}
 //Mixture calculation tab setup
 //*****************************
 

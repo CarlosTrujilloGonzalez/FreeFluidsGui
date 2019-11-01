@@ -1,3 +1,10 @@
+Version 1.5.0
+- Now using the new EOS functions based in passing a FF_SubstanceData reference.
+- More properties are now calculated at the substance EOS tab.
+- Added corresponding states calculation for saturated liquid viscosity and thermal conductivity.
+- Some bugs correction.
+- The QT debug libraries have been eliminated from the Windows executable folders. 
+
 Version 1.4.3
 -New compilation of the Windows executable. The previous one was made with some calculations dissabled.
 
