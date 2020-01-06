@@ -1,3 +1,7 @@
+Version 1.5.1
+- Bug correction: Calculation of boiling temperature was inhibited.
+- Modified exportation in Modelica format.
+
 Version 1.5.0
 - Now using the new EOS functions based in passing a FF_SubstanceData reference.
 - More properties are now calculated at the substance EOS tab.

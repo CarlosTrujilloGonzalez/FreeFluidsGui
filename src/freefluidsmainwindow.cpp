@@ -56,6 +56,7 @@ FreeFluidsMainWindow::FreeFluidsMainWindow(QWidget *parent) :
     //QueryModel(no editable) for holding the substances list
     subsListModel=new QSqlQueryModel(this);
     subsListModel->setQuery("SELECT Id,Name,MW from Products ORDER BY Name");
+    //subsListModel->setQuery("SELECT Id,Name,MW from Products WHERE (Id<=2001 OR InGitHub=1) ORDER BY Name");
     //Data entry validators
     presBarValidator=new QDoubleValidator(0.0,10000.0,5,this);
     //presBarValidator->setNotation(QDoubleValidator::StandardNotation);
@@ -707,7 +708,7 @@ void FreeFluidsMainWindow::twSubsCalcUpdate()
     if(subsData->model==FF_SAFTtype) MW=subsData->saftData.MW;
     else if(subsData->model==FF_SWtype) MW=subsData->swData.MW;
     else MW=subsData->cubicData.MW;
-    //FF_TbEOSs(&thR.P,subsData,&Tb);//boiling point calculation
+    FF_TbEOSs(&thR.P,subsData,&Tb);//boiling point calculation
     th0.MW=thR.MW=MW;
     ui->leSubsCalcMW->setText(QString::number(MW));
     ui->leSubsCalcTb->setText(QString::number(Tb-273.15));
@@ -914,6 +915,7 @@ void FreeFluidsMainWindow::btnSubsCalcAltCalc(){
 
 
     //Later we charge the known variables
+    thR.MW=MW;
     switch (ui->cbSubsCalcKnownVars->currentIndex()){
     case 0://P,H
         var='H';
@@ -1000,7 +1002,7 @@ void FreeFluidsMainWindow::btnSubsCalcExportSubs(){
     QString subsName = QInputDialog::getText(this, tr("QInputDialog::getText()"), tr("Substance name (Compatible with Modelica):"));
     QString subsDescription = QInputDialog::getText(this, tr("QInputDialog::getText()"), tr("Description for better identification:"));
 
-    QFileDialog *dia = new QFileDialog(this,"Choose directory and file name without extension");
+    QFileDialog *dia = new QFileDialog(this,"Choose directory and file name without extension. A .txt and a .sd files will be generated.");
     //dia->setNameFilter("*.mo");
     dia->showNormal();
     QString fileName,fileBinary,fileText;
@@ -1015,8 +1017,9 @@ void FreeFluidsMainWindow::btnSubsCalcExportSubs(){
         QTextStream out(file);
         out.setRealNumberNotation(QTextStream::ScientificNotation);
         out<<"//To be copied in the FreeFluids.ExternalMedia.Fluids package. Later you can delete this file\n";
-        out<<"  package "<<subsName.toUtf8()<<"\n    extends ExternalTPMedium(final mediumName = \""<<subsName.toUtf8()<<"\",\n";
-        out<<" fluidK(casRegistryNumber = \""<<subsData->CAS<<"\", description = \""<<subsDescription.toUtf8()<<"\", molarMass = "<<subsData->baseProp.MW<<"),\n";
+        out<<"  package "<<subsName.toUtf8()<<"\n    extends FreeFluids.ExternalMedia.ExternalMedium(final mediumName = \""<<subsName.toUtf8()<<"\",\n";
+        out<<" fluidK(casRegistryNumber = \""<<subsData->CAS<<"\", description = \""<<subsDescription.toUtf8()<<"\", molarMass = "<<subsData->baseProp.MW*1e-3;
+        out<<", criticalPressure = "<<subsData->baseProp.Pc<<"),\n";
         out<<" final onePhase=false, thermoModel=1, refState=2);\n  end "<<subsName.toUtf8()<<";";
     }
     file->close();
@@ -2061,7 +2064,7 @@ void FreeFluidsMainWindow::btnSubsToolsExport(){
         out<<"//To be copied in the FreeFluids.MediaCommon.MediaDataAL/MZ package\n";
         out<<"  constant FreeFluids.MediaCommon.DataRecord "<<subsName.toUtf8()<<"(\n    name = \""<<subsName.toUtf8()<<"\", description = \""<<subsDescription.toUtf8();
         out<<"\", CAS = \""<<subsData->CAS<<"\", family = "<<subsData->baseProp.type<<", MW = "<<subsData->baseProp.MW<<", molarMass = "<<subsData->baseProp.MW*1e-3;
-        out<<", Tc = "<<subsData->baseProp.Tc<<", Pc = "<<subsData->baseProp.Pc<<", Vc = "<<subsData->baseProp.Vc<<", Zc = "<<subsData->baseProp.Zc;
+        out<<", Tc = "<<subsData->baseProp.Tc<<", criticalPressure = "<<subsData->baseProp.Pc<<", Vc = "<<subsData->baseProp.Vc<<", Zc = "<<subsData->baseProp.Zc;
         out<<", w = "<<subsData->baseProp.w<<", Tb = "<<subsData->baseProp.Tb;
         if (subsData->baseProp.mu<1.0e2) out<<", mu = "<<subsData->baseProp.mu;
         if (subsData->lIsothComp.y>0) out<<", IsothComp = "<<subsData->lIsothComp.y;
@@ -2142,7 +2145,7 @@ void FreeFluidsMainWindow::btnSubsToolsExport(){
         out<<"); \n\n";
 
         out<<"//To be copied in the FreeFluids.TMedia.Fluids package. Please change MediaData by MediaDataAL or MediaDataMZ as needed.\n";
-        out<<"  package "<<subsName.toUtf8()<<"\n    extends TMedium(final mediumName = \""<<subsName.toUtf8()<<"\", final singleState = false,";
+        out<<"  package "<<subsName.toUtf8()<<"\n    extends FreeFluids.TMedia.TMedium(final mediumName = \""<<subsName.toUtf8()<<"\", final singleState = false,";
         out<<" fluidConstants = {FreeFluids.MediaCommon.MediaData."<<subsName.toUtf8()<<"}, refState=\"IIR\", reference_T=273.15);\n  end "<<subsName.toUtf8()<<";";
 
     }
